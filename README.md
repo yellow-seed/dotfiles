@@ -2,7 +2,28 @@
 
 chezmoiを使用したdotfiles管理のガイドです。
 
+## 管理ポリシー
+
+このdotfilesリポジトリでは、以下の3つのツールを役割分担して使用しています：
+
+### chezmoi
+- **目的**: dotfiles全体の運用管理
+- **管理対象**: 設定ファイル（`.zshrc`, `.gitconfig`, `.chezmoi.toml`など）
+- **役割**: 設定ファイルのバージョン管理、複数環境での同期、設定の適用・更新
+
+### Homebrew
+- **目的**: グローバルに適用したいアプリケーションの管理
+- **管理対象**: GUIアプリケーション、システム全体で使用するCLIツール
+- **役割**: macOSアプリケーションのインストール・管理、Brewfileによる一括管理
+
+### mise
+- **目的**: プログラミングに特化した言語とCLIの管理
+- **管理対象**: プログラミング言語（Node.js, Python, Goなど）、開発用CLIツール
+- **役割**: 言語バージョンの切り替え、プロジェクト固有のツール管理
+
 ## 初期セットアップ
+
+**初回設定時の流れ**: 新しいPCではHomebrewがインストールされていない状態から始まります。以下の手順で段階的に環境を構築します。
 
 ### 1. chezmoiのインストール
 
@@ -23,7 +44,17 @@ chezmoi cd
 chezmoi apply
 ```
 
-### 3. miseのセットアップ（chezmoi適用後）
+### 3. Homebrewのインストールとパッケージの一括インストール
+
+```bash
+# Homebrewをインストール
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# BrewfileからHomebrewパッケージを一括インストール（miseも含む）
+chezmoi cd
+brew bundle install --file=dot_Brewfile
+```
+
+### 4. miseのセットアップ
 
 ```bash
 # miseでツールをインストール（chezmoiで管理された設定から）
