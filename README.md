@@ -2,9 +2,40 @@
 
 chezmoiを使用したdotfiles管理のガイドです。
 
+## 初期セットアップ
+
+### 1. chezmoiのインストール
+
+```bash
+# 公式のインストールスクリプトを使用
+sh -c "$(curl -fsLS get.chezmoi.io)"
+```
+
+### 2. リポジトリの初期化
+
+```bash
+chezmoi init https://github.com/yellow-seed/dotfiles.git
+
+# chezmoiの設定ディレクトリに移動
+chezmoi cd
+
+# 設定をホームディレクトリに適用
+chezmoi apply
+```
+
+### 3. miseのセットアップ（chezmoi適用後）
+
+```bash
+# miseでツールをインストール（chezmoiで管理された設定から）
+mise install
+```
+
+**注意**: `.zshrc`にmiseの有効化設定が含まれているため、`chezmoi apply`実行後に新しいシェルセッションを開始すれば自動的にmiseが有効になります。
+
 ## 基本的な運用コマンド
 
 ### 初期設定・ディレクトリ移動
+
 ```bash
 # chezmoiの設定ディレクトリに移動
 chezmoi cd
@@ -16,6 +47,7 @@ chezmoi add ~/.config/mise/config.toml
 ```
 
 ### 設定の適用・確認
+
 ```bash
 # 設定をホームディレクトリに適用
 chezmoi apply
@@ -28,6 +60,7 @@ chezmoi status
 ```
 
 ### 設定の編集
+
 ```bash
 # 設定ファイルを編集（chezmoiディレクトリ内のファイルを直接編集）
 chezmoi edit ~/.zshrc
@@ -38,6 +71,7 @@ vim dot_zshrc
 ```
 
 ### 設定の管理
+
 ```bash
 # 設定ファイルを削除
 chezmoi remove ~/.zshrc
@@ -138,6 +172,7 @@ git push origin feature/add-new-config
 ```
 
 #### 既存設定の修正・更新
+
 ```bash
 # 修正用ブランチを作成
 git checkout -b fix/update-config
@@ -154,6 +189,7 @@ git push origin fix/update-config
 ```
 
 #### 緊急の設定反映（直接push）
+
 ```bash
 # 既存のPC設定をそのまま反映する場合
 chezmoi add ~/.existingconfig
