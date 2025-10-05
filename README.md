@@ -49,6 +49,32 @@ chezmoi re-add ~/.zshrc
 chezmoi cat ~/.zshrc
 ```
 
+## Homebrew Bundle管理
+
+Homebrewでパッケージをインストール・アンインストールした際は、以下の一連の流れを実行してBrewfileを更新し、chezmoiで管理します。
+
+### Homebrew Bundle更新の手順
+
+```bash
+# 現在のHomebrewパッケージをBrewfileに出力
+brew bundle dump --describe --force --file=~/.Brewfile
+
+# chezmoiで管理対象に追加
+chezmoi add ~/.Brewfile
+
+# 変更をコミット
+git add .
+git commit -m "chore: Brewfileを更新"
+git push origin main
+```
+
+### 注意事項
+
+- Homebrewでパッケージをインストール・アンインストールした後は必ず上記の手順を実行する
+- `--describe`オプションでパッケージの説明も含めて出力
+- `--force`オプションで既存のBrewfileを上書き
+- 新しいPCでの環境構築時は`brew bundle install`でBrewfileからパッケージを一括インストール可能
+
 ## ブランチ運用
 
 ### 基本的なブランチ運用方針
