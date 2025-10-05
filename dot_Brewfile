@@ -64,6 +64,8 @@ cask "applite"
 cask "brave-browser"
 # Design tool
 cask "canva"
+# OpenAI's official ChatGPT desktop app
+cask "chatgpt"
 # Anthropic's official Claude AI desktop app
 cask "claude"
 # Terminal-based AI coding assistant
