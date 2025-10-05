@@ -59,8 +59,11 @@ Homebrewでパッケージをインストール・アンインストールした
 # 現在のHomebrewパッケージをBrewfileに出力
 brew bundle dump --describe --force --file=~/.Brewfile
 
-# chezmoiで管理対象に追加
+# chezmoiで管理対象に追加（初回のみ）
 chezmoi add ~/.Brewfile
+
+# または、設定ファイルを更新（ホームディレクトリの変更をchezmoiに反映）
+chezmoi re-add ~/.Brewfile
 
 # 変更をコミット
 git add .
@@ -74,6 +77,37 @@ git push origin main
 - `--describe`オプションでパッケージの説明も含めて出力
 - `--force`オプションで既存のBrewfileを上書き
 - 新しいPCでの環境構築時は`brew bundle install`でBrewfileからパッケージを一括インストール可能
+
+## mise設定管理
+
+miseでツールのバージョンを追加・変更・削除した際は、以下の手順で設定ファイルを更新し、chezmoiで管理します。
+
+### mise設定更新の手順
+
+```bash
+# miseの設定をchezmoiで管理対象に追加（初回のみ）
+chezmoi add ~/.config/mise/config.toml
+
+# miseでツールを追加・変更・削除
+mise use node@20.0.0
+mise use python@3.11
+mise uninstall go@1.21
+
+# 設定ファイルを更新（ホームディレクトリの変更をchezmoiに反映）
+chezmoi re-add ~/.config/mise/config.toml
+
+# 変更をコミット
+git add .
+git commit -m "chore: mise設定を更新"
+git push origin main
+```
+
+### 注意事項
+
+- miseでツールのバージョンを変更した後は必ず上記の手順を実行する
+- `chezmoi re-add`でホームディレクトリの変更をchezmoiに反映
+- 新しいPCでの環境構築時は`mise install`で設定ファイルからツールを一括インストール可能
+- miseの設定は`~/.config/mise/config.toml`に保存される
 
 ## ブランチ運用
 

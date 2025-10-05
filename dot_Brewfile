@@ -2,44 +2,24 @@ tap "aws/tap"
 tap "go-swagger/go-swagger"
 tap "homebrew/bundle"
 tap "stuartleeks/tap"
-# Run your GitHub Actions locally
-brew "act"
 # New file format for still image compression
 brew "jpeg-xl"
 # Codec library for encoding and decoding AV1 video streams
 brew "aom"
-# C parser in Python
-brew "pycparser"
-# C Foreign Function Interface for Python
-brew "cffi"
-# Cryptographic recipes and primitives for Python
-brew "cryptography"
-# CLI tool to build, test, debug, and deploy Serverless applications using AWS SAM
-brew "aws-sam-cli"
-# Official Amazon AWS command-line interface
-brew "awscli"
 # Core application library for C
 brew "glib"
-# Validate CloudFormation templates against the CloudFormation spec
-brew "cfn-lint"
-# Manage your dotfiles across multiple diverse machines, securely
-brew "chezmoi"
+# C Foreign Function Interface for Python
+brew "cffi"
 # Cross-platform make
 brew "cmake"
-# Defines a standard way of committing rules and communicating it
-brew "commitizen"
 # Utility that creates projects from templates
 brew "cookiecutter"
+# Cryptographic recipes and primitives for Python
+brew "cryptography"
 # Pack, ship and run any application as a lightweight container
 brew "docker", link: false
-# Isolated development environments using Docker
-brew "docker-compose"
-# Text processing system for reStructuredText
-brew "docutils"
 # Utility for exporting data from Ente and decrypt the export from Ente Auth
 brew "ente-cli"
-# GitHub command-line tool
-brew "gh"
 # Validating, recursive, caching DNS resolver
 brew "unbound"
 # GNU Transport Layer Security (TLS) Library
@@ -61,11 +41,7 @@ brew "mise"
 # Framework for layout and rendering of i18n text
 brew "pango"
 # Interpreted, interactive, object-oriented programming language
-brew "python@3.11"
-# Interpreted, interactive, object-oriented programming language
 brew "python@3.12"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.8"
 # Low-level access to audio, keyboard, mouse, joystick, and graphics
 brew "sdl2"
 # AV1 encoder
@@ -74,10 +50,6 @@ brew "svt-av1"
 brew "tesseract"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
-# Extremely fast Python package installer and resolver, written in Rust
-brew "uv"
-# Toolkit to work with swagger for golang
-brew "go-swagger/go-swagger/go-swagger"
 # CLI for working with Visual Studio Code devcontainers
 brew "stuartleeks/tap/devcontainer"
 # Password manager that keeps all passwords secure behind one password
@@ -142,6 +114,8 @@ cask "sequel-ace"
 cask "slack"
 # Music streaming service
 cask "spotify"
+# SSH client
+cask "termius"
 # Open-source code editor
 cask "visual-studio-code"
 # Rust-based terminal
@@ -153,10 +127,8 @@ mas "LINE", id: 539883307
 mas "OneDrive", id: 823766827
 mas "RunCat", id: 1429033973
 mas "Swift Playground", id: 1496833156
-mas "Termius", id: 1176074088
 mas "Todoist", id: 585829637
 mas "Xcode", id: 497799835
-mas "時間割", id: 425121147
 vscode "1password.op-vscode"
 vscode "atsushieno.language-review"
 vscode "corschenzi.mermaid-graphical-editor"
