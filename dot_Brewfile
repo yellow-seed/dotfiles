@@ -70,6 +70,8 @@ cask "chatgpt"
 cask "claude"
 # Terminal-based AI coding assistant
 cask "claude-code"
+# OpenAI's coding agent that runs in your terminal
+cask "codex"
 # Write, edit, and chat about your code with AI
 cask "cursor"
 # Universal database tool and SQL client
@@ -118,6 +120,8 @@ cask "slack"
 cask "spotify"
 # SSH client
 cask "termius"
+# Web browser
+cask "thebrowsercompany-dia"
 # Open-source code editor
 cask "visual-studio-code"
 # Rust-based terminal
@@ -133,6 +137,7 @@ mas "Todoist", id: 585829637
 mas "Xcode", id: 497799835
 vscode "1password.op-vscode"
 vscode "atsushieno.language-review"
+vscode "christian-kohler.npm-intellisense"
 vscode "corschenzi.mermaid-graphical-editor"
 vscode "csstools.postcss"
 vscode "davidanson.vscode-markdownlint"
@@ -186,3 +191,5 @@ vscode "visualstudioexptteam.intellicode-api-usage-examples"
 vscode "visualstudioexptteam.vscodeintellicode"
 vscode "vivaxy.vscode-conventional-commits"
 vscode "vsls-contrib.gistfs"
+go "cmd/go"
+go "cmd/gofmt"
