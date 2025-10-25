@@ -2,6 +2,25 @@
 
 chezmoiを使用したdotfiles管理のガイドです。
 
+## ディレクトリ構造
+
+```
+.
+├── .chezmoiroot           # chezmoiのソースディレクトリを指定
+├── home/                  # chezmoi管理下のdotfiles
+│   ├── .chezmoi.toml.tmpl
+│   ├── .chezmoiignore
+│   ├── dot_Brewfile
+│   ├── dot_config/
+│   ├── dot_gitconfig
+│   ├── dot_gitignore_global
+│   └── dot_zshrc
+├── .github/
+└── README.md
+```
+
+`.chezmoiroot`ファイルによって、chezmoiは`home/`ディレクトリをソースディレクトリとして認識します。この構造により、将来的に`install/`（セットアップスクリプト）や`tests/`（自動テスト）などのディレクトリを追加することが可能になります。
+
 ## 管理ポリシー
 
 このdotfilesリポジトリでは、以下の3つのツールを役割分担して使用しています：
@@ -51,6 +70,7 @@ chezmoi apply
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 # BrewfileからHomebrewパッケージを一括インストール（miseも含む）
 chezmoi cd
+cd home
 brew bundle install --file=dot_Brewfile
 ```
 
