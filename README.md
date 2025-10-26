@@ -70,7 +70,6 @@ chezmoi apply
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 # BrewfileからHomebrewパッケージを一括インストール（miseも含む）
 chezmoi cd
-cd home
 brew bundle install --file=dot_Brewfile
 ```
 
