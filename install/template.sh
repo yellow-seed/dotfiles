@@ -7,6 +7,7 @@ if [ "${DOTFILES_DEBUG:-}" ]; then
 fi
 
 # ツール固有の関数群
+# Note: 'tool_name' is a placeholder - replace with actual tool name in implementations
 function is_tool_exists() {
     command -v tool_name &>/dev/null
 }
@@ -14,6 +15,7 @@ function is_tool_exists() {
 function install_tool() {
     if ! is_tool_exists; then
         # プラットフォーム固有のインストール処理
+        # Note: Replace 'tool_name' with actual tool name
         echo "Installing tool_name..."
     fi
 }
