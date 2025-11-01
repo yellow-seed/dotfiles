@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# kcoのインストール確認（必要に応じて）
+# kcovのインストール確認（必要に応じて）
 if ! command -v kcov &>/dev/null; then
     echo "Installing kcov..."
     
