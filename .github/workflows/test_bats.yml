@@ -1,0 +1,39 @@
+name: Run Bats Tests
+
+on:
+  push:
+
+jobs:
+  test-macos:
+    name: Test on macOS
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Bats
+        run: brew install bats-core
+      
+      - name: Run tests
+        run: |
+          cd ${{ github.workspace }}
+          bats tests/install/
+          bats tests/files/
+
+  test-ubuntu:
+    name: Test on Ubuntu
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+      
+      - name: Run tests
+        run: |
+          cd ${{ github.workspace }}
+          bats tests/install/
+          bats tests/files/
