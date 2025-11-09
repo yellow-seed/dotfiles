@@ -1,39 +1,44 @@
-name: Run Bats Tests
+name: Test
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  test-macos:
-    name: Test on macOS
-    runs-on: macos-latest
+  test:
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    
     steps:
       - uses: actions/checkout@v5
       
       - name: Install Bats
-        run: brew install bats-core
-      
-      - name: Run tests
         run: |
-          cd ${{ github.workspace }}
-          bats tests/install/
-          bats tests/files/
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update && sudo apt-get install -y bats
+          else
+            brew install bats-core
+          fi
+      
+      - name: Run tests with coverage
+        run: |
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            bash scripts/macos/run_unit_test.sh
+          else
+            bash scripts/ubuntu/run_unit_test.sh
+          fi
 
-  test-ubuntu:
-    name: Test on Ubuntu
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v5
-      
-      - name: Install Bats
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bats
-      
-      - name: Run tests
-        run: |
-          cd ${{ github.workspace }}
-          bats tests/install/
-          bats tests/files/
+      - name: Upload coverage reports
+        if: matrix.os == 'macos-latest'
+        uses: codecov/codecov-action@v4
+        continue-on-error: true
+        with:
+          files: ./coverage/cobertura.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
