@@ -18,17 +18,18 @@
 
 **実行内容**:
 1. Batsテストフレームワークのインストール
-2. `scripts/run_unit_test.sh`を使用したカバレッジ付きテスト実行
-   - `tests/install/` ディレクトリのテスト（kcovでカバレッジ測定）
-   - `tests/files/` ディレクトリのテスト
+2. プラットフォームごとのスクリプトを使用したテスト実行
+   - macOS: `scripts/macos/run_unit_test.sh`（kcovでカバレッジ測定）
+   - Ubuntu: `scripts/ubuntu/run_unit_test.sh`（カバレッジなしのテスト）
+   - 共通処理: `scripts/run_unit_test_common.sh`
 3. Codecovへのカバレッジレポートのアップロード
 
 **必要な設定**:
 - `CODECOV_TOKEN`: リポジトリのSecretsに設定が必要（Codecovアカウントから取得）
 
 **注意事項**:
-- kcovはUbuntu 24.04のデフォルトリポジトリで利用できないため、現在カバレッジ測定はmacOS環境でのみ実行されます
-- Ubuntu環境ではカバレッジ測定なしでテストのみが実行されます
+- kcovはUbuntu 24.04のデフォルトリポジトリで利用できないため、現在カバレッジ測定はmacOS環境でのみ実行されます（`scripts/macos/run_unit_test.sh`経由）
+- Ubuntu環境では`scripts/ubuntu/run_unit_test.sh`が実行され、カバレッジ測定なしでテストのみが実行されます
 - Codecovトークンが設定されていない場合、カバレッジアップロードステップは失敗しますが、テスト自体は成功します
 
 ### test_chezmoi_apply.yml
@@ -62,8 +63,8 @@
 bats tests/install/
 bats tests/files/
 
-# カバレッジ付きテスト実行
-bash scripts/run_unit_test.sh
+# macOSでのカバレッジ付きテスト実行
+bash scripts/macos/run_unit_test.sh
 ```
 
 ## 参考資料

@@ -28,9 +28,15 @@ jobs:
           fi
       
       - name: Run tests with coverage
-        run: bash scripts/run_unit_test.sh
-      
+        run: |
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            bash scripts/macos/run_unit_test.sh
+          else
+            bash scripts/ubuntu/run_unit_test.sh
+          fi
+
       - name: Upload coverage reports
+        if: matrix.os == 'macos-latest'
         uses: codecov/codecov-action@v4
         continue-on-error: true
         with:
