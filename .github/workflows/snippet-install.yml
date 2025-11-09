@@ -1,0 +1,29 @@
+name: E2E Setup Test
+
+on:
+  schedule:
+    - cron: "0 0 * * 5"  # 毎週金曜日
+  workflow_dispatch:  # 手動実行も可能に
+
+jobs:
+  setup:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    
+    steps:
+      - name: Setup dotfiles
+        run: |
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            bash -c "$(curl -fsLS https://raw.githubusercontent.com/yellow-seed/dotfiles/main/setup.sh)"
+          elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            bash -c "$(wget -qO - https://raw.githubusercontent.com/yellow-seed/dotfiles/main/setup.sh)"
+          fi
+      
+      - name: Verify installation
+        run: |
+          # 基本的な動作確認
+          command -v chezmoi
+          chezmoi --version
