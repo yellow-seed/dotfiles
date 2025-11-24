@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# デバッグモードの設定
 if [ "${DOTFILES_DEBUG:-}" ]; then
     set -x
 fi
 
+# Brewfile関連の関数群
 function is_brew_exists() {
     command -v brew &>/dev/null
 }
@@ -27,10 +29,12 @@ function install_brewfile() {
     brew bundle --file="$brewfile"
 }
 
+# メイン処理
 function main() {
     install_brewfile
 }
 
+# スクリプトが直接実行された場合のみmainを実行
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     main
 fi
