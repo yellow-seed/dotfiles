@@ -8,9 +8,8 @@
     [ -x "install/macos/common/brewfile.sh" ]
 }
 
-# 実際のインストールテストは時間がかかるため、
-# 基本的な動作確認のみ
+# Actual installation tests take time, so only basic operation checks are performed
 @test "brewfile script checks for brew command" {
     skip "Requires actual chezmoi setup"
-    # このテストはE2Eテストで実行
+    # This test should be executed in E2E tests
 }
