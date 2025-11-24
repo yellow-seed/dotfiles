@@ -162,6 +162,70 @@ git push origin main
 - `--force`オプションで既存のBrewfileを上書き
 - 新しいPCでの環境構築時は`brew bundle install`でBrewfileからパッケージを一括インストール可能
 
+### 自動インストールスクリプトの使用
+
+`install/macos/common/brewfile.sh` を使用することで、Brewfileからのパッケージインストールを自動化できます。
+
+```bash
+# Brewfileからパッケージを一括インストール
+bash install/macos/common/brewfile.sh
+```
+
+このスクリプトは以下の処理を行います：
+- Homebrewがインストールされているか確認
+- `~/.Brewfile` が存在するか確認（chezmoiでデプロイされている必要があります）
+- `brew bundle` を実行してパッケージをインストール
+
+### パッケージの追加・削除方法
+
+#### パッケージの追加
+```bash
+# Homebrewでパッケージをインストール
+brew install <package-name>
+
+# Brewfileを更新
+brew bundle dump --describe --force --file=~/.Brewfile
+chezmoi re-add ~/.Brewfile
+
+# 変更をコミット
+git add .
+git commit -m "chore: <package-name>をBrewfileに追加"
+git push origin main
+```
+
+#### パッケージの削除
+```bash
+# Homebrewでパッケージをアンインストール
+brew uninstall <package-name>
+
+# Brewfileを更新
+brew bundle dump --describe --force --file=~/.Brewfile
+chezmoi re-add ~/.Brewfile
+
+# 変更をコミット
+git add .
+git commit -m "chore: <package-name>をBrewfileから削除"
+git push origin main
+```
+
+### ローカルでのテスト方法
+
+新しいパッケージを追加した際は、以下の手順でテストできます：
+
+```bash
+# 1. Brewfileの構文チェック
+brew bundle check --file=~/.Brewfile
+
+# 2. インストールする内容を確認（実際にはインストールしない）
+brew bundle list --file=~/.Brewfile
+
+# 3. 実際にインストールを実行
+brew bundle install --file=~/.Brewfile
+
+# または自動インストールスクリプトを使用
+bash install/macos/common/brewfile.sh
+```
+
 ## mise設定管理
 
 miseでツールのバージョンを追加・変更・削除した際は、以下の手順で設定ファイルを更新し、chezmoiで管理します。
