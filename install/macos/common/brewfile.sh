@@ -16,7 +16,7 @@ function install_brewfile() {
     fi
 
     local brewfile="${HOME}/.Brewfile"
-    
+
     if [ ! -f "$brewfile" ]; then
         echo "Warning: Brewfile not found at ${brewfile}"
         echo "Make sure to run 'chezmoi apply' first"
