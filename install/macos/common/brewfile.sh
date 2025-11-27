@@ -17,11 +17,11 @@ function install_brewfile() {
         exit 1
     fi
 
-    local brewfile="${HOME}/.Brewfile"
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local brewfile="${script_dir}/Brewfile"
 
     if [ ! -f "$brewfile" ]; then
-        echo "Warning: Brewfile not found at ${brewfile}"
-        echo "Make sure to run 'chezmoi apply' first"
+        echo "Error: Brewfile not found at ${brewfile}"
         exit 1
     fi
 
