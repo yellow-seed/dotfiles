@@ -1,0 +1,81 @@
+name: Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install chezmoi
+      run: |
+        sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Setup dotfiles with chezmoi
+      run: |
+        chezmoi init --apply -S .
+        echo "Dotfiles applied successfully"
+
+    - name: Install mise
+      run: |
+        curl https://mise.run | sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Setup mise tools
+      run: |
+        # Initialize mise
+        eval "$(~/.local/bin/mise activate bash)"
+        # Install tools from config
+        mise install
+        echo "Mise tools installed successfully"
+
+    - name: Display chezmoi version
+      run: chezmoi --version
+
+    - name: Display mise version
+      run: ~/.local/bin/mise --version
+
+    - name: Display installed mise tools
+      run: |
+        eval "$(~/.local/bin/mise activate bash)"
+        mise list
+
+    - name: Display Node.js version
+      run: |
+        eval "$(~/.local/bin/mise activate bash)"
+        node --version
+
+    - name: Display Python version
+      run: |
+        eval "$(~/.local/bin/mise activate bash)"
+        python --version
+
+    - name: Display Go version
+      run: |
+        eval "$(~/.local/bin/mise activate bash)"
+        go version
+
+    - name: Display pnpm version
+      run: |
+        eval "$(~/.local/bin/mise activate bash)"
+        pnpm --version
+
+    - name: Display Ruby version
+      run: |
+        eval "$(~/.local/bin/mise activate bash)"
+        ruby --version
+
+    - name: Display GitHub CLI version
+      run: |
+        eval "$(~/.local/bin/mise activate bash)"
+        gh --version
+
+    - name: Setup complete
+      run: echo "Development environment setup complete for GitHub Copilot"
