@@ -39,6 +39,6 @@ elif command -v wget &> /dev/null; then
   echo "Using wget to download chezmoi installer..."
   sh -c "$(wget -qO- get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
 else
-  echo "Error: curl or wget is required to install chezmoi"
+  echo "Error: Neither curl nor wget is available. Please install one of these tools to proceed."
   exit 1
 fi
