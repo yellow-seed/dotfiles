@@ -157,6 +157,217 @@ bash scripts/ubuntu/run_unit_test.sh
 }
 ```
 
+## テストファーストなシェルスクリプト実装
+
+このリポジトリでは、**BATS (Bash Automated Testing System)** を使用したテストファースト開発を推奨しています。新しいインストールスクリプトやユーティリティを追加する際は、必ず先にテストを書いてから実装を行います。
+
+### テストファースト開発の流れ
+
+#### 1. テストファイルの作成（Red フェーズ）
+
+まず、期待する動作を定義するテストを書きます。この時点でテストは失敗します。
+
+**例**: 新しいインストールスクリプト `install/macos/common/git.sh` のテスト作成
+
+```bash
+# tests/install/macos/common/git.bats
+#!/usr/bin/env bats
+
+@test "git installation script exists" {
+    [ -f "install/macos/common/git.sh" ]
+}
+
+@test "git installation script is executable" {
+    [ -x "install/macos/common/git.sh" ]
+}
+
+@test "git installation script has proper error handling" {
+    run head -1 install/macos/common/git.sh
+    [[ "$output" =~ "#!/usr/bin/env bash" ]] || [[ "$output" =~ "#!/bin/bash" ]]
+}
+
+@test "git installation script uses set -Eeuo pipefail" {
+    run grep "set -Eeuo pipefail" install/macos/common/git.sh
+    [ "$status" -eq 0 ]
+}
+
+@test "git installation script runs without errors in dry-run mode" {
+    # 環境変数でドライランモードを有効化
+    DRY_RUN=true run bash install/macos/common/git.sh
+    [ "$status" -eq 0 ]
+}
+
+@test "git command is available after installation" {
+    skip "Requires actual installation, test in CI only"
+    run command -v git
+    [ "$status" -eq 0 ]
+}
+```
+
+#### 2. テストの実行と確認（Red フェーズ）
+
+```bash
+# macOSの場合
+bash scripts/macos/run_unit_test.sh
+
+# Ubuntuの場合
+bash scripts/ubuntu/run_unit_test.sh
+```
+
+この段階では、スクリプトがまだ存在しないため、テストは失敗します。
+
+#### 3. 実装（Green フェーズ）
+
+テストをパスする最小限の実装を行います。
+
+```bash
+# install/macos/common/git.sh
+#!/usr/bin/env bash
+
+# エラーハンドリング設定
+set -Eeuo pipefail
+
+# 環境変数の設定
+DRY_RUN="${DRY_RUN:-false}"
+
+# Gitがインストール済みかチェック
+if command -v git >/dev/null 2>&1; then
+    echo "Git is already installed"
+    git --version
+    exit 0
+fi
+
+# ドライランモードの場合は実際のインストールをスキップ
+if [ "$DRY_RUN" = "true" ]; then
+    echo "[DRY RUN] Would install git"
+    exit 0
+fi
+
+# Gitをインストール
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo "Installing git via Homebrew..."
+    brew install git
+else
+    echo "Unsupported OS: $OSTYPE"
+    exit 1
+fi
+
+echo "Git installation completed"
+git --version
+```
+
+#### 4. テストの再実行（Green フェーズ）
+
+実装後、テストを再実行してすべてパスすることを確認します。
+
+```bash
+bash scripts/macos/run_unit_test.sh
+```
+
+#### 5. リファクタリング（Refactor フェーズ）
+
+テストがパスしたら、コードの品質を向上させます：
+
+- 重複コードの削除
+- 関数への分割
+- コメントの追加
+- エラーメッセージの改善
+
+各リファクタリング後は必ずテストを再実行し、動作が壊れていないことを確認します。
+
+### BATSテストのベストプラクティス
+
+#### テストの構造
+
+```bash
+#!/usr/bin/env bats
+
+# セットアップ処理（各テスト実行前）
+setup() {
+    # テスト用の一時ディレクトリを作成
+    export TEST_TEMP_DIR="$(mktemp -d)"
+}
+
+# クリーンアップ処理（各テスト実行後）
+teardown() {
+    # 一時ディレクトリを削除
+    [ -d "$TEST_TEMP_DIR" ] && rm -rf "$TEST_TEMP_DIR"
+}
+
+@test "スクリプトが存在する" {
+    [ -f "install/macos/common/script.sh" ]
+}
+
+@test "スクリプトが実行可能" {
+    [ -x "install/macos/common/script.sh" ]
+}
+
+@test "エラーハンドリングが設定されている" {
+    run grep "set -Eeuo pipefail" install/macos/common/script.sh
+    [ "$status" -eq 0 ]
+}
+
+@test "環境変数のデフォルト値が設定されている" {
+    run grep 'VARIABLE="${ENVIRONMENT_VAR:-default_value}"' install/macos/common/script.sh
+    [ "$status" -eq 0 ]
+}
+```
+
+#### テストケースの分類
+
+1. **存在確認テスト**: ファイルやディレクトリの存在を確認
+2. **権限テスト**: 実行可能権限などを確認
+3. **構文テスト**: エラーハンドリングや変数定義の確認
+4. **機能テスト**: 実際の動作を確認（ドライランモードを活用）
+5. **統合テスト**: 複数のスクリプトの連携を確認
+
+#### ドライランモードの実装
+
+実際にシステムを変更せずにテストするために、ドライランモードを実装します：
+
+```bash
+# スクリプト内
+DRY_RUN="${DRY_RUN:-false}"
+
+if [ "$DRY_RUN" = "true" ]; then
+    echo "[DRY RUN] Would execute: brew install package"
+    exit 0
+fi
+
+# 実際のコマンド
+brew install package
+```
+
+```bash
+# テスト内
+@test "ドライランモードで正常に動作する" {
+    DRY_RUN=true run bash install/macos/common/script.sh
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "\[DRY RUN\]" ]]
+}
+```
+
+### 実装時の重点ポイント
+
+1. **テストを先に書く**: コードを書く前に、期待する動作を定義する
+2. **小さく始める**: 最小限の機能から始めて、段階的に拡張する
+3. **頻繁にテストする**: コード変更のたびにテストを実行する
+4. **エッジケースを考える**: 正常系だけでなく、異常系もテストする
+5. **CI/CDで自動化**: GitHub Actionsで自動的にテストを実行する
+
+### テスト実行コマンド
+
+```bash
+# すべてのテストを実行
+bash scripts/macos/run_unit_test.sh
+
+# 特定のテストファイルのみ実行
+bats tests/install/macos/common/brew.bats
+
+# デバッグ出力を有効化
+bats --trace tests/install/macos/common/brew.bats
+```
+
 ### CI/CDワークフロー
 
 1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行
@@ -212,7 +423,7 @@ bash scripts/ubuntu/run_unit_test.sh
 brew install <package-name>
 
 # Brewfileを更新
-brew bundle dump --describe --force --file=~/dotfiles/home/dot_Brewfile
+brew bundle dump --describe --force --file=~/.local/share/chezmoi/home/dot_Brewfile
 
 # chezmoiに反映
 chezmoi re-add ~/.Brewfile
