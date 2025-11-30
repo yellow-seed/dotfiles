@@ -75,8 +75,8 @@
   - vscode: VS Code拡張機能
 
 - **dot_config/mise/config.toml**: miseで管理する開発ツール
-  - Node.js, Python, Go, Ruby等の言語ランタイム
-  - gh (GitHub CLI), chezmoi, docker-compose等のCLIツール
+  - 言語ランタイム: Node.js, Python, Go, Ruby
+  - CLIツール: act, aws-sam-cli, awscli, chezmoi, docker-compose, gh, pnpm, uv
 
 - **dot_zshrc**: Zshシェル設定
   - miseの初期化設定を含む

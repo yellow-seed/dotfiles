@@ -32,7 +32,8 @@ jobs:
         run: |
           # Initialize mise
           eval "$(~/.local/bin/mise activate bash)"
-          # Install tools from config
+          # Install tools from config in home directory
+          cd ~
           mise install
           echo "Mise tools installed successfully"
 
