@@ -25,7 +25,7 @@ jobs:
 
       - name: Install mise
         run: |
-          curl https://mise.run | sh
+          curl -fsSL https://mise.run | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Setup mise tools
@@ -34,7 +34,7 @@ jobs:
           eval "$(~/.local/bin/mise activate bash)"
           # Install tools from config in home directory
           cd ~
-          mise install
+          ~/.local/bin/mise install
           echo "Mise tools installed successfully"
 
       - name: Display chezmoi version
