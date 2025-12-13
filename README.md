@@ -12,9 +12,9 @@ chezmoiを使用したdotfiles管理のガイドです。
 │   ├── .chezmoiignore
 │   ├── dot_Brewfile
 │   ├── dot_config/
-│   ├── dot_gitconfig
+│   ├── dot_gitconfig.tmpl
 │   ├── dot_gitignore_global
-│   └── dot_zshrc
+│   └── dot_zshrc.tmpl
 ├── .github/
 └── README.md
 ```
@@ -39,6 +39,93 @@ chezmoiを使用したdotfiles管理のガイドです。
 - **目的**: プログラミングに特化した言語とCLIの管理
 - **管理対象**: プログラミング言語（Node.js, Python, Goなど）、開発用CLIツール
 - **役割**: 言語バージョンの切り替え、プロジェクト固有のツール管理
+
+## テンプレート機能
+
+chezmoiのテンプレート機能を活用することで、環境やOS固有の設定を動的に管理できます。テンプレートファイルは`.tmpl`拡張子を持ち、Go の `text/template` シンタックスを使用します。
+
+### テンプレート変数の管理
+
+`.chezmoi.toml.tmpl`ファイルで変数を定義します：
+
+```toml
+[data]
+    name = "your-name"
+    email = "your-email@example.com"
+    
+    # OS固有の設定
+    isMac = true/false    # macOSの場合true
+    isLinux = true/false  # Linuxの場合true
+```
+
+これらの変数は、他のテンプレートファイルから `{{ .name }}` や `{{ .email }}` のようにアクセスできます。
+
+### OS固有の設定
+
+テンプレート内で `{{ .chezmoi.os }}` を使用してOSを判定し、環境に応じた設定を適用できます：
+
+#### gitconfig の例
+
+`dot_gitconfig.tmpl` では、OSに応じて適切なcredential helperを設定：
+
+```gitconfig
+[user]
+    name = {{ .name }}
+    email = {{ .email }}
+
+{{- if eq .chezmoi.os "darwin" }}
+[credential]
+    helper = osxkeychain
+{{- end }}
+
+{{- if eq .chezmoi.os "linux" }}
+[credential]
+    helper = cache --timeout=3600
+{{- end }}
+```
+
+#### zshrc の例
+
+`dot_zshrc.tmpl` では、OSに応じてPNPM_HOMEのパスを設定：
+
+```bash
+{{- if eq .chezmoi.os "darwin" }}
+export PNPM_HOME="$HOME/Library/pnpm"
+{{- else if eq .chezmoi.os "linux" }}
+export PNPM_HOME="$HOME/.local/share/pnpm"
+{{- end }}
+```
+
+### 初回セットアップ時の変数入力
+
+`chezmoi init` 実行時に、テンプレート変数の値を対話的に入力できます：
+
+```bash
+chezmoi init --promptString name=your-name --promptString email=your-email@example.com
+```
+
+または、既存の`.chezmoi.toml.tmpl`の変数定義を直接編集することもできます。
+
+### テンプレートのテスト
+
+テンプレートが正しく展開されるかをテストできます：
+
+```bash
+# 特定のファイルのテンプレート展開結果を確認
+chezmoi cat ~/.gitconfig
+
+# すべての変更の差分を確認
+chezmoi diff
+
+# テンプレート変数の値を確認
+chezmoi data
+```
+
+### 参考情報
+
+- [chezmoi templating公式ドキュメント](https://www.chezmoi.io/user-guide/templating/)
+- テンプレートシンタックス：Go の text/template
+- 利用可能な変数：`.chezmoi.os`, `.chezmoi.osRelease`, `.chezmoi.arch`, etc.
 
 ## 初期セットアップ
 
