@@ -8,19 +8,11 @@ SCRIPTS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 source "${SCRIPTS_ROOT}/run_unit_test_common.sh"
 
 if ! command -v kcov &>/dev/null; then
-    echo "kcov not found. Installing via apt..."
-    # Check if we have sudo access (CI environment)
-    if command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
-        sudo apt-get update && sudo apt-get install -y kcov || {
-            echo "Warning: Failed to install kcov via apt. Running tests without coverage." >&2
-            run_tests_without_coverage
-            exit 0
-        }
-    else
-        echo "Warning: Cannot install kcov without sudo. Running tests without coverage." >&2
-        run_tests_without_coverage
-        exit 0
-    fi
+    echo "Warning: kcov not found. Running tests without coverage." >&2
+    echo "To enable coverage on Ubuntu, install kcov from source:" >&2
+    echo "  https://github.com/SimonKagstrom/kcov" >&2
+    run_tests_without_coverage
+    exit 0
 fi
 
 run_tests_with_kcov
