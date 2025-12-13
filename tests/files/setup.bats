@@ -103,8 +103,11 @@ setup() {
     # テスト用のスクリプトを作成（run_chezmoiを無害化）
     TEST_SCRIPT=$(mktemp)
     cat "${SETUP_SCRIPT}" > "${TEST_SCRIPT}"
-    # run_chezmoiをechoに置換してインストールを回避
-    sed -i 's/sh -c.*get.chezmoi.io.*/echo "Mock chezmoi install"/' "${TEST_SCRIPT}"
+    # run_chezmoi関数全体をモックに置換（より堅牢）
+    sed -i '/^function run_chezmoi()/,/^}$/c\
+function run_chezmoi() {\
+    echo "Mock chezmoi install"\
+}' "${TEST_SCRIPT}"
     
     # bash -c "$(cat script)" の形式で実行（curlシナリオのシミュレート）
     run bash -c "$(cat "${TEST_SCRIPT}")"
@@ -120,8 +123,16 @@ setup() {
 
 @test "script does not execute main when sourced with BASH_SOURCE defined" {
     # sourceで読み込んだ場合はmainが実行されないことを確認
-    source "${SETUP_SCRIPT}"
-    # mainが実行されていない場合、run_chezmoiも呼ばれていないはず
-    # エラーが発生せずにsourceできることを確認
-    [ $? -eq 0 ]
+    # mainが実行されないことを検証するため、mainをモック化
+    main() {
+        echo "Main was called"
+    }
+    export -f main
+    
+    # スクリプトをsource（エラーが発生しないことを確認）
+    run bash -c 'main() { echo "Main was called"; }; export -f main; source '"${SETUP_SCRIPT}"
+    
+    # sourceは成功するが、mainは実行されないことを確認
+    [ "$status" -eq 0 ]
+    [[ ! "$output" =~ "Main was called" ]]
 }
