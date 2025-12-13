@@ -8,7 +8,7 @@ SCRIPTS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 source "${SCRIPTS_ROOT}/run_unit_test_common.sh"
 
 if ! command -v kcov &>/dev/null; then
-    echo "Warning: kcov not found. Running tests without coverage." >&2
+    echo "Warning: kcov is not installed. Running tests without coverage." >&2
     echo "To enable coverage on Ubuntu, install kcov from source:" >&2
     echo "  https://github.com/SimonKagstrom/kcov" >&2
     run_tests_without_coverage
