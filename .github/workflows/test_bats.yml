@@ -27,6 +27,34 @@ jobs:
             brew install bats-core
           fi
       
+      - name: Cache kcov (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/cache@v4
+        id: cache-kcov
+        with:
+          path: ~/.local/bin/kcov
+          key: ${{ runner.os }}-kcov-v42
+      
+      - name: Build and install kcov (Ubuntu)
+        if: matrix.os == 'ubuntu-latest' && steps.cache-kcov.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binutils-dev build-essential cmake libssl-dev \
+            libcurl4-openssl-dev libelf-dev libstdc++-12-dev zlib1g-dev \
+            libdw-dev libiberty-dev
+          cd /tmp
+          git clone --depth 1 https://github.com/SimonKagstrom/kcov.git
+          cd kcov
+          mkdir build && cd build
+          cmake ..
+          make
+          mkdir -p ~/.local/bin
+          cp src/kcov ~/.local/bin/
+      
+      - name: Add kcov to PATH (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
       - name: Run tests with coverage
         run: |
           if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
@@ -35,10 +63,11 @@ jobs:
             bash scripts/ubuntu/run_unit_test.sh
           fi
 
-      - name: Upload coverage reports
-        if: matrix.os == 'macos-latest'
+      - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
-        continue-on-error: true
         with:
-          files: ./coverage/cobertura.xml
+          directory: ./coverage
+          flags: ${{ matrix.os == 'macos-latest' && 'macos' || 'ubuntu' }}
+          fail_ci_if_error: false
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
