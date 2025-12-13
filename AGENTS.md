@@ -383,6 +383,14 @@ bats --trace tests/install/macos/common/brew.bats
 - **目的**: シェルスクリプトの静的解析
 - **検出内容**: 文法エラー、潜在的なバグ、非推奨な書き方
 - **設定ファイル**: `.shellcheckrc`
+- **インストール**:
+  ```bash
+  # macOS
+  brew install shellcheck
+  
+  # Ubuntu
+  sudo apt-get install shellcheck
+  ```
 - **実行方法**:
   ```bash
   # ローカルでの実行
@@ -392,11 +400,18 @@ bats --trace tests/install/macos/common/brew.bats
   shellcheck install/**/*.sh scripts/**/*.sh setup.sh
   ```
 - **CI統合**: `.github/workflows/shellcheck.yml`で自動実行
-- **VS Code統合**: `timonwong.shellcheck`拡張機能により、エディタ内でリアルタイム検証
+- **VS Code統合**: `timonwong.shellcheck`拡張機能（手動インストール）により、エディタ内でリアルタイム検証
 
 #### shfmt
 - **目的**: シェルスクリプトの自動フォーマット
-- **管理方法**: miseで管理（`home/dot_config/mise/config.toml`）
+- **インストール**:
+  ```bash
+  # mise経由（推奨）
+  mise use shfmt@latest
+  
+  # または Homebrew
+  brew install shfmt
+  ```
 - **実行方法**:
   ```bash
   # チェックのみ
