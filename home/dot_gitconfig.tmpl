@@ -4,15 +4,25 @@
 	process = git-lfs filter-process
 	required = true
 [user]
-	name = yellow-seed
-	email = 42381113+yellow-seed@users.noreply.github.com
+	name = {{ .name }}
+	email = {{ .email }}
 [alias]
 	br = branch
 [core]
-	excludesfile = /Users/kazuya/.gitignore_global
+	excludesfile = ~/.gitignore_global
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
+
+{{- if eq .chezmoi.os "darwin" }}
+[credential]
+	helper = osxkeychain
+{{- end }}
+
+{{- if eq .chezmoi.os "linux" }}
+[credential]
+	helper = cache --timeout=3600
+{{- end }}
