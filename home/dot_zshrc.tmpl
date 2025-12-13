@@ -7,6 +7,8 @@ eval "$(mise activate zsh)"
 export PNPM_HOME="$HOME/Library/pnpm"
 {{- else if eq .chezmoi.os "linux" }}
 export PNPM_HOME="$HOME/.local/share/pnpm"
+{{- else }}
+export PNPM_HOME="$HOME/.local/share/pnpm"
 {{- end }}
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;

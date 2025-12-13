@@ -6,6 +6,8 @@
     email = "{{ $email }}"
     
     # OS固有の設定
+    # Note: これらのフラグは .chezmoi.os を直接使用することでも代替可能ですが、
+    # 可読性とシンプルさのために提供しています
     {{- if eq .chezmoi.os "darwin" }}
     isMac = true
     {{- else }}
