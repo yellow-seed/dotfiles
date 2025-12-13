@@ -32,7 +32,7 @@ ignore:
   - "home/**"           # Configuration files
   - "tests/**"          # Test files themselves
   - ".github/**"        # GitHub Actions workflows
-  - "*.md"              # Documentation
+  - "**/*.md"           # Documentation files
   - "setup.sh"          # Entry point script
 
 # Flags for different environments

@@ -50,7 +50,6 @@ jobs:
           make
           mkdir -p ~/.local/bin
           cp src/kcov ~/.local/bin/
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
       
       - name: Add kcov to PATH (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
