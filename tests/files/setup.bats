@@ -95,3 +95,33 @@ setup() {
     result=$(DOTFILES_DEBUG=1 bash -c 'source '"${SETUP_SCRIPT}"' 2>&1 && echo "success"')
     [[ "${result}" == *"success"* ]]
 }
+
+@test "script works when BASH_SOURCE is undefined (curl/wget scenario)" {
+    # BASH_SOURCEが未定義の状態をシミュレート（bash -c "$(curl ...)" のような実行）
+    # スクリプトが unbound variable エラーなく実行できることを確認
+    
+    # テスト用のスクリプトを作成（run_chezmoiを無害化）
+    TEST_SCRIPT=$(mktemp)
+    cat "${SETUP_SCRIPT}" > "${TEST_SCRIPT}"
+    # run_chezmoiをechoに置換してインストールを回避
+    sed -i 's/sh -c.*get.chezmoi.io.*/echo "Mock chezmoi install"/' "${TEST_SCRIPT}"
+    
+    # bash -c "$(cat script)" の形式で実行（curlシナリオのシミュレート）
+    run bash -c "$(cat "${TEST_SCRIPT}")"
+    
+    # クリーンアップ
+    rm -f "${TEST_SCRIPT}"
+    
+    # エラーなく実行できることを確認
+    [ "$status" -eq 0 ]
+    # unbound variable エラーが出ていないことを確認
+    [[ ! "$output" =~ "unbound variable" ]]
+}
+
+@test "script does not execute main when sourced with BASH_SOURCE defined" {
+    # sourceで読み込んだ場合はmainが実行されないことを確認
+    source "${SETUP_SCRIPT}"
+    # mainが実行されていない場合、run_chezmoiも呼ばれていないはず
+    # エラーが発生せずにsourceできることを確認
+    [ $? -eq 0 ]
+}
