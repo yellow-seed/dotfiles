@@ -1,5 +1,7 @@
 # dotfiles
 
+[![codecov](https://codecov.io/gh/yellow-seed/dotfiles/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/dotfiles)
+
 chezmoiを使用したdotfiles管理のガイドです。
 
 ## ディレクトリ構造
