@@ -8,18 +8,6 @@
     [ -f ".github/workflows/shellcheck.yml" ]
 }
 
-@test "shellcheck is in Brewfile" {
-    grep -q "brew \"shellcheck\"" "home/dot_Brewfile"
-}
-
-@test "ShellCheck VS Code extension is in Brewfile" {
-    grep -q "vscode \"timonwong.shellcheck\"" "home/dot_Brewfile"
-}
-
-@test "shfmt is in mise config" {
-    grep -q "shfmt" "home/dot_config/mise/config.toml"
-}
-
 @test "all shell scripts pass ShellCheck validation" {
     # Skip if shellcheck is not available
     if ! command -v shellcheck &>/dev/null; then

@@ -348,6 +348,19 @@ chezmoi cat ~/.zshrc
 
 ShellCheckはシェルスクリプトの文法エラー、潜在的なバグ、非推奨な書き方を検出します。
 
+**インストール:**
+```bash
+# macOS
+brew install shellcheck
+
+# Ubuntu
+sudo apt-get install shellcheck
+
+# VS Code拡張機能（オプション）
+# Brewfileに以下を追加して `brew bundle install` を実行
+# vscode "timonwong.shellcheck"
+```
+
 **ローカルでの実行:**
 ```bash
 # 単一ファイルをチェック
@@ -361,7 +374,7 @@ shellcheck install/macos/common/*.sh
 ```
 
 **VS Code統合:**
-- ShellCheck拡張機能（`timonwong.shellcheck`）をインストール済み
+- ShellCheck拡張機能（`timonwong.shellcheck`）を手動でインストール可能
 - エディタ内でリアルタイムに警告を表示
 
 **CI/CD統合:**
@@ -378,8 +391,11 @@ shfmtはシェルスクリプトの自動フォーマットツールです。
 
 **インストール:**
 ```bash
-# miseで管理されているため、自動的にインストールされます
-mise install
+# mise経由（推奨）
+mise use shfmt@latest
+
+# または Homebrew
+brew install shfmt
 ```
 
 **使用方法:**
