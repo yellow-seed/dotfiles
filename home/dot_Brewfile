@@ -46,6 +46,8 @@ brew "python@3.12"
 brew "qpdf"
 # Low-level access to audio, keyboard, mouse, joystick, and graphics
 brew "sdl2"
+# Shell script static analysis tool
+brew "shellcheck"
 # AV1 encoder
 brew "svt-av1"
 # OCR (Optical Character Recognition) engine
@@ -199,6 +201,7 @@ vscode "rangav.vscode-thunder-client"
 vscode "redhat.vscode-yaml"
 vscode "shopify.ruby-lsp"
 vscode "simonsiefke.svg-preview"
+vscode "timonwong.shellcheck"
 vscode "tomoki1207.pdf"
 vscode "vivaxy.vscode-conventional-commits"
 vscode "vsls-contrib.gistfs"
