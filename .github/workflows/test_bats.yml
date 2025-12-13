@@ -35,10 +35,11 @@ jobs:
             bash scripts/ubuntu/run_unit_test.sh
           fi
 
-      - name: Upload coverage reports
-        if: matrix.os == 'macos-latest'
+      - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
-        continue-on-error: true
         with:
-          files: ./coverage/cobertura.xml
+          directory: ./coverage
+          flags: ${{ matrix.os == 'macos-latest' && 'macos' || 'ubuntu' }}
+          fail_ci_if_error: false
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
