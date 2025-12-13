@@ -372,7 +372,39 @@ bats --trace tests/install/macos/common/brew.bats
 
 1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行
 2. **test_chezmoi_apply.yml**: chezmoiの適用が正常に動作するか検証
-3. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
+3. **shellcheck.yml**: ShellCheckによるシェルスクリプトの静的解析
+4. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
+
+## コード品質管理
+
+### Lintツール
+
+#### ShellCheck
+- **目的**: シェルスクリプトの静的解析
+- **検出内容**: 文法エラー、潜在的なバグ、非推奨な書き方
+- **設定ファイル**: `.shellcheckrc`
+- **実行方法**:
+  ```bash
+  # ローカルでの実行
+  shellcheck script.sh
+  
+  # すべてのスクリプトを一括チェック
+  shellcheck install/**/*.sh scripts/**/*.sh setup.sh
+  ```
+- **CI統合**: `.github/workflows/shellcheck.yml`で自動実行
+- **VS Code統合**: `timonwong.shellcheck`拡張機能により、エディタ内でリアルタイム検証
+
+#### shfmt
+- **目的**: シェルスクリプトの自動フォーマット
+- **管理方法**: miseで管理（`home/dot_config/mise/config.toml`）
+- **実行方法**:
+  ```bash
+  # チェックのみ
+  shfmt -d .
+  
+  # 自動フォーマット
+  shfmt -w .
+  ```
 
 ## コーディング規約とベストプラクティス
 
@@ -395,6 +427,23 @@ bats --trace tests/install/macos/common/brew.bats
    ```bash
    VARIABLE="${ENVIRONMENT_VAR:-default_value}"
    ```
+
+4. **ShellCheckによる静的解析**:
+   - すべてのシェルスクリプトは[ShellCheck](https://www.shellcheck.net/)で検証されます
+   - CI/CDパイプラインで自動チェックが実行されます
+   - ローカルでの検証方法:
+     ```bash
+     # 単一ファイルをチェック
+     shellcheck install/macos/common/brew.sh
+     
+     # すべてのシェルスクリプトをチェック
+     shellcheck **/*.sh
+     
+     # shfmtでフォーマット
+     shfmt -w .
+     ```
+   - VS Code拡張機能を使用すると、エディタ内でリアルタイム検証が可能
+   - `.shellcheckrc`でプロジェクト固有のルールを設定可能
 
 ### Git コミットメッセージ
 
