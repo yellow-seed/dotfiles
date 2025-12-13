@@ -17,7 +17,8 @@ function install_brewfile() {
         exit 1
     fi
 
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local brewfile="${script_dir}/Brewfile"
 
     if [ ! -f "$brewfile" ]; then
