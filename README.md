@@ -1,5 +1,7 @@
 # dotfiles
 
+[![codecov](https://codecov.io/gh/yellow-seed/dotfiles/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/dotfiles)
+
 chezmoiを使用したdotfiles管理のガイドです。
 
 ## ディレクトリ構造
@@ -422,6 +424,110 @@ git push origin main
 chezmoi status
 chezmoi cat ~/.zshrc
 ```
+
+## 開発ガイド
+
+### シェルスクリプトのLint・フォーマット
+
+このリポジトリでは、シェルスクリプトの品質向上のために[ShellCheck](https://www.shellcheck.net/)と[shfmt](https://github.com/mvdan/sh)を使用しています。
+
+#### ShellCheck（静的解析）
+
+ShellCheckはシェルスクリプトの文法エラー、潜在的なバグ、非推奨な書き方を検出します。
+
+**インストール:**
+```bash
+# macOS
+brew install shellcheck
+
+# Ubuntu
+sudo apt-get install shellcheck
+
+# VS Code拡張機能（オプション）
+# Brewfileに以下を追加して `brew bundle install` を実行
+# vscode "timonwong.shellcheck"
+```
+
+**ローカルでの実行:**
+```bash
+# 単一ファイルをチェック
+shellcheck install/macos/common/brew.sh
+
+# すべてのシェルスクリプトをチェック
+shellcheck install/**/*.sh scripts/**/*.sh setup.sh
+
+# 特定のディレクトリ配下をチェック
+shellcheck install/macos/common/*.sh
+```
+
+**VS Code統合:**
+- ShellCheck拡張機能（`timonwong.shellcheck`）を手動でインストール可能
+- エディタ内でリアルタイムに警告を表示
+
+**CI/CD統合:**
+- `.github/workflows/shellcheck.yml`でPR時に自動チェック
+- すべてのシェルスクリプトが対象
+
+**設定ファイル:**
+- `.shellcheckrc`でプロジェクト共通のルールを設定
+- 現在の設定: SC1091（sourced filesのフォロー）を無効化
+
+#### shfmt（フォーマッター）
+
+shfmtはシェルスクリプトの自動フォーマットツールです。
+
+**インストール:**
+```bash
+# mise経由（推奨）
+mise use shfmt@latest
+
+# または Homebrew
+brew install shfmt
+```
+
+**使用方法:**
+```bash
+# フォーマットの確認（変更なし）
+shfmt -d .
+
+# 自動フォーマット（ファイルを上書き）
+shfmt -w .
+
+# 特定のファイルのみフォーマット
+shfmt -w install/macos/common/brew.sh
+```
+
+### テストの実行
+
+シェルスクリプトの動作を検証するため、[BATS (Bash Automated Testing System)](https://github.com/bats-core/bats-core)を使用しています。
+
+**すべてのテストを実行:**
+```bash
+# macOSの場合
+bash scripts/macos/run_unit_test.sh
+
+# Ubuntuの場合
+bash scripts/ubuntu/run_unit_test.sh
+```
+
+**特定のテストファイルのみ実行:**
+```bash
+# BATSコマンドで直接実行
+bats tests/install/macos/common/brew.bats
+
+# ShellCheckのテスト
+bats tests/files/shellcheck.bats
+```
+
+### コーディング規約
+
+シェルスクリプトを作成・修正する際は、以下の規約に従ってください：
+
+1. **エラーハンドリング**: 必ず`set -Eeuo pipefail`を設定
+2. **ShellCheck検証**: すべてのスクリプトはShellCheckをパス
+3. **コメント**: 日本語でのコメント推奨
+4. **変数命名**: 環境変数は`UPPER_CASE`、ローカル変数は`lower_case`
+5. **テスト**: 新しいスクリプトには対応するBATSテストを作成
 
 ## 注意事項
 

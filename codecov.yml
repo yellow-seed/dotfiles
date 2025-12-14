@@ -1,0 +1,51 @@
+# Codecov configuration file
+# See: https://docs.codecov.com/docs/codecov-yaml
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 5%
+        base: auto
+    patch:
+      default:
+        target: auto
+        threshold: 5%
+        base: auto
+
+  # Define coverage measurement targets
+  # We focus on shell scripts in install/ and scripts/ directories
+  precision: 2
+  round: down
+  range: "50...100"
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+# Ignore patterns - exclude files that don't need coverage
+ignore:
+  - "home/**"           # Configuration files
+  - "tests/**"          # Test files themselves
+  - ".github/**"        # GitHub Actions workflows
+  - "**/*.md"           # Documentation files
+  - "setup.sh"          # Entry point script
+
+# Flags for different environments
+flags:
+  macos:
+    paths:
+      - install/macos/
+      - scripts/macos/
+  ubuntu:
+    paths:
+      - install/ubuntu/
+      - scripts/ubuntu/
+  common:
+    paths:
+      - install/common/
+      - scripts/run_unit_test_common.sh

@@ -90,6 +90,7 @@ function main() {
 }
 
 # スクリプトが直接実行された場合のみmainを実行（テスト時はスキップ）
-if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+# BASH_SOURCE[0]が未定義の場合（curl/wgetでの実行時）も実行する
+if [ -z "${BASH_SOURCE[0]:-}" ] || [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     main
 fi
