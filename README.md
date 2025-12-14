@@ -56,8 +56,8 @@ chezmoiのテンプレート機能を活用することで、環境やOS固有�
     email = "your-email@example.com"
     
     # OS固有の設定
-    isMac = true/false    # macOSの場合true
-    isLinux = true/false  # Linuxの場合true
+    isMac = true    # macOSの場合はtrue、そうでなければfalse
+    isLinux = false # Linuxの場合はtrue、そうでなければfalse
 ```
 
 これらの変数は、他のテンプレートファイルから `{{ .name }}` や `{{ .email }}` のようにアクセスできます。
