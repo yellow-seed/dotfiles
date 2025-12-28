@@ -1,16 +1,15 @@
+# Taps
 tap "aws/tap"
 tap "dotenvx/brew"
 tap "go-swagger/go-swagger"
 tap "homebrew/bundle"
 tap "stuartleeks/tap"
-# New file format for still image compression
-brew "jpeg-xl"
+
+# Formulae (explicitly installed)
 # Codec library for encoding and decoding AV1 video streams
 brew "aom"
-# Core application library for C
-brew "glib"
-# C Foreign Function Interface for Python
-brew "cffi"
+# Bourne-Again SHell, a UNIX command interpreter
+brew "bash"
 # Cross-platform make
 brew "cmake"
 # Utility that creates projects from templates
@@ -18,45 +17,37 @@ brew "cookiecutter"
 # Cryptographic recipes and primitives for Python
 brew "cryptography"
 # Pack, ship and run any application as a lightweight container
-brew "docker", link: false
+brew "docker"
+# Secure dotenv–from the creator of `dotenv`
+brew "dotenvx/brew/dotenvx"
 # Utility for exporting data from Ente and decrypt the export from Ente Auth
 brew "ente-cli"
-# Validating, recursive, caching DNS resolver
-brew "unbound"
-# GNU Transport Layer Security (TLS) Library
-brew "gnutls"
 # Database migrations CLI tool
 brew "golang-migrate"
-# OpenType text shaping engine
-brew "harfbuzz"
 # Subtitle renderer for the ASS/SSA subtitle format
 brew "libass"
-# Light HTTP/1.1 server library
-brew "libmicrohttpd"
 # Reliable Internet Stream Transport (RIST)
 brew "librist"
 # Mac App Store command-line interface
 brew "mas"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
-# Framework for layout and rendering of i18n text
-brew "pango"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.12"
 # Tools for and transforming and inspecting PDF files
 brew "qpdf"
 # Low-level access to audio, keyboard, mouse, joystick, and graphics
 brew "sdl2"
+# CLI for working with Visual Studio Code devcontainers
+brew "stuartleeks/tap/devcontainer"
 # AV1 encoder
 brew "svt-av1"
 # OCR (Optical Character Recognition) engine
 brew "tesseract"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
-# Secure dotenv–from the creator of `dotenv`
-brew "dotenvx/brew/dotenvx"
-# CLI for working with Visual Studio Code devcontainers
-brew "stuartleeks/tap/devcontainer"
+
+# Casks
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
@@ -85,6 +76,7 @@ cask "dbeaver-community"
 cask "devtoys"
 # Voice and text chat software
 cask "discord"
+cask "docker"
 # App to build and share containerised applications and microservices
 cask "docker-desktop"
 # Desktop client for Ente Auth
@@ -103,6 +95,7 @@ cask "github"
 cask "gitify"
 # Web browser
 cask "google-chrome"
+cask "google-cloud-sdk"
 # Open-source firewall to block unknown outgoing connections
 cask "lulu"
 # App to write, plan, collaborate, and get organised
@@ -139,6 +132,8 @@ cask "visual-studio-code"
 cask "warp"
 # Video communication and virtual meeting platform
 cask "zoom"
+
+# Mac App Store
 mas "1Password for Safari", id: 1569813296
 mas "Easy Screenshot for Safari", id: 6445823588
 mas "FireShot - Full web page screenshots", id: 1541862561
@@ -146,6 +141,8 @@ mas "Kindle", id: 302584613
 mas "LINE", id: 539883307
 mas "OneDrive", id: 823766827
 mas "RunCat", id: 1429033973
+
+# Go packages
 go "github.com/go-delve/delve/cmd/dlv"
 go "cmd/go"
 go "cmd/gofmt"
