@@ -612,7 +612,15 @@ git push
    - 直接ホームディレクトリを編集せず、`chezmoi edit`を使用
    - Brewfile更新時は`brew bundle dump`を実行
 
-4. **テスト必須事項**:
+4. **PR作成時の必須事項（Chezmoi設定変更の場合）**:
+   - Chezmoiの設定変更（テンプレートファイルや設定ファイルの追加・変更）を含むPRでは、必ず以下を実施しPRに記載すること：
+     - `chezmoi apply --dry-run --verbose` の実行結果を提示
+     - または `chezmoi diff` の出力を提示
+     - テンプレートファイル（`.tmpl`）の場合は、`chezmoi execute-template` で展開結果を提示
+     - 複数OS対応の場合は、各OS（macOS/Linux）での展開結果を明示
+   - これにより、変更内容が実際の環境でどのように適用されるかをレビュアーが確認できる
+
+5. **テスト必須事項**:
    - スクリプト変更時は必ずBATSテストを実行
    - CI/CDワークフローで自動テストが実行される
    - macOSとUbuntuの両環境をサポート

@@ -1,0 +1,16 @@
+export PATH="$HOME/.local/bin:$PATH"
+eval "$(mise activate zsh)"
+
+# pnpm
+{{- if eq .chezmoi.os "darwin" }}
+export PNPM_HOME="$HOME/Library/pnpm"
+{{- else if eq .chezmoi.os "linux" }}
+export PNPM_HOME="$HOME/.local/share/pnpm"
+{{- else }}
+export PNPM_HOME="$HOME/.local/share/pnpm"
+{{- end }}
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

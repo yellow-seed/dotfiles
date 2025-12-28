@@ -1,3 +1,25 @@
+{{- $name := "yellow-seed" -}}
+{{- $email := "42381113+yellow-seed@users.noreply.github.com" -}}
+
+[data]
+    name = "{{ $name }}"
+    email = "{{ $email }}"
+    
+    # OS固有の設定
+    # Note: これらのフラグは .chezmoi.os を直接使用することでも代替可能ですが、
+    # 可読性とシンプルさのために提供しています
+    {{- if eq .chezmoi.os "darwin" }}
+    isMac = true
+    {{- else }}
+    isMac = false
+    {{- end }}
+    
+    {{- if eq .chezmoi.os "linux" }}
+    isLinux = true
+    {{- else }}
+    isLinux = false
+    {{- end }}
+
 [edit]
     command = "code"
     args = ["--wait"]
