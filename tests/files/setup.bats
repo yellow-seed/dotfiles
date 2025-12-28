@@ -35,13 +35,29 @@ setup() {
 
 @test "GITHUB_USERNAME can be overridden by environment variable" {
     # 新しいシェルで実行してreadonlyの影響を受けないようにする
-    result=$(GITHUB_USERNAME="test-user" bash -c 'source '"${SETUP_SCRIPT}"'; echo "${GITHUB_USERNAME}"')
+    # 一時ラッパースクリプトを作成してBASH_SOURCE問題を回避
+    local wrapper_script
+    wrapper_script=$(mktemp)
+    cat > "${wrapper_script}" <<'EOF'
+source "$1"
+echo "${GITHUB_USERNAME}"
+EOF
+    result=$(GITHUB_USERNAME="test-user" bash "${wrapper_script}" "${SETUP_SCRIPT}")
+    rm -f "${wrapper_script}"
     [ "${result}" = "test-user" ]
 }
 
 @test "DOTFILES_REPO uses GITHUB_USERNAME in URL" {
     # 新しいシェルで実行してreadonlyの影響を受けないようにする
-    result=$(GITHUB_USERNAME="custom-user" bash -c 'source '"${SETUP_SCRIPT}"'; echo "${DOTFILES_REPO}"')
+    # 一時ラッパースクリプトを作成してBASH_SOURCE問題を回避
+    local wrapper_script
+    wrapper_script=$(mktemp)
+    cat > "${wrapper_script}" <<'EOF'
+source "$1"
+echo "${DOTFILES_REPO}"
+EOF
+    result=$(GITHUB_USERNAME="custom-user" bash "${wrapper_script}" "${SETUP_SCRIPT}")
+    rm -f "${wrapper_script}"
     [ "${result}" = "https://github.com/custom-user/dotfiles.git" ]
 }
 
@@ -92,7 +108,15 @@ setup() {
 
 @test "debug mode can be enabled with DOTFILES_DEBUG" {
     # 新しいシェルで実行してDOTFILES_DEBUGを設定
-    result=$(DOTFILES_DEBUG=1 bash -c 'source '"${SETUP_SCRIPT}"' 2>&1 && echo "success"')
+    # 一時ラッパースクリプトを作成してBASH_SOURCE問題を回避
+    local wrapper_script
+    wrapper_script=$(mktemp)
+    cat > "${wrapper_script}" <<'EOF'
+source "$1" 2>&1
+echo "success"
+EOF
+    result=$(DOTFILES_DEBUG=1 bash "${wrapper_script}" "${SETUP_SCRIPT}")
+    rm -f "${wrapper_script}"
     [[ "${result}" == *"success"* ]]
 }
 

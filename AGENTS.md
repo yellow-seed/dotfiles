@@ -388,48 +388,28 @@ bats --trace tests/install/macos/common/brew.bats
 
 この優先順位により、実際の利用シーンに即した高品質なテストカバレッジを維持します。
 
-#### ローカルでのカバレッジ確認
 
-テストスクリプトを実行すると、自動的にkcovでカバレッジが計測されます：
+**現在のテスト実行方法**:
 
 ```bash
-# macOSの場合（kcovが自動インストールされます）
+# macOSでのテスト実行
 bash scripts/macos/run_unit_test.sh
 
-# Ubuntuの場合（kcovが未インストールの場合は手動でインストールしてください）
+# Ubuntuでのテスト実行
 bash scripts/ubuntu/run_unit_test.sh
-
-# カバレッジレポートの確認
-open coverage/index.html  # macOS
-xdg-open coverage/index.html  # Ubuntu
 ```
 
-カバレッジレポートは`coverage/`ディレクトリに生成され、以下の情報が確認できます：
+テストは引き続きBATSフレームワークで実行され、すべてのテストケースが網羅的に検証されます。カバレッジ率の数値指標は取得しませんが、テストケースの品質とテストファースト開発の原則は維持されます。
 
-- 全体のカバレッジ率
-- ファイルごとのカバレッジ
-- 実行された行と実行されなかった行
-
-#### CI/CDでのカバレッジ
-
-GitHub Actionsの`test_bats.yml`ワークフローで、自動的にCodecovにカバレッジがアップロードされます：
-
-- macOSとUbuntuの両環境でカバレッジを計測
-- Pull Requestにカバレッジレポートがコメントとして表示される
-- カバレッジの変化をグラフで確認できる
-
-#### カバレッジ設定
-
-`codecov.yml`で以下の設定を行っています：
-
-- **計測対象**: `install/`と`scripts/`ディレクトリのシェルスクリプト
-- **除外対象**: `home/`（設定ファイル）、`tests/`（テスト自体）、`.github/`（ワークフロー）
-- **環境別フラグ**: macOS、Ubuntu、共通コードで分類
-- **カバレッジ閾値**: プロジェクト全体で前回から5%以上の低下を検出
+**将来的な対応**:
+カバレッジ計測が必要になった場合は、以下の選択肢を検討します：
+- より保守しやすいツール（bashcovなど）への移行
+- GitHub Actions標準のカバレッジツールの利用
+- カバレッジ計測専用の別ワークフローとしての分離
 
 ### CI/CDワークフロー
 
-1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行し、Codecovにカバレッジをアップロード
+1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行
 2. **test_chezmoi_apply.yml**: chezmoiの適用が正常に動作するか検証
 3. **shellcheck.yml**: ShellCheckによるシェルスクリプトの静的解析
 4. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
