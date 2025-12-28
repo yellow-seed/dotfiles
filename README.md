@@ -230,13 +230,13 @@ Homebrewでパッケージをインストール・アンインストールした
 
 ```bash
 # 現在のHomebrewパッケージをBrewfileに出力
-brew bundle dump --describe --force --file=~/.Brewfile
+brew bundle dump --no-vscode --describe --force --file=./install/macos/common/Brewfile
 
 # chezmoiで管理対象に追加（初回のみ）
-chezmoi add ~/.Brewfile
+chezmoi add ./install/macos/common/Brewfile
 
 # または、設定ファイルを更新（ホームディレクトリの変更をchezmoiに反映）
-chezmoi re-add ~/.Brewfile
+chezmoi re-add ./install/macos/common/Brewfile
 
 # 変更をコミット
 git add .
