@@ -14,6 +14,7 @@ ensure_bats() {
 run_bats_suite() {
     bats "${REPO_ROOT}/tests/install/"
     bats "${REPO_ROOT}/tests/files/"
+    bats "${REPO_ROOT}/tests/scripts/"
 }
 
 run_tests_without_coverage() {
@@ -32,9 +33,19 @@ run_tests_with_kcov() {
     local coverage_dir="${REPO_ROOT}/coverage"
     mkdir -p "${coverage_dir}"
 
-    kcov --clean --include-path="${REPO_ROOT}/install" \
+    # Run tests with coverage for install/ directory
+    kcov --include-path="${REPO_ROOT}/install" \
         "${coverage_dir}" \
         bats "${REPO_ROOT}/tests/install/"
 
-    bats "${REPO_ROOT}/tests/files/"
+    # Run tests with coverage for scripts/ directory
+    kcov --include-path="${REPO_ROOT}/scripts" \
+        "${coverage_dir}" \
+        bats "${REPO_ROOT}/tests/scripts/"
+
+    # Run tests with coverage for files/ directory (chezmoi templates, etc.)
+    kcov --include-path="${REPO_ROOT}" \
+        --exclude-path="${REPO_ROOT}/tests,${REPO_ROOT}/.github,${REPO_ROOT}/home" \
+        "${coverage_dir}" \
+        bats "${REPO_ROOT}/tests/files/"
 }
