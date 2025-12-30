@@ -16,8 +16,6 @@ brew "cmake"
 brew "cookiecutter"
 # Cryptographic recipes and primitives for Python
 brew "cryptography"
-# Pack, ship and run any application as a lightweight container
-brew "docker"
 # Secure dotenv–from the creator of `dotenv`
 brew "dotenvx/brew/dotenvx"
 # Utility for exporting data from Ente and decrypt the export from Ente Auth
@@ -76,7 +74,6 @@ cask "dbeaver-community"
 cask "devtoys"
 # Voice and text chat software
 cask "discord"
-cask "docker"
 # App to build and share containerised applications and microservices
 cask "docker-desktop"
 # Desktop client for Ente Auth
@@ -95,7 +92,6 @@ cask "github"
 cask "gitify"
 # Web browser
 cask "google-chrome"
-cask "google-cloud-sdk"
 # Open-source firewall to block unknown outgoing connections
 cask "lulu"
 # App to write, plan, collaborate, and get organised

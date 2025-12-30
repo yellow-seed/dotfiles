@@ -19,6 +19,7 @@ teardown() {
     [ -x "$SCRIPT_PATH" ]
 }
 
+# Note: intel macは考慮しない
 @test "brew-dump-explicit script has valid shebang" {
     run head -n 1 "$SCRIPT_PATH"
     [[ "$output" == "#!/opt/homebrew/bin/bash" ]]
@@ -92,7 +93,7 @@ teardown() {
 }
 
 @test "brew-dump-explicit can be sourced as a function" {
-    run bash -c "source ${SCRIPT_PATH} && type brew-dump-explicit"
+    run bash -c "source '${SCRIPT_PATH}' && type brew-dump-explicit"
     [ "$status" -eq 0 ]
     [[ "$output" =~ "brew-dump-explicit is a function" ]]
 }
