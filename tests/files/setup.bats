@@ -68,6 +68,11 @@ EOF
         echo "Darwin"
     }
     export -f get_os_type
+    # initialize_os_macos をモック
+    initialize_os_macos() {
+        echo "Mock macOS initialization"
+    }
+    export -f initialize_os_macos
     # Darwin の場合はエラーなく終了することを確認
     run initialize_os_env
     [ "$status" -eq 0 ]
@@ -80,6 +85,11 @@ EOF
         echo "Linux"
     }
     export -f get_os_type
+    # initialize_os_linux をモック
+    initialize_os_linux() {
+        echo "Mock Linux initialization"
+    }
+    export -f initialize_os_linux
     # Linux の場合はエラーなく終了することを確認
     run initialize_os_env
     [ "$status" -eq 0 ]
@@ -123,21 +133,24 @@ EOF
 @test "script works when BASH_SOURCE is undefined (curl/wget scenario)" {
     # BASH_SOURCEが未定義の状態をシミュレート（bash -c "$(curl ...)" のような実行）
     # スクリプトが unbound variable エラーなく実行できることを確認
-    
-    # テスト用のスクリプトを作成（run_chezmoiを無害化）
+
+    # テスト用のスクリプトを作成（initialize_os_envとrun_chezmoiを無害化）
     TEST_SCRIPT=$(mktemp)
-    # run_chezmoi関数全体をモックに置換（macOS/Linux両対応）
-    sed '/^function run_chezmoi()/,/^}$/c\
+    # initialize_os_env関数とrun_chezmoi関数をモックに置換
+    sed -e '/^function initialize_os_env()/,/^}$/c\
+function initialize_os_env() {\
+    echo "Mock OS environment initialization"\
+}' -e '/^function run_chezmoi()/,/^}$/c\
 function run_chezmoi() {\
     echo "Mock chezmoi install"\
 }' "${SETUP_SCRIPT}" > "${TEST_SCRIPT}"
-    
+
     # bash -c "$(cat script)" の形式で実行（curlシナリオのシミュレート）
     run bash -c "$(cat "${TEST_SCRIPT}")"
-    
+
     # クリーンアップ
     rm -f "${TEST_SCRIPT}"
-    
+
     # エラーなく実行できることを確認
     [ "$status" -eq 0 ]
     # unbound variable エラーが出ていないことを確認
