@@ -519,6 +519,29 @@ bats tests/install/macos/common/brew.bats
 bats tests/files/shellcheck.bats
 ```
 
+**カバレッジ付きテスト実行（オプション）:**
+
+コードカバレッジを計測したい場合は、[bashcov](https://github.com/infertux/bashcov)を使用できます：
+
+```bash
+# bashcovのインストール（初回のみ）
+gem install --user-install bashcov
+
+# PATHの設定（必要に応じて）
+export PATH="$HOME/.local/share/gem/ruby/3.2.0/bin:$PATH"
+
+# カバレッジ付きテスト実行
+export CI=true
+export RUNNER_OS=macos  # または ubuntu
+bashcov scripts/macos/run_unit_test.sh
+
+# HTMLレポートの確認
+open coverage/index.html  # macOS
+xdg-open coverage/index.html  # Linux
+```
+
+カバレッジレポートは、GitHub Actionsの`coverage`ワークフローで自動的に[Codecov](https://codecov.io/)にアップロードされます。
+
 ### コーディング規約
 
 シェルスクリプトを作成・修正する際は、以下の規約に従ってください：
