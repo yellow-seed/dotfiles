@@ -370,7 +370,15 @@ bats --trace tests/install/macos/common/brew.bats
 
 ### テストカバレッジの確認
 
-このリポジトリでは、**kcov**を使用してBashスクリプトのテストカバレッジを計測し、**Codecov**で可視化しています。
+このリポジトリでは、**bashcov**（SimpleCov-based coverage tool）を使用してBashスクリプトのテストカバレッジを計測し、**Codecov**で可視化しています。
+
+#### カバレッジツールの特徴
+
+- **bashcov**: RubyGems経由でインストール可能なBashカバレッジツール
+  - SimpleCovベースの成熟したツール
+  - JSON形式でのレポート生成（Codecov連携）
+  - HTMLレポート生成（ローカル確認用）
+  - CI/CD環境のみでインストール（dotfiles本体には依存なし）
 
 #### テスト環境の優先順位
 
@@ -389,30 +397,44 @@ bats --trace tests/install/macos/common/brew.bats
 この優先順位により、実際の利用シーンに即した高品質なテストカバレッジを維持します。
 
 
-**現在のテスト実行方法**:
+**テスト実行方法**:
 
 ```bash
-# macOSでのテスト実行
+# macOSでのテスト実行（カバレッジなし）
 bash scripts/macos/run_unit_test.sh
 
-# Ubuntuでのテスト実行
+# Ubuntuでのテスト実行（カバレッジなし）
 bash scripts/ubuntu/run_unit_test.sh
 ```
 
-テストは引き続きBATSフレームワークで実行され、すべてのテストケースが網羅的に検証されます。カバレッジ率の数値指標は取得しませんが、テストケースの品質とテストファースト開発の原則は維持されます。
+**カバレッジ付きテスト実行方法（CI/CDまたはローカル）**:
 
-**将来的な対応**:
-カバレッジ計測が必要になった場合は、以下の選択肢を検討します：
-- より保守しやすいツール（bashcovなど）への移行
-- GitHub Actions標準のカバレッジツールの利用
-- カバレッジ計測専用の別ワークフローとしての分離
+```bash
+# bashcovのインストール（初回のみ）
+gem install --user-install bashcov
+
+# PATHの設定（必要に応じて）
+export PATH="$HOME/.local/share/gem/ruby/3.2.0/bin:$PATH"
+
+# カバレッジ付きテスト実行
+export CI=true
+export RUNNER_OS=macos  # または ubuntu
+bashcov scripts/macos/run_unit_test.sh
+
+# カバレッジレポートの確認
+open coverage/index.html  # macOS
+xdg-open coverage/index.html  # Linux
+```
+
+テストはBATSフレームワークで実行され、すべてのテストケースが網羅的に検証されます。カバレッジ計測は専用のGitHub Actionsワークフロー（`coverage.yml`）で実行され、本体のテストワークフロー（`test_bats.yml`）には影響しません。
 
 ### CI/CDワークフロー
 
-1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行
-2. **test_chezmoi_apply.yml**: chezmoiの適用が正常に動作するか検証
-3. **shellcheck.yml**: ShellCheckによるシェルスクリプトの静的解析
-4. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
+1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行（カバレッジなし、高速実行）
+2. **coverage.yml**: bashcovによるカバレッジ計測とCodecovへのレポート送信
+3. **test_chezmoi_apply.yml**: chezmoiの適用が正常に動作するか検証
+4. **shellcheck.yml**: ShellCheckによるシェルスクリプトの静的解析
+5. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
 
 ## コード品質管理
 
