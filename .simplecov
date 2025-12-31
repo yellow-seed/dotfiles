@@ -18,10 +18,10 @@ if ENV['CI']
     command_name "bashcov-#{ENV['RUNNER_OS'] || 'local'}"
     
     # Add filters to exclude files we don't want to measure
-    add_filter '/tests/'
-    add_filter '/home/'
-    add_filter '/.github/'
-    add_filter 'setup.sh'
+    add_filter '/tests/'          # Test files
+    add_filter '/home/'           # Chezmoi configuration files (not executable scripts)
+    add_filter '/.github/'        # GitHub Actions workflows
+    add_filter 'setup.sh'         # Entry point script (minimal logic)
     
     # Group files by directory
     add_group 'Install Scripts', 'install/'
