@@ -99,12 +99,18 @@ function keepalive_sudo() {
 function initialize_os_macos() {
     local script_dir
     script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local install_dir="${script_dir}/install/macos/common"
+
+    # プロファイルの検出（環境変数またはデフォルト）
+    local profile="${DOTFILES_PROFILE:-private}"
+    echo "Using profile: ${profile}"
+
+    local common_dir="${script_dir}/install/macos/common"
+    local profile_dir="${script_dir}/install/macos/${profile}"
 
     echo "Initializing macOS environment..."
 
     # Homebrewのインストール
-    local brew_script="${install_dir}/brew.sh"
+    local brew_script="${common_dir}/brew.sh"
     if [ -f "${brew_script}" ]; then
         echo "Running Homebrew installation script..."
         bash "${brew_script}"
@@ -122,14 +128,23 @@ function initialize_os_macos() {
         eval "$(/usr/local/bin/brew shellenv)"
     fi
 
-    # Brewfileのインストール
-    local brewfile_script="${install_dir}/brewfile.sh"
-    if [ -f "${brewfile_script}" ]; then
-        echo "Running Brewfile installation script..."
-        bash "${brewfile_script}"
+    # Common Brewfileのインストール
+    local common_brewfile_script="${common_dir}/brewfile.sh"
+    if [ -f "${common_brewfile_script}" ]; then
+        echo "Installing common packages..."
+        bash "${common_brewfile_script}"
     else
-        echo "Error: brewfile.sh not found at ${brewfile_script}" >&2
+        echo "Error: brewfile.sh not found at ${common_brewfile_script}" >&2
         exit 1
+    fi
+
+    # プロファイル固有のBrewfileのインストール
+    local profile_brewfile="${profile_dir}/Brewfile"
+    if [ -f "${profile_brewfile}" ]; then
+        echo "Installing ${profile}-specific packages..."
+        brew bundle --file="${profile_brewfile}"
+    else
+        echo "Warning: ${profile} Brewfile not found at ${profile_brewfile}, skipping profile-specific packages"
     fi
 
     echo "macOS environment initialization completed."

@@ -1,10 +1,27 @@
 {{- $name := "yellow-seed" -}}
 {{- $email := "42381113+yellow-seed@users.noreply.github.com" -}}
 
+{{- /* Profile detection (private or work) */ -}}
+{{- $profile := "private" -}}
+{{- $hostname := .chezmoi.hostname -}}
+
+{{- /* Auto-detect work environment based on hostname */ -}}
+{{- if or (contains "work" $hostname) (contains "corp" $hostname) -}}
+{{-   $profile = "work" -}}
+{{- end -}}
+
+{{- /* Allow manual profile override via environment variable */ -}}
+{{- if env "DOTFILES_PROFILE" -}}
+{{-   $profile = env "DOTFILES_PROFILE" -}}
+{{- end -}}
+
 [data]
     name = "{{ $name }}"
     email = "{{ $email }}"
-    
+
+    # Profile configuration (private or work)
+    profile = "{{ $profile }}"
+
     # OS固有の設定
     # Note: これらのフラグは .chezmoi.os を直接使用することでも代替可能ですが、
     # 可読性とシンプルさのために提供しています
@@ -13,7 +30,7 @@
     {{- else }}
     isMac = false
     {{- end }}
-    
+
     {{- if eq .chezmoi.os "linux" }}
     isLinux = true
     {{- else }}

@@ -6,144 +6,43 @@ tap "homebrew/bundle"
 tap "stuartleeks/tap"
 
 # Formulae (explicitly installed)
-# Codec library for encoding and decoding AV1 video streams
-brew "aom"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
-# Cross-platform make
-brew "cmake"
-# Utility that creates projects from templates
-brew "cookiecutter"
-# Cryptographic recipes and primitives for Python
-brew "cryptography"
-# Secure dotenv–from the creator of `dotenv`
-brew "dotenvx/brew/dotenvx"
-# Utility for exporting data from Ente and decrypt the export from Ente Auth
-brew "ente-cli"
-# Database migrations CLI tool
-brew "golang-migrate"
-# Subtitle renderer for the ASS/SSA subtitle format
-brew "libass"
-# Reliable Internet Stream Transport (RIST)
-brew "librist"
-# Mac App Store command-line interface
-brew "mas"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.12"
-# Tools for and transforming and inspecting PDF files
-brew "qpdf"
-# Low-level access to audio, keyboard, mouse, joystick, and graphics
-brew "sdl2"
-# CLI for working with Visual Studio Code devcontainers
-brew "stuartleeks/tap/devcontainer"
-# AV1 encoder
-brew "svt-av1"
-# OCR (Optical Character Recognition) engine
-brew "tesseract"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 
 # Casks
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
-# Command-line interface for 1Password
-cask "1password-cli"
 # View, print, and comment on PDF documents
 cask "adobe-acrobat-reader"
-# User-friendly GUI app for Homebrew
-cask "applite"
-# Web browser focusing on privacy
-cask "brave-browser"
-# Design tool
-cask "canva"
-# OpenAI's official ChatGPT desktop app
-cask "chatgpt"
 # Anthropic's official Claude AI desktop app
 cask "claude"
 # Terminal-based AI coding assistant
 cask "claude-code"
-# OpenAI's coding agent that runs in your terminal
-cask "codex"
 # Write, edit, and chat about your code with AI
 cask "cursor"
 # Universal database tool and SQL client
 cask "dbeaver-community"
-# Utilities designed to make common development tasks easier
-cask "devtoys"
-# Voice and text chat software
-cask "discord"
 # App to build and share containerised applications and microservices
 cask "docker-desktop"
-# Desktop client for Ente Auth
-cask "ente-auth"
-# Collaborative team software
-cask "figma"
-# Web browser
-cask "firefox"
-# Set of tools to manage resources and applications hosted on Google Cloud
-cask "gcloud-cli"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Desktop client for GitHub repositories
 cask "github"
-# GitHub notifications on your menu bar
-cask "gitify"
 # Web browser
 cask "google-chrome"
-# Open-source firewall to block unknown outgoing connections
-cask "lulu"
-# App to write, plan, collaborate, and get organised
-cask "notion"
-# Calendar for professionals and teams
-cask "notion-calendar"
-# Knowledge base that works on top of a local folder of plain text Markdown files
-cask "obsidian"
 # Collaboration platform for API development
 cask "postman"
-# VPN client focusing on security
-cask "protonvpn"
 # Control your tools with a few keystrokes
 cask "raycast"
-# MySQL/MariaDB database management
-cask "sequel-ace"
 # Screenshot measurement and annotation tool
 cask "shottr"
-# Team communication and collaboration software
-cask "slack"
-# Music streaming service
-cask "spotify"
-# SSH client
-cask "termius"
-# Web browser
-cask "thebrowsercompany-dia"
-# To-do list
-cask "todoist-app"
-# Charting and social-networking for investment traders
-cask "tradingview"
 # Open-source code editor
 cask "visual-studio-code"
 # Rust-based terminal
 cask "warp"
-# Video communication and virtual meeting platform
-cask "zoom"
-
-# Mac App Store
-mas "1Password for Safari", id: 1569813296
-mas "Easy Screenshot for Safari", id: 6445823588
-mas "FireShot - Full web page screenshots", id: 1541862561
-mas "Kindle", id: 302584613
-mas "LINE", id: 539883307
-mas "OneDrive", id: 823766827
-mas "RunCat", id: 1429033973
-
-# Go packages
-go "github.com/go-delve/delve/cmd/dlv"
-go "cmd/go"
-go "cmd/gofmt"
-go "github.com/haya14busa/goplay/cmd/goplay"
-go "golang.org/x/tools/gopls"
-go "github.com/cweill/gotests/gotests"
-go "github.com/josharian/impl"
-go "honnef.co/go/tools/cmd/staticcheck"
