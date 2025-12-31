@@ -51,11 +51,13 @@ function keepalive_sudo_macos() {
     sudo -v
 
     # バックグラウンドでsudo権限を維持
-    while true; do
+    # 親プロセスのPIDを明示的に保存してサブシェルで使用
+    local parent_pid=$$
+    (while true; do
         sudo -n true
         sleep 60
-        kill -0 "$$" || exit
-    done 2>/dev/null &
+        kill -0 "$parent_pid" || exit
+    done) &
 }
 
 # sudo権限の維持（Linux版）
@@ -64,11 +66,13 @@ function keepalive_sudo_linux() {
     sudo -v
 
     # バックグラウンドでsudo権限を維持
-    while true; do
+    # 親プロセスのPIDを明示的に保存してサブシェルで使用
+    local parent_pid=$$
+    (while true; do
         sudo -n true
         sleep 60
-        kill -0 "$$" || exit
-    done 2>/dev/null &
+        kill -0 "$parent_pid" || exit
+    done) &
 }
 
 # sudo権限の維持（OS別ラッパー）
