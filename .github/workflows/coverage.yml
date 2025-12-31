@@ -1,0 +1,59 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  coverage:
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      
+      - name: Install bashcov
+        run: gem install bashcov
+      
+      - name: Install Bats
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update && sudo apt-get install -y bats
+          else
+            brew install bats-core
+          fi
+      
+      - name: Run tests with coverage
+        run: |
+          # Set environment variables for SimpleCov
+          export CI=true
+          export RUNNER_OS=${{ matrix.os == 'macos-latest' && 'macos' || 'ubuntu' }}
+          export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
+          
+          # Run tests with bashcov
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            bashcov scripts/macos/run_unit_test.sh
+          else
+            bashcov scripts/ubuntu/run_unit_test.sh
+          fi
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/coverage.json
+          flags: ${{ matrix.os == 'macos-latest' && 'macos' || 'ubuntu' }}
+          name: coverage-${{ matrix.os }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
