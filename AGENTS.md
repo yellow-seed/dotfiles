@@ -414,7 +414,7 @@ bash scripts/ubuntu/run_unit_test.sh
 gem install --user-install bashcov
 
 # PATHの設定（必要に応じて）
-export PATH="$HOME/.local/share/gem/ruby/3.2.0/bin:$PATH"
+export PATH="$(ruby -e 'puts Gem.user_dir')/bin:$PATH"
 
 # カバレッジ付きテスト実行
 export CI=true
