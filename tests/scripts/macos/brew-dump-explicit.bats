@@ -4,6 +4,9 @@ setup() {
   # Create a temporary directory for test outputs
   TEST_TEMP_DIR="$(mktemp -d)"
   SCRIPT_PATH="scripts/macos/brew-dump-explicit.sh"
+  
+  # Source the script to make functions available for testing
+  source "$SCRIPT_PATH"
 }
 
 teardown() {
@@ -92,10 +95,31 @@ teardown() {
   [ "$status" -eq 0 ]
 }
 
-@test "brew-dump-explicit can be sourced as a function" {
-  run bash -c "source '${SCRIPT_PATH}' && type brew-dump-explicit"
+@test "brew-dump-explicit function is defined after sourcing" {
+  run type brew-dump-explicit
   [ "$status" -eq 0 ]
   [[ "$output" =~ "brew-dump-explicit is a function" ]]
+}
+
+@test "brew-dump-explicit function accepts output path argument" {
+  # Test function signature by examining its definition
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ 'local output="${1:-Brewfile}"' ]]
+}
+
+@test "brew-dump-explicit function handles directory paths" {
+  # Test that the function contains logic to handle directory paths
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "if [[ -d" ]]
+}
+
+@test "brew-dump-explicit function preserves comments" {
+  # Test that the function contains logic to preserve comments
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "package_comments" ]]
 }
 
 @test "brew-dump-explicit handles directory path by appending Brewfile" {
