@@ -46,15 +46,16 @@ brew-dump-explicit() {
       else
         comment_buffer=""
       fi
-    done < "$output"
+    done <"$output"
   fi
 
   # Generate new content
   {
     echo "# Taps"
     while IFS= read -r tap_name; do
-      if [[ -n "${package_comments[tap:$tap_name]}" ]]; then
-        printf "%s" "${package_comments[tap:$tap_name]}"
+      local tap_key="tap:${tap_name}"
+      if [[ -n "${package_comments[$tap_key]}" ]]; then
+        printf "%s" "${package_comments[$tap_key]}"
       fi
       echo "tap \"$tap_name\""
     done < <(brew tap | sort)
@@ -62,8 +63,9 @@ brew-dump-explicit() {
     echo ""
     echo "# Formulae (explicitly installed)"
     while IFS= read -r brew_name; do
-      if [[ -n "${package_comments[brew:$brew_name]}" ]]; then
-        printf "%s" "${package_comments[brew:$brew_name]}"
+      local brew_key="brew:${brew_name}"
+      if [[ -n "${package_comments[$brew_key]}" ]]; then
+        printf "%s" "${package_comments[$brew_key]}"
       fi
       echo "brew \"$brew_name\""
     done < <(brew leaves | sort)
@@ -71,8 +73,9 @@ brew-dump-explicit() {
     echo ""
     echo "# Casks"
     while IFS= read -r cask_name; do
-      if [[ -n "${package_comments[cask:$cask_name]}" ]]; then
-        printf "%s" "${package_comments[cask:$cask_name]}"
+      local cask_key="cask:${cask_name}"
+      if [[ -n "${package_comments[$cask_key]}" ]]; then
+        printf "%s" "${package_comments[$cask_key]}"
       fi
       echo "cask \"$cask_name\""
     done < <(brew list --cask | sort)
@@ -91,7 +94,7 @@ brew-dump-explicit() {
         grep '^go ' "$output"
       fi
     fi
-  } > "$temp_file"
+  } >"$temp_file"
 
   # Move temp file to output
   mv "$temp_file" "$output"
