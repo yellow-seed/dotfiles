@@ -330,8 +330,8 @@ miseでツールのバージョンを追加・変更・削除した際は、以�
 chezmoi add ~/.config/mise/config.toml
 
 # miseでツールを追加・変更・削除
-mise use node@20.0.0
-mise use python@3.11
+mise use --global node@20.0.0
+mise use --global python@3.11
 mise uninstall go@1.21
 
 # 設定ファイルを更新（ホームディレクトリの変更をchezmoiに反映）
