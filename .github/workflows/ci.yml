@@ -1,4 +1,4 @@
-name: Coverage
+name: Test with Coverage
 
 on:
   push:
@@ -27,6 +27,9 @@ jobs:
       - name: Install bashcov
         run: gem install bashcov
       
+      - name: Copy .simplecov to root
+        run: cp .github/.simplecov .simplecov
+      
       - name: Install Bats
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
@@ -42,11 +45,16 @@ jobs:
           export RUNNER_OS=${{ matrix.os == 'macos-latest' && 'macos' || 'ubuntu' }}
           export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
           
-          # Run tests with bashcov
+          # Exclude BATS internal scripts from coverage tracking
+          # This prevents errors when bashcov tries to track BATS internal scripts
           if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            bashcov scripts/macos/run_unit_test.sh
+            bashcov --exclude '/opt/homebrew/Cellar/bats-core/*' \
+                    --exclude '/usr/local/Cellar/bats-core/*' \
+                    -- bats tests/install/ tests/files/ tests/scripts/
           else
-            bashcov scripts/ubuntu/run_unit_test.sh
+            bashcov --exclude '/usr/lib/bats/*' \
+                    --exclude '/usr/bin/bats' \
+                    -- bats tests/install/ tests/files/ tests/scripts/
           fi
       
       - name: Upload coverage to Codecov
@@ -57,3 +65,19 @@ jobs:
           name: coverage-${{ matrix.os }}
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
+  
+  shellcheck:
+    name: ShellCheck Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          severity: warning
+          ignore_paths: .git
