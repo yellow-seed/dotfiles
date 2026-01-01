@@ -6,7 +6,7 @@ chezmoiを使用したdotfiles管理のガイドです。
 
 ## ディレクトリ構造
 
-```
+```bash
 .
 ├── .chezmoiroot           # chezmoiのソースディレクトリを指定
 ├── home/                  # chezmoi管理下のdotfiles
@@ -28,16 +28,19 @@ chezmoiを使用したdotfiles管理のガイドです。
 このdotfilesリポジトリでは、以下の3つのツールを役割分担して使用しています：
 
 ### chezmoi
+
 - **目的**: dotfiles全体の運用管理
 - **管理対象**: 設定ファイル（`.zshrc`, `.gitconfig`, `.chezmoi.toml`など）
 - **役割**: 設定ファイルのバージョン管理、複数環境での同期、設定の適用・更新
 
 ### Homebrew
+
 - **目的**: グローバルに適用したいアプリケーションの管理
 - **管理対象**: GUIアプリケーション、システム全体で使用するCLIツール
 - **役割**: macOSアプリケーションのインストール・管理、Brewfileによる一括管理
 
 ### mise
+
 - **目的**: プログラミングに特化した言語とCLIの管理
 - **管理対象**: プログラミング言語（Node.js, Python, Goなど）、開発用CLIツール
 - **役割**: 言語バージョンの切り替え、プロジェクト固有のツール管理
@@ -261,6 +264,7 @@ bash install/macos/common/brewfile.sh
 ```
 
 このスクリプトは以下の処理を行います：
+
 - Homebrewがインストールされているか確認
 - `install/macos/common/Brewfile` が存在するか確認
 - `brew bundle` を実行してパッケージをインストール
@@ -268,6 +272,7 @@ bash install/macos/common/brewfile.sh
 ### パッケージの追加・削除方法
 
 #### パッケージの追加
+
 ```bash
 # Homebrewでパッケージをインストール
 brew install <package-name>
@@ -282,6 +287,7 @@ git push origin main
 ```
 
 #### パッケージの削除
+
 ```bash
 # Homebrewでパッケージをアンインストール
 brew uninstall <package-name>
@@ -337,7 +343,7 @@ git commit -m "chore: mise設定を更新"
 git push origin main
 ```
 
-### 注意事項
+### mise設定時の注意事項
 
 - miseでツールのバージョンを変更した後は必ず上記の手順を実行する
 - `chezmoi re-add`でホームディレクトリの変更をchezmoiに反映
@@ -354,6 +360,7 @@ git push origin main
 ### ブランチ運用の手順
 
 #### 新しい設定や機能追加の場合
+
 ```bash
 # 新しいブランチを作成
 git checkout -b feature/add-new-config
@@ -399,13 +406,6 @@ git commit -m "chore: 既存設定を反映"
 git push origin main
 ```
 
-### ブランチ命名規則
-
-- `feature/` - 新機能追加
-- `fix/` - バグ修正・設定修正
-- `chore/` - 既存設定の反映・メンテナンス
-- `docs/` - ドキュメント更新
-
 ### よく使用するコマンドの組み合わせ
 
 ```bash
@@ -425,135 +425,9 @@ chezmoi status
 chezmoi cat ~/.zshrc
 ```
 
-## 開発ガイド
+## その他規約
 
-### シェルスクリプトのLint・フォーマット
-
-このリポジトリでは、シェルスクリプトの品質向上のために[ShellCheck](https://www.shellcheck.net/)と[shfmt](https://github.com/mvdan/sh)を使用しています。
-
-#### ShellCheck（静的解析）
-
-ShellCheckはシェルスクリプトの文法エラー、潜在的なバグ、非推奨な書き方を検出します。
-
-**インストール:**
-```bash
-# macOS
-brew install shellcheck
-
-# Ubuntu
-sudo apt-get install shellcheck
-
-# VS Code拡張機能（オプション）
-# Brewfileに以下を追加して `brew bundle install` を実行
-# vscode "timonwong.shellcheck"
-```
-
-**ローカルでの実行:**
-```bash
-# 単一ファイルをチェック
-shellcheck install/macos/common/brew.sh
-
-# すべてのシェルスクリプトをチェック
-shellcheck install/**/*.sh scripts/**/*.sh setup.sh
-
-# 特定のディレクトリ配下をチェック
-shellcheck install/macos/common/*.sh
-```
-
-**VS Code統合:**
-- ShellCheck拡張機能（`timonwong.shellcheck`）を手動でインストール可能
-- エディタ内でリアルタイムに警告を表示
-
-**CI/CD統合:**
-- `.github/workflows/shellcheck.yml`でPR時に自動チェック
-- すべてのシェルスクリプトが対象
-
-**設定ファイル:**
-- `.shellcheckrc`でプロジェクト共通のルールを設定
-- 現在の設定: SC1091（sourced filesのフォロー）を無効化
-
-#### shfmt（フォーマッター）
-
-shfmtはシェルスクリプトの自動フォーマットツールです。
-
-**インストール:**
-```bash
-# mise経由（推奨）
-mise use shfmt@latest
-
-# または Homebrew
-brew install shfmt
-```
-
-**使用方法:**
-```bash
-# フォーマットの確認（変更なし）
-shfmt -d .
-
-# 自動フォーマット（ファイルを上書き）
-shfmt -w .
-
-# 特定のファイルのみフォーマット
-shfmt -w install/macos/common/brew.sh
-```
-
-### テストの実行
-
-シェルスクリプトの動作を検証するため、[BATS (Bash Automated Testing System)](https://github.com/bats-core/bats-core)を使用しています。
-
-**すべてのテストを実行:**
-```bash
-# macOSの場合
-bash scripts/macos/run_unit_test.sh
-
-# Ubuntuの場合
-bash scripts/ubuntu/run_unit_test.sh
-```
-
-**特定のテストファイルのみ実行:**
-```bash
-# BATSコマンドで直接実行
-bats tests/install/macos/common/brew.bats
-
-# ShellCheckのテスト
-bats tests/files/shellcheck.bats
-```
-
-**カバレッジ付きテスト実行（オプション）:**
-
-コードカバレッジを計測したい場合は、[bashcov](https://github.com/infertux/bashcov)を使用できます：
-
-```bash
-# bashcovのインストール（初回のみ）
-gem install --user-install bashcov
-
-# PATHの設定（必要に応じて）
-export PATH="$(ruby -e 'puts Gem.user_dir')/bin:$PATH"
-
-# カバレッジ付きテスト実行
-export CI=true
-export RUNNER_OS=macos  # または ubuntu
-bashcov scripts/macos/run_unit_test.sh
-
-# HTMLレポートの確認
-open coverage/index.html  # macOS
-xdg-open coverage/index.html  # Linux
-```
-
-カバレッジレポートは、GitHub Actionsの`coverage`ワークフローで自動的に[Codecov](https://codecov.io/)にアップロードされます。
-
-### コーディング規約
-
-シェルスクリプトを作成・修正する際は、以下の規約に従ってください：
-
-1. **エラーハンドリング**: 必ず`set -Eeuo pipefail`を設定
-2. **ShellCheck検証**: すべてのスクリプトはShellCheckをパス
-3. **コメント**: 日本語でのコメント推奨
-4. **変数命名**: 環境変数は`UPPER_CASE`、ローカル変数は`lower_case`
-5. **テスト**: 新しいスクリプトには対応するBATSテストを作成
-
-## 注意事項
-
+- 開発に関する規約は`AGENTS.md`に記載
 - `chezmoi apply`を実行する前に`chezmoi diff`で変更内容を確認することを推奨
 - 重要な設定変更は必ずブランチを作成して作業する
 - コミットメッセージは[Conventional Commits](https://www.conventionalcommits.org/)の形式に従う
