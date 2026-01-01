@@ -1,13 +1,23 @@
 {{- $name := "yellow-seed" -}}
 {{- $email := "42381113+yellow-seed@users.noreply.github.com" -}}
 
-{{- /* Profile detection (private or work) */ -}}
-{{- $profile := "private" -}}
+{{- /* Profile detection (common baseline, auto-detect work, env override) */ -}}
+{{- $profile := "common" -}}
 {{- $hostname := .chezmoi.hostname -}}
+{{- $hostname_lower := lower $hostname -}}
 
-{{- /* Auto-detect work environment based on hostname */ -}}
-{{- if or (contains "work" $hostname) (contains "corp" $hostname) -}}
-{{-   $profile = "work" -}}
+{{- /* Auto-detect work environment based on hostname (explicit allowlist to avoid broad substring matches). */ -}}
+{{- if ne $hostname_lower "" -}}
+  {{- $workHostnames := list
+        "work-laptop"
+        "work-desktop"
+        "corp-mac"
+    -}}
+  {{- range $i, $h := $workHostnames -}}
+    {{- if eq $hostname_lower (lower $h) -}}
+      {{- $profile = "work" -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /* Allow manual profile override via environment variable */ -}}

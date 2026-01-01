@@ -100,8 +100,25 @@ function initialize_os_macos() {
   local script_dir
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-  # プロファイルの検出（環境変数またはデフォルト）
-  local profile="${DOTFILES_PROFILE:-private}"
+  # プロファイルの検出（共通をデフォルト、ホスト名による自動判定、環境変数で上書き）
+  local profile="common"
+  local hostname_lower
+  hostname_lower="$(hostname | tr '[:upper:]' '[:lower:]')"
+  if [ -z "${hostname_lower}" ]; then
+    echo "Warning: hostname could not be detected; using profile=common (only common packages will be installed)"
+  else
+    local work_hostnames=("work-laptop" "work-desktop" "corp-mac")
+    local work_host
+    for work_host in "${work_hostnames[@]}"; do
+      if [ "${hostname_lower}" = "${work_host}" ]; then
+        profile="work"
+        break
+      fi
+    done
+  fi
+  if [ -n "${DOTFILES_PROFILE:-}" ]; then
+    profile="${DOTFILES_PROFILE}"
+  fi
   echo "Using profile: ${profile}"
 
   local common_dir="${script_dir}/install/macos/common"
@@ -140,7 +157,9 @@ function initialize_os_macos() {
 
   # プロファイル固有のBrewfileのインストール
   local profile_brewfile="${profile_dir}/Brewfile"
-  if [ -f "${profile_brewfile}" ]; then
+  if [ "${profile}" = "common" ]; then
+    echo "Profile is common; skipping profile-specific Brewfile (common packages already installed)"
+  elif [ -f "${profile_brewfile}" ]; then
     echo "Installing ${profile}-specific packages..."
     brew bundle --file="${profile_brewfile}"
   else
