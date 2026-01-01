@@ -194,10 +194,10 @@ function run_chezmoi() {
   #    init: リポジトリを初期化
   #    --apply: 設定ファイルを即座にホームディレクトリに適用
   #    ${GITHUB_USERNAME}: GitHubのユーザー名を指定してリポジトリを特定
-  if command -v curl &> /dev/null; then
+  if command -v curl &>/dev/null; then
     echo "Using curl to download chezmoi installer..."
     sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
-  elif command -v wget &> /dev/null; then
+  elif command -v wget &>/dev/null; then
     echo "Using wget to download chezmoi installer..."
     sh -c "$(wget -qO- get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
   else
