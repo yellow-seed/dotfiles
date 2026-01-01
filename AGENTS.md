@@ -9,7 +9,6 @@
 1. **chezmoi**: dotfiles全体の運用管理
    - 設定ファイルのバージョン管理と同期
    - テンプレート機能による環境別の設定
-   
 2. **Homebrew**: macOSアプリケーション管理
    - GUIアプリケーションとシステムツールのインストール
    - Brewfileによる一括管理
@@ -20,7 +19,7 @@
 
 ## リポジトリ構造
 
-```
+```bash
 .
 ├── .chezmoiroot              # chezmoiのルートディレクトリ指定
 ├── .github/                  # GitHub Actions ワークフロー
@@ -102,22 +101,26 @@
 ### 新しいマシンでの初期セットアップ
 
 1. **chezmoiのインストールとdotfilesの適用**:
+
    ```bash
    sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply yellow-seed
    ```
 
 2. **Homebrewのインストール** (macOSのみ):
+
    ```bash
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
    ```
 
 3. **Brewfileからパッケージをインストール** (macOSのみ):
+
    ```bash
    cd ~/.local/share/chezmoi
    brew bundle install --file=home/dot_Brewfile
    ```
 
 4. **miseでツールをインストール**:
+
    ```bash
    mise install
    ```
@@ -125,6 +128,7 @@
 ### クイックセットアップ
 
 リポジトリの`setup.sh`を使用:
+
 ```bash
 sh setup.sh
 ```
@@ -133,12 +137,14 @@ sh setup.sh
 
 ### ローカルテスト実行
 
-#### macOSでテスト実行:
+#### macOSでテスト実行
+
 ```bash
 bash scripts/macos/run_unit_test.sh
 ```
 
-#### Ubuntuでテスト実行:
+#### Ubuntuでテスト実行
+
 ```bash
 bash scripts/ubuntu/run_unit_test.sh
 ```
@@ -359,20 +365,24 @@ brew install package
 
 ```bash
 # すべてのテストを実行
-bash scripts/macos/run_unit_test.sh
+bats tests/
 
 # 特定のテストファイルのみ実行
 bats tests/install/macos/common/brew.bats
-
-# デバッグ出力を有効化
-bats --trace tests/install/macos/common/brew.bats
 ```
 
 ### テストカバレッジの確認
 
-このリポジトリでは、**kcov**を使用してBashスクリプトのテストカバレッジを計測し、**Codecov**で可視化しています。
+このリポジトリでは、**bashcov**（SimpleCov-based coverage tool）を使用してBashスクリプトのテストカバレッジを計測し、**Codecov**で可視化しています。
 
-#### テスト環境の優先順位
+カバレッジツールの特徴
+
+- **bashcov**: RubyGems経由でインストール可能なBashカバレッジツール
+  - SimpleCovベースの成熟したツール
+  - JSON形式でのレポート生成（Codecov連携）
+  - CI/CD環境のみでインストール（dotfiles本体には依存なし）
+
+### テスト環境の優先順位
 
 **重要**: このリポジトリでは、macOSを主要な開発・運用環境としているため、テスト検証とカバレッジ拡充は**macOSを優先**します。
 
@@ -388,41 +398,25 @@ bats --trace tests/install/macos/common/brew.bats
 
 この優先順位により、実際の利用シーンに即した高品質なテストカバレッジを維持します。
 
-
-**現在のテスト実行方法**:
-
-```bash
-# macOSでのテスト実行
-bash scripts/macos/run_unit_test.sh
-
-# Ubuntuでのテスト実行
-bash scripts/ubuntu/run_unit_test.sh
-```
-
-テストは引き続きBATSフレームワークで実行され、すべてのテストケースが網羅的に検証されます。カバレッジ率の数値指標は取得しませんが、テストケースの品質とテストファースト開発の原則は維持されます。
-
-**将来的な対応**:
-カバレッジ計測が必要になった場合は、以下の選択肢を検討します：
-- より保守しやすいツール（bashcovなど）への移行
-- GitHub Actions標準のカバレッジツールの利用
-- カバレッジ計測専用の別ワークフローとしての分離
-
 ### CI/CDワークフロー
 
-1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行
-2. **test_chezmoi_apply.yml**: chezmoiの適用が正常に動作するか検証
-3. **shellcheck.yml**: ShellCheckによるシェルスクリプトの静的解析
-4. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
+1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行（カバレッジなし、高速実行）
+2. **coverage.yml**: bashcovによるカバレッジ計測とCodecovへのレポート送信
+3. **test_chezmoi_apply.yml**: chezmoiの適用が正常に動作するか検証
+4. **shellcheck.yml**: ShellCheckによるシェルスクリプトの静的解析
+5. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
 
 ## コード品質管理
 
 ### Lintツール
 
 #### ShellCheck
+
 - **目的**: シェルスクリプトの静的解析
 - **検出内容**: 文法エラー、潜在的なバグ、非推奨な書き方
 - **設定ファイル**: `.shellcheckrc`
 - **インストール**:
+
   ```bash
   # macOS
   brew install shellcheck
@@ -430,7 +424,9 @@ bash scripts/ubuntu/run_unit_test.sh
   # Ubuntu
   sudo apt-get install shellcheck
   ```
+
 - **実行方法**:
+
   ```bash
   # ローカルでの実行
   shellcheck script.sh
@@ -438,12 +434,14 @@ bash scripts/ubuntu/run_unit_test.sh
   # すべてのスクリプトを一括チェック
   shellcheck install/**/*.sh scripts/**/*.sh setup.sh
   ```
-- **CI統合**: `.github/workflows/shellcheck.yml`で自動実行
-- **VS Code統合**: `timonwong.shellcheck`拡張機能（手動インストール）により、エディタ内でリアルタイム検証
+
+- **CI統合**: `.github/workflows/ci.yml`で自動実行
 
 #### shfmt
+
 - **目的**: シェルスクリプトの自動フォーマット
 - **インストール**:
+
   ```bash
   # mise経由（推奨）
   mise use shfmt@latest
@@ -451,23 +449,29 @@ bash scripts/ubuntu/run_unit_test.sh
   # または Homebrew
   brew install shfmt
   ```
+
 - **実行方法**:
+
   ```bash
   # チェックのみ
-  shfmt -d .
+  shfmt -d -i 2 .
   
   # 自動フォーマット
-  shfmt -w .
+  shfmt -w -d -i 2 .
   ```
+
+- **CI統合**: `.github/workflows/ci.yml`で自動実行
 
 ## コーディング規約とベストプラクティス
 
 ### Bashスクリプト
 
 1. **エラーハンドリング**:
+
    ```bash
    set -Eeuo pipefail
    ```
+
    - `-E`: ERRトラップを関数に継承
    - `-e`: エラー時に即座に終了
    - `-u`: 未定義変数をエラーとする
@@ -478,6 +482,7 @@ bash scripts/ubuntu/run_unit_test.sh
    - ローカル変数: `lower_case`
 
 3. **デフォルト値の設定**:
+
    ```bash
    VARIABLE="${ENVIRONMENT_VAR:-default_value}"
    ```
@@ -486,6 +491,7 @@ bash scripts/ubuntu/run_unit_test.sh
    - すべてのシェルスクリプトは[ShellCheck](https://www.shellcheck.net/)で検証されます
    - CI/CDパイプラインで自動チェックが実行されます
    - ローカルでの検証方法:
+
      ```bash
      # 単一ファイルをチェック
      shellcheck install/macos/common/brew.sh
@@ -496,6 +502,7 @@ bash scripts/ubuntu/run_unit_test.sh
      # shfmtでフォーマット
      shfmt -w .
      ```
+
    - VS Code拡張機能を使用すると、エディタ内でリアルタイム検証が可能
    - `.shellcheckrc`でプロジェクト固有のルールを設定可能
 

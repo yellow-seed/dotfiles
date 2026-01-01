@@ -1,0 +1,9 @@
+# Coverage reports
+coverage/
+
+# Ruby gems (used only in CI)
+.bundle/
+vendor/
+
+# OS files
+.DS_Store

@@ -1,29 +1,17 @@
 #!/usr/bin/env bats
 
-@test ".shellcheckrc configuration file exists" {
-    [ -f ".shellcheckrc" ]
-}
-
-@test "ShellCheck workflow exists" {
-    [ -f ".github/workflows/shellcheck.yml" ]
-}
-
 @test "all shell scripts pass ShellCheck validation" {
-    # Skip if shellcheck is not available
-    if ! command -v shellcheck &>/dev/null; then
-        skip "ShellCheck is not installed"
-    fi
-    
-    # Find all shell scripts and run ShellCheck
-    run shellcheck \
-        install/macos/common/brew.sh \
-        install/macos/common/brewfile.sh \
-        install/template.sh \
-        scripts/macos/run_unit_test.sh \
-        scripts/run_tests.sh \
-        scripts/run_unit_test_common.sh \
-        scripts/ubuntu/run_unit_test.sh \
-        setup.sh
-    
-    [ "$status" -eq 0 ]
+  # Skip if shellcheck is not available
+  if ! command -v shellcheck &>/dev/null; then
+    skip "ShellCheck is not installed"
+  fi
+
+  # Find all shell scripts and run ShellCheck
+  run shellcheck \
+    install/macos/common/brew.sh \
+    install/macos/common/brewfile.sh \
+    install/template.sh \
+    setup.sh
+
+  [ "$status" -eq 0 ]
 }
