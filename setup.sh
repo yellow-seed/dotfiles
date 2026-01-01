@@ -140,7 +140,7 @@ function initialize_os_macos() {
   if [[ $(arch) == "arm64" ]]; then
     echo "Detected Apple Silicon, setting up Homebrew path..."
     eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [[ $(arch) == "i386" ]]; then
+  elif [[ $(arch) == "x86_64" ]]; then
     echo "Detected Intel Mac, setting up Homebrew path..."
     eval "$(/usr/local/bin/brew shellenv)"
   fi
