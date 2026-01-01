@@ -1,4 +1,4 @@
-name: Test with Coverage
+name: Test with Coverage and Format Linting
 
 on:
   push:
