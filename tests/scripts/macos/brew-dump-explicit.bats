@@ -4,7 +4,7 @@ setup() {
   # Create a temporary directory for test outputs
   TEST_TEMP_DIR="$(mktemp -d)"
   SCRIPT_PATH="scripts/macos/brew-dump-explicit.sh"
-  
+
   # Source the script to make functions available for testing
   source "$SCRIPT_PATH"
 }

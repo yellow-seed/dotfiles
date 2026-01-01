@@ -37,6 +37,12 @@ jobs:
           ~/.local/bin/mise install
           echo "Mise tools installed successfully"
 
+      - name: Install shfmt
+        run: |
+          curl -sS https://webi.sh/shfmt | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          shfmt --version
+
       - name: Display chezmoi version
         run: chezmoi --version
 

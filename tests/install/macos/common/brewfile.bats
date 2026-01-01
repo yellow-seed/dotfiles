@@ -3,7 +3,7 @@
 setup() {
   # Source the script to make functions available for testing
   source install/macos/common/brewfile.sh
-  
+
   # Create temporary directory for testing
   TEST_TEMP_DIR="$(mktemp -d)"
 }
