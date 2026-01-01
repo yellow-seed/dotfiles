@@ -46,33 +46,33 @@ function is_ci_or_not_tty() {
 
 # sudo権限の維持（macOS版）
 function keepalive_sudo_macos() {
-    # Keychainを使用したパスワード管理
-    # sudo権限を取得
-    sudo -v
+  # Keychainを使用したパスワード管理
+  # sudo権限を取得
+  sudo -v
 
-    # バックグラウンドでsudo権限を維持
-    # 親プロセスのPIDを明示的に保存してサブシェルで使用
-    local parent_pid=$$
-    (while true; do
-        sudo -n true
-        sleep 60
-        kill -0 "$parent_pid" || exit
-    done) &
+  # バックグラウンドでsudo権限を維持
+  # 親プロセスのPIDを明示的に保存してサブシェルで使用
+  local parent_pid=$$
+  (while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$parent_pid" || exit
+  done) &
 }
 
 # sudo権限の維持（Linux版）
 function keepalive_sudo_linux() {
-    # sudo権限を取得
-    sudo -v
+  # sudo権限を取得
+  sudo -v
 
-    # バックグラウンドでsudo権限を維持
-    # 親プロセスのPIDを明示的に保存してサブシェルで使用
-    local parent_pid=$$
-    (while true; do
-        sudo -n true
-        sleep 60
-        kill -0 "$parent_pid" || exit
-    done) &
+  # バックグラウンドでsudo権限を維持
+  # 親プロセスのPIDを明示的に保存してサブシェルで使用
+  local parent_pid=$$
+  (while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$parent_pid" || exit
+  done) &
 }
 
 # sudo権限の維持（OS別ラッパー）
