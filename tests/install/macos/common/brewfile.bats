@@ -3,6 +3,14 @@
 setup() {
   # Source the script to make functions available for testing
   source install/macos/common/brewfile.sh
+  
+  # Create temporary directory for testing
+  TEST_TEMP_DIR="$(mktemp -d)"
+}
+
+teardown() {
+  # Clean up temporary directory
+  [ -d "$TEST_TEMP_DIR" ] && rm -rf "$TEST_TEMP_DIR"
 }
 
 @test "brewfile installation script exists" {
@@ -46,6 +54,42 @@ setup() {
   run declare -f install_brewfile
   [ "$status" -eq 0 ]
   [[ "$output" =~ "Brewfile" ]]
+}
+
+@test "install_brewfile finds script directory correctly" {
+  # Verify the function uses BASH_SOURCE to find script directory
+  run declare -f install_brewfile
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "BASH_SOURCE" ]]
+  [[ "$output" =~ "dirname" ]]
+}
+
+@test "install_brewfile constructs correct Brewfile path" {
+  # Verify the function constructs path to Brewfile in script directory
+  run declare -f install_brewfile
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ 'brewfile="${script_dir}/Brewfile"' ]]
+}
+
+@test "install_brewfile includes error message for missing brew" {
+  # Verify error message exists for missing brew
+  run declare -f install_brewfile
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "Homebrew is not installed" ]]
+}
+
+@test "install_brewfile includes error message for missing Brewfile" {
+  # Verify error message exists for missing Brewfile
+  run declare -f install_brewfile
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "Brewfile not found" ]]
+}
+
+@test "install_brewfile uses brew bundle command" {
+  # Verify the function uses brew bundle
+  run declare -f install_brewfile
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "brew bundle" ]]
 }
 
 @test "main function is defined" {
