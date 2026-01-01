@@ -11,7 +11,7 @@ set -Eeuo pipefail
 
 # デバッグモード
 if [ "${DOTFILES_DEBUG:-}" ]; then
-    set -x
+  set -x
 fi
 
 # 環境変数の設定（環境変数が未設定の場合はデフォルト値を使用）
@@ -21,213 +21,213 @@ declare -r BRANCH_NAME="${BRANCH_NAME:-main}"
 
 # OS検出
 function get_os_type() {
-    uname
+  uname
 }
 
 # CI環境の検出
 function is_ci() {
-    [ -n "${CI:-}" ]
+  [ -n "${CI:-}" ]
 }
 
 # TTY環境の検出
 function is_tty() {
-    [ -t 0 ]
+  [ -t 0 ]
 }
 
 # 非TTY環境の検出
 function is_not_tty() {
-    ! is_tty
+  ! is_tty
 }
 
 # CI環境または非TTY環境の検出
 function is_ci_or_not_tty() {
-    is_ci || is_not_tty
+  is_ci || is_not_tty
 }
 
 # sudo権限の維持（macOS版）
 function keepalive_sudo_macos() {
-    # Keychainを使用したパスワード管理
-    # sudo権限を取得
-    sudo -v
+  # Keychainを使用したパスワード管理
+  # sudo権限を取得
+  sudo -v
 
-    # バックグラウンドでsudo権限を維持
-    while true; do
-        sudo -n true
-        sleep 60
-        kill -0 "$$" || exit
-    done 2>/dev/null &
+  # バックグラウンドでsudo権限を維持
+  while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+  done 2>/dev/null &
 }
 
 # sudo権限の維持（Linux版）
 function keepalive_sudo_linux() {
-    # sudo権限を取得
-    sudo -v
+  # sudo権限を取得
+  sudo -v
 
-    # バックグラウンドでsudo権限を維持
-    while true; do
-        sudo -n true
-        sleep 60
-        kill -0 "$$" || exit
-    done 2>/dev/null &
+  # バックグラウンドでsudo権限を維持
+  while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+  done 2>/dev/null &
 }
 
 # sudo権限の維持（OS別ラッパー）
 function keepalive_sudo() {
-    # CI環境または非TTY環境ではスキップ
-    if is_ci_or_not_tty; then
-        echo "Skipping sudo keepalive in CI or non-TTY environment"
-        return 0
-    fi
+  # CI環境または非TTY環境ではスキップ
+  if is_ci_or_not_tty; then
+    echo "Skipping sudo keepalive in CI or non-TTY environment"
+    return 0
+  fi
 
-    local ostype
-    ostype="$(get_os_type)"
+  local ostype
+  ostype="$(get_os_type)"
 
-    case "${ostype}" in
-        Darwin)
-            keepalive_sudo_macos
-            ;;
-        Linux)
-            keepalive_sudo_linux
-            ;;
-        *)
-            echo "Warning: sudo keepalive not supported on ${ostype}" >&2
-            ;;
-    esac
+  case "${ostype}" in
+  Darwin)
+    keepalive_sudo_macos
+    ;;
+  Linux)
+    keepalive_sudo_linux
+    ;;
+  *)
+    echo "Warning: sudo keepalive not supported on ${ostype}" >&2
+    ;;
+  esac
 }
 
 # macOS環境の初期化
 function initialize_os_macos() {
-    local script_dir
-    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-    # プロファイルの検出（環境変数またはデフォルト）
-    local profile="${DOTFILES_PROFILE:-private}"
-    echo "Using profile: ${profile}"
+  # プロファイルの検出（環境変数またはデフォルト）
+  local profile="${DOTFILES_PROFILE:-private}"
+  echo "Using profile: ${profile}"
 
-    local common_dir="${script_dir}/install/macos/common"
-    local profile_dir="${script_dir}/install/macos/${profile}"
+  local common_dir="${script_dir}/install/macos/common"
+  local profile_dir="${script_dir}/install/macos/${profile}"
 
-    echo "Initializing macOS environment..."
+  echo "Initializing macOS environment..."
 
-    # Homebrewのインストール
-    local brew_script="${common_dir}/brew.sh"
-    if [ -f "${brew_script}" ]; then
-        echo "Running Homebrew installation script..."
-        bash "${brew_script}"
-    else
-        echo "Error: brew.sh not found at ${brew_script}" >&2
-        exit 1
-    fi
+  # Homebrewのインストール
+  local brew_script="${common_dir}/brew.sh"
+  if [ -f "${brew_script}" ]; then
+    echo "Running Homebrew installation script..."
+    bash "${brew_script}"
+  else
+    echo "Error: brew.sh not found at ${brew_script}" >&2
+    exit 1
+  fi
 
-    # Apple Silicon/IntelでのPATH設定
-    if [[ $(arch) == "arm64" ]]; then
-        echo "Detected Apple Silicon, setting up Homebrew path..."
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    elif [[ $(arch) == "i386" ]]; then
-        echo "Detected Intel Mac, setting up Homebrew path..."
-        eval "$(/usr/local/bin/brew shellenv)"
-    fi
+  # Apple Silicon/IntelでのPATH設定
+  if [[ $(arch) == "arm64" ]]; then
+    echo "Detected Apple Silicon, setting up Homebrew path..."
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ $(arch) == "i386" ]]; then
+    echo "Detected Intel Mac, setting up Homebrew path..."
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
 
-    # Common Brewfileのインストール
-    local common_brewfile_script="${common_dir}/brewfile.sh"
-    if [ -f "${common_brewfile_script}" ]; then
-        echo "Installing common packages..."
-        bash "${common_brewfile_script}"
-    else
-        echo "Error: brewfile.sh not found at ${common_brewfile_script}" >&2
-        exit 1
-    fi
+  # Common Brewfileのインストール
+  local common_brewfile_script="${common_dir}/brewfile.sh"
+  if [ -f "${common_brewfile_script}" ]; then
+    echo "Installing common packages..."
+    bash "${common_brewfile_script}"
+  else
+    echo "Error: brewfile.sh not found at ${common_brewfile_script}" >&2
+    exit 1
+  fi
 
-    # プロファイル固有のBrewfileのインストール
-    local profile_brewfile="${profile_dir}/Brewfile"
-    if [ -f "${profile_brewfile}" ]; then
-        echo "Installing ${profile}-specific packages..."
-        brew bundle --file="${profile_brewfile}"
-    else
-        echo "Warning: ${profile} Brewfile not found at ${profile_brewfile}, skipping profile-specific packages"
-    fi
+  # プロファイル固有のBrewfileのインストール
+  local profile_brewfile="${profile_dir}/Brewfile"
+  if [ -f "${profile_brewfile}" ]; then
+    echo "Installing ${profile}-specific packages..."
+    brew bundle --file="${profile_brewfile}"
+  else
+    echo "Warning: ${profile} Brewfile not found at ${profile_brewfile}, skipping profile-specific packages"
+  fi
 
-    echo "macOS environment initialization completed."
+  echo "macOS environment initialization completed."
 }
 
 # Linux環境の初期化
 function initialize_os_linux() {
-    echo "Initializing Linux environment..."
-    # TODO: Implement Linux initialization (Phase 2 - Ubuntu support)
-    echo "Linux initialization not yet implemented."
+  echo "Initializing Linux environment..."
+  # TODO: Implement Linux initialization (Phase 2 - Ubuntu support)
+  echo "Linux initialization not yet implemented."
 }
 
 # OS環境の初期化
 function initialize_os_env() {
-    local ostype
-    ostype="$(get_os_type)"
+  local ostype
+  ostype="$(get_os_type)"
 
-    case "${ostype}" in
-        Darwin)
-            initialize_os_macos
-            ;;
-        Linux)
-            initialize_os_linux
-            ;;
-        *)
-            echo "Unsupported OS: ${ostype}" >&2
-            exit 1
-            ;;
-    esac
+  case "${ostype}" in
+  Darwin)
+    initialize_os_macos
+    ;;
+  Linux)
+    initialize_os_linux
+    ;;
+  *)
+    echo "Unsupported OS: ${ostype}" >&2
+    exit 1
+    ;;
+  esac
 }
 
 # chezmoi のセットアップ
 function run_chezmoi() {
-    # chezmoiのインストールとセットアップを実行
-    # curl または wget でインストールスクリプトを取得
-    # 1. インストールスクリプトを取得:
-    #    curl の場合:
-    #      -f: HTTPエラー時に失敗
-    #      -s: サイレントモード（進捗表示なし）
-    #      -L: リダイレクトをフォロー
-    #      -S: エラー時はメッセージを表示
-    #    wget の場合:
-    #      -q: 静かモード（進捗表示なし）
-    #      -O-: 標準出力に出力
-    # 2. 取得したスクリプトを sh で実行
-    # 3. -- 以降は chezmoi のインストールスクリプトへの引数
-    #    init: リポジトリを初期化
-    #    --apply: 設定ファイルを即座にホームディレクトリに適用
-    #    ${GITHUB_USERNAME}: GitHubのユーザー名を指定してリポジトリを特定
-    if command -v curl &> /dev/null; then
-        echo "Using curl to download chezmoi installer..."
-        sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
-    elif command -v wget &> /dev/null; then
-        echo "Using wget to download chezmoi installer..."
-        sh -c "$(wget -qO- get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
-    else
-        echo "Error: Neither curl nor wget is available. Please install curl or wget to proceed."
-        echo "On Debian/Ubuntu: sudo apt-get install curl"
-        echo "On macOS: brew install curl"
-        exit 1
-    fi
+  # chezmoiのインストールとセットアップを実行
+  # curl または wget でインストールスクリプトを取得
+  # 1. インストールスクリプトを取得:
+  #    curl の場合:
+  #      -f: HTTPエラー時に失敗
+  #      -s: サイレントモード（進捗表示なし）
+  #      -L: リダイレクトをフォロー
+  #      -S: エラー時はメッセージを表示
+  #    wget の場合:
+  #      -q: 静かモード（進捗表示なし）
+  #      -O-: 標準出力に出力
+  # 2. 取得したスクリプトを sh で実行
+  # 3. -- 以降は chezmoi のインストールスクリプトへの引数
+  #    init: リポジトリを初期化
+  #    --apply: 設定ファイルを即座にホームディレクトリに適用
+  #    ${GITHUB_USERNAME}: GitHubのユーザー名を指定してリポジトリを特定
+  if command -v curl &> /dev/null; then
+    echo "Using curl to download chezmoi installer..."
+    sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
+  elif command -v wget &> /dev/null; then
+    echo "Using wget to download chezmoi installer..."
+    sh -c "$(wget -qO- get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
+  else
+    echo "Error: Neither curl nor wget is available. Please install curl or wget to proceed."
+    echo "On Debian/Ubuntu: sudo apt-get install curl"
+    echo "On macOS: brew install curl"
+    exit 1
+  fi
 }
 
 # dotfiles の初期化
 function initialize_dotfiles() {
-    # sudo権限の維持を開始（CI/非TTY環境以外）
-    keepalive_sudo
+  # sudo権限の維持を開始（CI/非TTY環境以外）
+  keepalive_sudo
 
-    # OS環境の初期化
-    initialize_os_env
+  # OS環境の初期化
+  initialize_os_env
 
-    # chezmoiのセットアップ
-    run_chezmoi
+  # chezmoiのセットアップ
+  run_chezmoi
 }
 
 # メイン処理
 function main() {
-    echo "Setting up dotfiles from ${DOTFILES_REPO}"
-    initialize_dotfiles
+  echo "Setting up dotfiles from ${DOTFILES_REPO}"
+  initialize_dotfiles
 }
 
 # スクリプトが直接実行された場合のみmainを実行（テスト時はスキップ）
 # BASH_SOURCE[0]が未定義の場合（curl/wgetでの実行時）も実行する
 if [ -z "${BASH_SOURCE[0]:-}" ] || [ "${BASH_SOURCE[0]:-}" = "${0}" ]; then
-    main
+  main
 fi
