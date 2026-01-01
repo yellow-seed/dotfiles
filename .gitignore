@@ -7,3 +7,4 @@ vendor/
 
 # OS files
 .DS_Store
+.simplecov
