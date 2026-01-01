@@ -22,10 +22,10 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: '3.4'
       
-      - name: Install bashcov
-        run: gem install bashcov
+      - name: Install bashcov and simplecov_json_formatter
+        run: gem install bashcov simplecov_json_formatter
       
       - name: Copy .simplecov to root
         run: cp .github/.simplecov .simplecov
@@ -45,17 +45,9 @@ jobs:
           export RUNNER_OS=${{ matrix.os == 'macos-latest' && 'macos' || 'ubuntu' }}
           export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
           
-          # Exclude BATS internal scripts from coverage tracking
-          # This prevents errors when bashcov tries to track BATS internal scripts
-          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            bashcov --exclude '/opt/homebrew/Cellar/bats-core/*' \
-                    --exclude '/usr/local/Cellar/bats-core/*' \
-                    -- bats tests/install/ tests/files/ tests/scripts/
-          else
-            bashcov --exclude '/usr/lib/bats/*' \
-                    --exclude '/usr/bin/bats' \
-                    -- bats tests/install/ tests/files/ tests/scripts/
-          fi
+          # Run tests with coverage
+          # BATS internal scripts are excluded via .simplecov configuration
+          bashcov -- bats tests/install/ tests/files/ tests/scripts/
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
