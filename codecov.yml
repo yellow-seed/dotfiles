@@ -48,4 +48,3 @@ flags:
   common:
     paths:
       - install/common/
-      - scripts/run_unit_test_common.sh

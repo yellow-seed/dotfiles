@@ -1,0 +1,83 @@
+name: Test with Coverage and Format Linting
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  coverage:
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+      
+      - name: Install bashcov and simplecov_json_formatter
+        run: gem install bashcov simplecov_json_formatter
+      
+      - name: Copy .simplecov to root
+        run: cp .github/.simplecov .simplecov
+      
+      - name: Install Bats
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update && sudo apt-get install -y bats
+          else
+            brew install bats-core
+          fi
+      
+      - name: Run tests with coverage
+        run: |
+          # Set environment variables for SimpleCov
+          export CI=true
+          export RUNNER_OS=${{ matrix.os == 'macos-latest' && 'macos' || 'ubuntu' }}
+          export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
+          
+          # Run tests with coverage
+          # BATS internal scripts are excluded via .simplecov configuration
+          bashcov -- bats tests/install/ tests/files/ tests/scripts/
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/coverage.json
+          flags: ${{ matrix.os == 'macos-latest' && 'macos' || 'ubuntu' }}
+          name: coverage-${{ matrix.os }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+  
+  shellcheck:
+    name: ShellCheck Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          severity: warning
+          ignore_paths: .git
+
+      - name: Install shfmt
+        run: |
+          curl -sS https://webi.sh/shfmt | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Run shfmt check
+        run: shfmt -d -i 2 .
