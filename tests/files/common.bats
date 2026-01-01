@@ -1,17 +1,17 @@
 #!/usr/bin/env bats
 
 @test "home directory structure exists" {
-    [ -d "home" ]
+  [ -d "home" ]
 }
 
 @test "install directory structure exists" {
-    [ -d "install" ]
+  [ -d "install" ]
 }
 
 @test "README.md exists" {
-    [ -f "README.md" ]
+  [ -f "README.md" ]
 }
 
 @test ".chezmoiroot file exists" {
-    [ -f ".chezmoiroot" ]
+  [ -f ".chezmoiroot" ]
 }

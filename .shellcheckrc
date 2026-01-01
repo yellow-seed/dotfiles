@@ -1,6 +1,0 @@
-# ShellCheck configuration file
-# See: https://www.shellcheck.net/wiki/
-
-# SC1091: Not following sourced files
-# We don't need ShellCheck to follow sourced files as they are checked separately
-disable=SC1091
