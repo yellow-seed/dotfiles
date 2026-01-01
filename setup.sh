@@ -97,42 +97,42 @@ function keepalive_sudo() {
 
 # macOS環境の初期化
 function initialize_os_macos() {
-    local script_dir
-    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local install_dir="${script_dir}/install/macos/common"
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local install_dir="${script_dir}/install/macos/common"
 
-    echo "Initializing macOS environment..."
+  echo "Initializing macOS environment..."
 
-    # Homebrewのインストール
-    local brew_script="${install_dir}/brew.sh"
-    if [ -f "${brew_script}" ]; then
-        echo "Running Homebrew installation script..."
-        bash "${brew_script}"
-    else
-        echo "Error: brew.sh not found at ${brew_script}" >&2
-        exit 1
-    fi
+  # Homebrewのインストール
+  local brew_script="${install_dir}/brew.sh"
+  if [ -f "${brew_script}" ]; then
+    echo "Running Homebrew installation script..."
+    bash "${brew_script}"
+  else
+    echo "Error: brew.sh not found at ${brew_script}" >&2
+    exit 1
+  fi
 
-    # Apple Silicon/IntelでのPATH設定
-    if [[ $(arch) == "arm64" ]]; then
-        echo "Detected Apple Silicon, setting up Homebrew path..."
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    elif [[ $(arch) == "x86_64" ]]; then
-        echo "Detected Intel Mac, setting up Homebrew path..."
-        eval "$(/usr/local/bin/brew shellenv)"
-    fi
+  # Apple Silicon/IntelでのPATH設定
+  if [[ $(arch) == "arm64" ]]; then
+    echo "Detected Apple Silicon, setting up Homebrew path..."
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ $(arch) == "x86_64" ]]; then
+    echo "Detected Intel Mac, setting up Homebrew path..."
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
 
-    # Brewfileのインストール
-    local brewfile_script="${install_dir}/brewfile.sh"
-    if [ -f "${brewfile_script}" ]; then
-        echo "Running Brewfile installation script..."
-        bash "${brewfile_script}"
-    else
-        echo "Error: brewfile.sh not found at ${brewfile_script}" >&2
-        exit 1
-    fi
+  # Brewfileのインストール
+  local brewfile_script="${install_dir}/brewfile.sh"
+  if [ -f "${brewfile_script}" ]; then
+    echo "Running Brewfile installation script..."
+    bash "${brewfile_script}"
+  else
+    echo "Error: brewfile.sh not found at ${brewfile_script}" >&2
+    exit 1
+  fi
 
-    echo "macOS environment initialization completed."
+  echo "macOS environment initialization completed."
 }
 
 # Linux環境の初期化
