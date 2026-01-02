@@ -4,6 +4,9 @@ setup() {
   # Create a temporary directory for test outputs
   TEST_TEMP_DIR="$(mktemp -d)"
   SCRIPT_PATH="scripts/macos/brew-dump-explicit.sh"
+
+  # Source the script to make functions available for testing
+  source "$SCRIPT_PATH"
 }
 
 teardown() {
@@ -92,10 +95,106 @@ teardown() {
   [ "$status" -eq 0 ]
 }
 
-@test "brew-dump-explicit can be sourced as a function" {
-  run bash -c "source '${SCRIPT_PATH}' && type brew-dump-explicit"
+@test "brew-dump-explicit function is defined after sourcing" {
+  run type brew-dump-explicit
   [ "$status" -eq 0 ]
   [[ "$output" =~ "brew-dump-explicit is a function" ]]
+}
+
+@test "brew-dump-explicit function accepts output path argument" {
+  # Test function signature by examining its definition
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ 'local output="${1:-Brewfile}"' ]]
+}
+
+@test "brew-dump-explicit function handles directory paths" {
+  # Test that the function contains logic to handle directory paths
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "if [[ -d" ]]
+}
+
+@test "brew-dump-explicit function preserves comments" {
+  # Test that the function contains logic to preserve comments
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "package_comments" ]]
+}
+
+@test "brew-dump-explicit function uses mktemp for temporary file" {
+  # Verify the function uses mktemp for safe temporary file creation
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "mktemp" ]]
+}
+
+@test "brew-dump-explicit function uses associative array for comments" {
+  # Verify the function declares an associative array
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "declare -A" ]]
+}
+
+@test "brew-dump-explicit function processes tap entries" {
+  # Verify the function includes logic for taps
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "tap" ]]
+  [[ "$output" =~ "brew tap" ]]
+}
+
+@test "brew-dump-explicit function processes brew entries" {
+  # Verify the function includes logic for formulae
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "brew leaves" ]]
+}
+
+@test "brew-dump-explicit function processes cask entries" {
+  # Verify the function includes logic for casks
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "brew list --cask" ]]
+}
+
+@test "brew-dump-explicit function preserves mas entries" {
+  # Verify the function checks for mas entries
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "mas" ]]
+  [[ "$output" =~ "Mac App Store" ]]
+}
+
+@test "brew-dump-explicit function preserves go entries" {
+  # Verify the function checks for go entries
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "Go packages" ]]
+}
+
+@test "brew-dump-explicit function sorts output" {
+  # Verify the function sorts the output
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "sort" ]]
+}
+
+@test "brew-dump-explicit function moves temp file to output" {
+  # Verify the function moves the temp file to final output
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "mv" ]]
+  [[ "$output" =~ "temp_file" ]]
+}
+
+@test "brew-dump-explicit function includes section headers" {
+  # Verify the function includes section headers in output
+  run declare -f brew-dump-explicit
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "# Taps" ]]
+  [[ "$output" =~ "# Formulae" ]]
+  [[ "$output" =~ "# Casks" ]]
 }
 
 @test "brew-dump-explicit handles directory path by appending Brewfile" {

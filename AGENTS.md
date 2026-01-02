@@ -461,6 +461,8 @@ bats tests/install/macos/common/brew.bats
   ```
 
 - **CI統合**: `.github/workflows/ci.yml`で自動実行
+- **コミット前の運用**: コミット直前に必ず `shfmt -w -i 2 .` を実行し、shfmtでフォーマットされた状態でコミットする
+- **ローカル開発環境**: mise経由で `mise exec shfmt -- shfmt -w -i 2 .` を使えばローカルにインストール済みのshfmtを利用できる
 
 ## コーディング規約とベストプラクティス
 
