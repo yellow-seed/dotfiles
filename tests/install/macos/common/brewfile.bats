@@ -66,8 +66,9 @@ teardown() {
   }
   export -f is_brew_exists
   
-  # Run in subshell to capture output
-  run bash -c 'source install/macos/common/brewfile.sh; install_brewfile 2>&1 || true'
+  # Run in subshell to capture output (expect exit 1)
+  run bash -c 'source install/macos/common/brewfile.sh; install_brewfile 2>&1; exit_code=$?; echo "OUTPUT_END"; exit $exit_code'
+  # Script should exit with error, but we check output
   [[ "$output" =~ "Homebrew is not installed" ]]
 }
 
@@ -81,7 +82,7 @@ teardown() {
   # Store original directory and run in temp directory
   local orig_dir="$PWD"
   cd "$TEST_TEMP_DIR"
-  run bash -c "source '$orig_dir/install/macos/common/brewfile.sh'; install_brewfile 2>&1 || true"
+  run bash -c "source '$orig_dir/install/macos/common/brewfile.sh'; install_brewfile 2>&1; exit_code=\$?; echo 'OUTPUT_END'; exit \$exit_code"
   cd "$orig_dir"
   [[ "$output" =~ "Brewfile not found" ]]
 }
@@ -109,7 +110,10 @@ teardown() {
   
   run install_brewfile
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "Installing packages from Brewfile" ]] || [[ "$output" =~ "Mock: brew bundle" ]]
+  # Output should contain one of these messages
+  if ! [[ "$output" =~ "Installing packages from Brewfile" ]]; then
+    [[ "$output" =~ "Mock: brew bundle" ]]
+  fi
 }
 
 @test "main function calls install_brewfile" {

@@ -85,9 +85,9 @@ setup() {
   
   # This test executes the install_brew function body
   # We expect it to try to install (which we mock)
-  run bash -c 'source install/macos/common/brew.sh && install_brew' 
-  # The test may fail due to mocking, but it exercises the code path
-  [[ "$output" =~ "Installing Homebrew" ]] || true
+  run bash -c 'source install/macos/common/brew.sh && install_brew || true' 
+  # Check that installation was attempted
+  [[ "$output" =~ "Installing Homebrew" ]]
 }
 
 @test "main function calls install_brew" {
