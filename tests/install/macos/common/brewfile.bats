@@ -3,7 +3,7 @@
 setup() {
   # Source the script to make functions available for testing
   source install/macos/common/brewfile.sh
-
+  
   # Create temporary directory for testing
   TEST_TEMP_DIR="$(mktemp -d)"
 }
@@ -21,12 +21,6 @@ teardown() {
   [ -x "install/macos/common/brewfile.sh" ]
 }
 
-@test "is_brew_exists function is defined" {
-  run type is_brew_exists
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ "is_brew_exists is a function" ]]
-}
-
 @test "is_brew_exists returns 0 when brew is installed" {
   if command -v brew &>/dev/null; then
     run is_brew_exists
@@ -36,70 +30,80 @@ teardown() {
   fi
 }
 
-@test "install_brewfile function is defined" {
-  run type install_brewfile
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ "install_brewfile is a function" ]]
+@test "is_brew_exists returns 1 when brew is not installed" {
+  # Mock command to ensure function body executes
+  function command() {
+    if [[ "$1" == "-v" && "$2" == "brew" ]]; then
+      return 1
+    fi
+    builtin command "$@"
+  }
+  export -f command
+  
+  run is_brew_exists
+  [ "$status" -ne 0 ]
 }
 
-@test "install_brewfile function requires brew to be installed" {
-  # Check function definition contains brew check logic
-  run declare -f install_brewfile
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ "is_brew_exists" ]]
-}
-
-@test "install_brewfile checks for Brewfile existence" {
-  # Verify the function logic checks for Brewfile
-  run declare -f install_brewfile
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ "Brewfile" ]]
-}
-
-@test "install_brewfile finds script directory correctly" {
-  # Verify the function uses BASH_SOURCE to find script directory
-  run declare -f install_brewfile
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ "BASH_SOURCE" ]]
-  [[ "$output" =~ "dirname" ]]
-}
-
-@test "install_brewfile constructs correct Brewfile path" {
-  # Verify the function constructs path to Brewfile in script directory
-  run declare -f install_brewfile
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ 'brewfile="${script_dir}/Brewfile"' ]]
-}
-
-@test "install_brewfile includes error message for missing brew" {
-  # Verify error message exists for missing brew
-  run declare -f install_brewfile
-  [ "$status" -eq 0 ]
+@test "install_brewfile exits when brew is not installed" {
+  # Mock is_brew_exists to return false
+  function is_brew_exists() {
+    return 1
+  }
+  export -f is_brew_exists
+  
+  # Run in subshell to capture exit
+  run bash -c 'source install/macos/common/brewfile.sh; install_brewfile 2>&1 || echo "EXIT_CODE:$?"'
   [[ "$output" =~ "Homebrew is not installed" ]]
 }
 
-@test "install_brewfile includes error message for missing Brewfile" {
-  # Verify error message exists for missing Brewfile
-  run declare -f install_brewfile
-  [ "$status" -eq 0 ]
+@test "install_brewfile checks for Brewfile existence" {
+  # Mock brew to exist but Brewfile to not exist
+  function is_brew_exists() {
+    return 0
+  }
+  export -f is_brew_exists
+  
+  # Run in a temp directory where Brewfile doesn't exist
+  cd "$TEST_TEMP_DIR"
+  run bash -c 'source '"$(realpath ..)"'/install/macos/common/brewfile.sh; install_brewfile 2>&1 || echo "EXIT_CODE:$?"'
+  cd - > /dev/null
   [[ "$output" =~ "Brewfile not found" ]]
 }
 
-@test "install_brewfile uses brew bundle command" {
-  # Verify the function uses brew bundle
-  run declare -f install_brewfile
+@test "install_brewfile runs brew bundle when requirements are met" {
+  if ! command -v brew &>/dev/null; then
+    skip "brew not installed"
+  fi
+  
+  # Create a test Brewfile in the script's directory
+  local brewfile="install/macos/common/Brewfile"
+  if [ ! -f "$brewfile" ]; then
+    skip "Brewfile not found"
+  fi
+  
+  # Mock brew bundle to avoid actual package installation
+  function brew() {
+    if [[ "$1" == "bundle" ]]; then
+      echo "Mock: brew bundle executed with file: $3"
+      return 0
+    fi
+    command brew "$@"
+  }
+  export -f brew
+  
+  run install_brewfile
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "brew bundle" ]]
-}
-
-@test "main function is defined" {
-  run type main
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ "main is a function" ]]
+  [[ "$output" =~ "Installing packages from Brewfile" ]] || [[ "$output" =~ "Mock: brew bundle" ]]
 }
 
 @test "main function calls install_brewfile" {
-  run declare -f main
+  # Mock install_brewfile to track if it was called
+  function install_brewfile() {
+    echo "install_brewfile was called"
+  }
+  export -f install_brewfile
+  
+  run main
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "install_brewfile" ]]
+  [[ "$output" =~ "install_brewfile was called" ]]
 }
