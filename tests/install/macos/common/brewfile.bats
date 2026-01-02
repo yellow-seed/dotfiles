@@ -66,8 +66,8 @@ teardown() {
   }
   export -f is_brew_exists
   
-  # Run in subshell to capture exit
-  run bash -c 'source install/macos/common/brewfile.sh; install_brewfile 2>&1 || echo "EXIT_CODE:$?"'
+  # Run in subshell to capture output
+  run bash -c 'source install/macos/common/brewfile.sh; install_brewfile 2>&1 || true'
   [[ "$output" =~ "Homebrew is not installed" ]]
 }
 
@@ -78,10 +78,11 @@ teardown() {
   }
   export -f is_brew_exists
   
-  # Run in a temp directory where Brewfile doesn't exist
+  # Store original directory and run in temp directory
+  local orig_dir="$PWD"
   cd "$TEST_TEMP_DIR"
-  run bash -c 'source '"$(realpath ..)"'/install/macos/common/brewfile.sh; install_brewfile 2>&1 || echo "EXIT_CODE:$?"'
-  cd - > /dev/null
+  run bash -c "source '$orig_dir/install/macos/common/brewfile.sh'; install_brewfile 2>&1 || true"
+  cd "$orig_dir"
   [[ "$output" =~ "Brewfile not found" ]]
 }
 
