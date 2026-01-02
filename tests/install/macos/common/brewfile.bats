@@ -2,7 +2,22 @@
 
 setup() {
   # Source the script to make functions available for testing
-  source install/macos/common/brewfile.sh
+  local script="install/macos/common/brewfile.sh"
+  
+  if [ ! -f "$script" ]; then
+    echo "Error: required script '$script' not found." >&2
+    return 1
+  fi
+  
+  if [ ! -r "$script" ]; then
+    echo "Error: required script '$script' is not readable." >&2
+    return 1
+  fi
+  
+  if ! source "$script"; then
+    echo "Error: failed to source '$script'. Check for syntax errors or runtime issues." >&2
+    return 1
+  fi
   
   # Create temporary directory for testing
   TEST_TEMP_DIR="$(mktemp -d)"
