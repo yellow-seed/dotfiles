@@ -133,6 +133,30 @@
 sh setup.sh
 ```
 
+## Claude Code での開発環境
+
+### GitHub CLI (gh) のセットアップ
+
+Claude Code on the Web などのリモート環境で GitHub CLI (`gh`) コマンドを使用する場合は、以下のhookスクリプトを実行してください：
+
+```bash
+bash .claude/hooks/gh-setup.sh
+```
+
+### リモート環境での gh コマンド使用方法
+
+gitのremoteがローカルプロキシを経由している環境では、`gh` コマンドがリポジトリを自動認識できない場合があります。その場合は以下の方法を使用してください：
+
+**方法: `-R` フラグでリポジトリを明示的に指定**
+
+```bash
+# Issue一覧を表示
+gh issue list -R yellow-seed/dotfiles
+
+# PR詳細を表示
+gh pr view 123 -R yellow-seed/dotfiles
+```
+
 ## 開発とテスト方法
 
 ### ローカルテスト実行

@@ -27,9 +27,6 @@ jobs:
       - name: Install bashcov and simplecov_json_formatter
         run: gem install bashcov simplecov_json_formatter
       
-      - name: Copy .simplecov to root
-        run: cp .github/.simplecov .simplecov
-      
       - name: Install Bats
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
