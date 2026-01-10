@@ -27,6 +27,7 @@ jobs:
       - name: Run chezmoi dry-run and capture output
         id: dryrun
         run: |
+          # shellcheck disable=SC2129
           echo "## Chezmoi Dry-Run Output (Ubuntu/Linux)" > dryrun_output.txt
           echo "" >> dryrun_output.txt
           echo '```' >> dryrun_output.txt

@@ -74,7 +74,7 @@ jobs:
       - name: Install shfmt
         run: |
           curl -sS https://webi.sh/shfmt | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run shfmt check
         run: shfmt -d -i 2 .
