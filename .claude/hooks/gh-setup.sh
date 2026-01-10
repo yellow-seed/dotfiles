@@ -49,7 +49,7 @@ log "Installing gh CLI to $LOCAL_BIN..."
 
 # Create temp directory for installation
 TEMP_DIR=$(mktemp -d)
-trap "rm -rf $TEMP_DIR" EXIT
+trap 'rm -rf "$TEMP_DIR"' EXIT
 
 # Detect architecture
 ARCH=$(uname -m)
