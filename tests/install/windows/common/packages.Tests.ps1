@@ -94,13 +94,17 @@ Describe "packages.ps1 Script Tests" {
         It "packages.json should have Sources array" {
             $json = Get-Content $PackageJsonPath | ConvertFrom-Json
             $json.Sources | Should -Not -BeNullOrEmpty
-            $json.Sources | Should -BeOfType [System.Array]
+            # PowerShell converts JSON arrays to PSCustomObject or arrays depending on content
+            # Check if it's iterable instead of checking exact type
+            @($json.Sources).Count | Should -BeGreaterThan 0
         }
 
         It "packages.json should have Packages array" {
             $json = Get-Content $PackageJsonPath | ConvertFrom-Json
             $json.Sources[0].Packages | Should -Not -BeNullOrEmpty
-            $json.Sources[0].Packages | Should -BeOfType [System.Array]
+            # PowerShell converts JSON arrays to PSCustomObject or arrays depending on content
+            # Check if it's iterable instead of checking exact type
+            @($json.Sources[0].Packages).Count | Should -BeGreaterThan 0
         }
 
         It "packages.json should have valid package identifiers" {

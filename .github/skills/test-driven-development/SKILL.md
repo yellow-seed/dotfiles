@@ -39,6 +39,9 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
   # 特定のテストファイルのみ実行
   docker compose run shell-dev bats tests/example.bats
+
+  # Windows PowerShell Testing (Pester)
+  docker compose run --rm windows-test
   ```
 
 - 失敗理由が意図通りであることを確認
@@ -60,6 +63,9 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   ```bash
   # Shell Script Testing (bats)
   docker compose run shell-dev bats tests/
+
+  # Windows PowerShell Testing (Pester)
+  docker compose run --rm windows-test
   ```
 
 - 新しいテストで既存テストが壊れていないか確認
@@ -80,6 +86,9 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   ```bash
   # Shell Script Testing (bats)
   docker compose run shell-dev bats tests/
+
+  # Windows PowerShell Testing (Pester)
+  docker compose run --rm windows-test
   ```
 
 #### 3.3. ローカルLint/Format実行
@@ -89,6 +98,9 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   ```bash
   # Shell Script Linting
   docker compose run shell-dev lint-shell
+
+  # Windows PowerShell Linting (PSScriptAnalyzer)
+  docker compose run --rm windows-test-shell pwsh -Command "Invoke-ScriptAnalyzer -Path install/windows -Recurse"
   ```
 
 - Lintで問題がある場合には、コードフォーマットを適用する、個別に修正するなどして対応する
