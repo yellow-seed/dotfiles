@@ -98,9 +98,6 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   ```bash
   # Shell Script Linting
   docker compose run shell-dev lint-shell
-
-  # Windows PowerShell Linting (PSScriptAnalyzer)
-  docker compose run --rm windows-test-shell pwsh -Command "Invoke-ScriptAnalyzer -Path install/windows -Recurse"
   ```
 
 - Lintで問題がある場合には、コードフォーマットを適用する、個別に修正するなどして対応する
@@ -111,6 +108,41 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
   # Shell Script Formatting (apply)
   docker compose run shell-dev shfmt -i 2 -w .
+  ```
+
+- **Windows環境のPowerShell開発の場合**: PSScriptAnalyzerによる静的解析を実行
+
+  ```bash
+  # Windows PowerShell Linting (PSScriptAnalyzer)
+  # CIと同じ設定（PSGallery）で実行して警告がないことを確認
+  docker compose run --rm windows-test-shell pwsh -Command \
+    '$results = Invoke-ScriptAnalyzer -Path install/windows -Recurse -Settings PSGallery; if ($results) { $results | Format-Table -AutoSize; Write-Error "PSScriptAnalyzer found issues"; exit 1 } else { Write-Host "No issues found" -ForegroundColor Green }'
+  ```
+
+  - 警告が出た場合の対応:
+    - 警告の原因を修正する
+    - 正当な理由がある場合は `SuppressMessageAttribute` で抑制
+
+- **PSScriptAnalyzer警告の抑制例**（Windows PowerShell開発時、正当な理由がある場合のみ）
+
+  ```powershell
+  # 例: 複数形の関数名が意図的な場合
+  function Install-Packages {
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '',
+          Justification='Packages refers to multiple items, plural is intentional')]
+      param (
+          [string]$PackageFile
+      )
+      # 実装...
+  }
+
+  # 例: 状態変更関数でShouldProcessが不要な場合
+  function Set-GitConfig {
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '',
+          Justification='User consent implied by running script')]
+      param()
+      # 実装...
+  }
   ```
 
 - GitHub Actionsワークフローを修正した場合はActionLintを実行
