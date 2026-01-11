@@ -11,6 +11,9 @@ if ($env:DOTFILES_DEBUG) {
 
 # Check if winget is installed
 function Test-WingetExists {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Exists is not a plural noun, it is a verb form')]
+    param()
+
     try {
         $null = Get-Command winget -ErrorAction Stop
         return $true

@@ -62,7 +62,11 @@ function Install-PowerShell7 {
 }
 
 # Configure Git for Windows line endings
+# SuppressMessageAttribute for PSScriptAnalyzer
 function Set-GitConfig {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification='Function only modifies git global config, user consent implied by running script')]
+    param()
+
     Write-Host "Configuring Git for Windows..."
 
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {

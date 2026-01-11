@@ -11,6 +11,9 @@ if ($env:DOTFILES_DEBUG) {
 
 # Check if winget is available
 function Test-WingetExists {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Exists is not a plural noun, it is a verb form')]
+    param()
+
     try {
         $null = Get-Command winget -ErrorAction Stop
         return $true
@@ -42,6 +45,7 @@ function Find-PackageFile {
 
 # Install packages from JSON file
 function Install-Packages {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Packages refers to multiple items being installed, plural is intentional')]
     param (
         [string]$PackageFile
     )
@@ -68,6 +72,7 @@ function Install-Packages {
 
 # Export current packages to JSON file
 function Export-Packages {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification='Packages refers to multiple items being exported, plural is intentional')]
     param (
         [string]$OutputFile = "$env:USERPROFILE\.winget.json"
     )
