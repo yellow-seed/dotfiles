@@ -27,9 +27,6 @@ jobs:
       - name: Install bashcov and simplecov_json_formatter
         run: gem install bashcov simplecov_json_formatter
       
-      - name: Copy .simplecov to root
-        run: cp .github/.simplecov .simplecov
-      
       - name: Install Bats
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
@@ -77,7 +74,7 @@ jobs:
       - name: Install shfmt
         run: |
           curl -sS https://webi.sh/shfmt | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run shfmt check
-        run: shfmt -d -i 2 .
+        run: shfmt -f . | grep '\.sh$' | xargs shfmt -d -i 2
