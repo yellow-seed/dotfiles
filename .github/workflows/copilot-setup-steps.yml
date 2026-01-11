@@ -4,79 +4,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  copilot-setup-steps:
+  setup:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install chezmoi
+      - name: Build Docker environment
         run: |
-          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "Building Docker Compose environment..."
+          docker compose build
 
-      - name: Setup dotfiles with chezmoi
+      - name: Verify environment setup
         run: |
-          chezmoi init --apply -S .
-          echo "Dotfiles applied successfully"
+          echo "Verifying shell linting tools..."
+          docker compose run --rm shell-dev shellcheck --version
+          docker compose run --rm shell-dev shfmt --version
+          docker compose run --rm shell-dev actionlint --version
 
-      - name: Install mise
+      - name: Run shell script linting
         run: |
-          curl -fsSL https://mise.run | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "Running shell linting checks..."
+          docker compose run --rm shell-dev lint-shell
 
-      - name: Setup mise tools
-        run: |
-          # Initialize mise
-          eval "$(~/.local/bin/mise activate bash)"
-          # Install tools from config in home directory
-          cd ~
-          ~/.local/bin/mise install
-          echo "Mise tools installed successfully"
-
-      - name: Display chezmoi version
-        run: chezmoi --version
-
-      - name: Display mise version
-        run: ~/.local/bin/mise --version
-
-      - name: Display installed mise tools
-        run: |
-          eval "$(~/.local/bin/mise activate bash)"
-          mise list
-
-      - name: Display Node.js version
-        run: |
-          eval "$(~/.local/bin/mise activate bash)"
-          node --version
-
-      - name: Display Python version
-        run: |
-          eval "$(~/.local/bin/mise activate bash)"
-          python --version
-
-      - name: Display Go version
-        run: |
-          eval "$(~/.local/bin/mise activate bash)"
-          go version
-
-      - name: Display pnpm version
-        run: |
-          eval "$(~/.local/bin/mise activate bash)"
-          pnpm --version
-
-      - name: Display Ruby version
-        run: |
-          eval "$(~/.local/bin/mise activate bash)"
-          ruby --version
-
-      - name: Display GitHub CLI version
-        run: |
-          eval "$(~/.local/bin/mise activate bash)"
-          gh --version
-
-      - name: Setup complete
-        run: echo "Development environment setup complete for GitHub Copilot"
