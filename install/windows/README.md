@@ -8,7 +8,37 @@ Windows環境でのdotfilesセットアップ用スクリプト集です。
 - PowerShell 5.1以降（PowerShell 7推奨）
 - 管理者権限（一部のパッケージインストールに必要）
 
+## クイックスタート
+
+開発者向けのクイックセットアップ：
+
+```powershell
+# 1. 開発ツールをインストール（Pester, PSScriptAnalyzerなど）
+.\install\windows\common\dev-tools.ps1
+
+# 2. テストを実行
+.\scripts\windows\run_unit_test.ps1
+
+# 3. パッケージをインストール
+.\install\windows\common\packages.ps1
+```
+
 ## 使い方
+
+### 0. 開発環境のセットアップ（開発者向け）
+
+dotfilesの開発やテストを行う場合は、まず開発ツールをインストールしてください：
+
+```powershell
+.\install\windows\common\dev-tools.ps1
+```
+
+このスクリプトは以下をインストールします：
+
+- **Pester 5.x**: PowerShellテストフレームワーク
+- **PSScriptAnalyzer**: PowerShellスクリプトの静的解析ツール
+- PowerShell 7+の推奨（インストール手順を表示）
+- Git設定の最適化
 
 ### 1. Wingetのインストール確認
 
@@ -84,7 +114,7 @@ winget search <パッケージ名>
 ### Wingetが見つからない
 
 Microsoft Storeから「アプリ インストーラー」をインストールしてください：
-https://www.microsoft.com/p/app-installer/9nblggh4nns1
+<https://www.microsoft.com/p/app-installer/9nblggh4nns1>
 
 または、管理者権限のPowerShellで：
 

@@ -134,16 +134,18 @@ chezmoi data
 
 ## 初期セットアップ
 
+### macOS / Linux環境
+
 **初回設定時の流れ**: 新しいPCではHomebrewがインストールされていない状態から始まります。以下の手順で段階的に環境を構築します。
 
-### 1. chezmoiのインストール
+#### 1. chezmoiのインストール
 
 ```bash
 # 公式のインストールスクリプトを使用
 sh -c "$(curl -fsLS get.chezmoi.io)"
 ```
 
-### 2. リポジトリの初期化
+#### 2. リポジトリの初期化
 
 ```bash
 chezmoi init https://github.com/yellow-seed/dotfiles.git
@@ -155,7 +157,7 @@ chezmoi cd
 chezmoi apply
 ```
 
-### 3. Homebrewのインストールとパッケージの一括インストール
+#### 3. Homebrewのインストールとパッケージの一括インストール
 
 ```bash
 # Homebrewをインストール
@@ -165,7 +167,7 @@ chezmoi cd
 brew bundle install --file=dot_Brewfile
 ```
 
-### 4. miseのセットアップ
+#### 4. miseのセットアップ
 
 ```bash
 # miseでツールをインストール（chezmoiで管理された設定から）
@@ -173,6 +175,34 @@ mise install
 ```
 
 **注意**: `.zshrc`にmiseの有効化設定が含まれているため、`chezmoi apply`実行後に新しいシェルセッションを開始すれば自動的にmiseが有効になります。
+
+### Windows環境
+
+Windows環境では、wingetを使用してパッケージを管理します。詳細な手順は [install/windows/README.md](install/windows/README.md) を参照してください。
+
+#### クイックスタート
+
+```powershell
+# 1. 開発ツールのインストール（Pester, PSScriptAnalyzerなど）
+.\install\windows\common\dev-tools.ps1
+
+# 2. Wingetの確認
+.\install\windows\common\winget.ps1
+
+# 3. パッケージのインストール
+.\install\windows\common\packages.ps1
+
+# 4. テストの実行（開発者向け）
+.\scripts\windows\run_unit_test.ps1
+```
+
+#### Windows環境の管理対象
+
+- **Winget**: Windowsアプリケーション管理（Git, VS Code, PowerShell, GitHub CLIなど）
+- **Pester**: PowerShellテストフレームワーク
+- **PSScriptAnalyzer**: PowerShellスクリプトの静的解析
+
+詳細は [install/windows/README.md](install/windows/README.md) を参照してください。
 
 ## 基本的な運用コマンド
 
