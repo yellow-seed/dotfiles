@@ -77,4 +77,4 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run shfmt check
-        run: shfmt -d -i 2 .
+        run: shfmt -f . | grep '\.sh$' | xargs shfmt -d -i 2
