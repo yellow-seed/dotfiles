@@ -54,7 +54,7 @@ Describe "dev-tools.ps1 Script Tests" {
             Get-Command Main -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
         }
 
-        It "Test-Administrator should return boolean" {
+        It "Test-Administrator should return boolean" -Skip:($IsLinux -or $IsMacOS) {
             $result = Test-Administrator
             $result | Should -BeOfType [bool]
         }

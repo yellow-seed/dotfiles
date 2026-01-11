@@ -8,7 +8,7 @@ services:
     volumes:
       - .:/workspace
     working_dir: /workspace
-    command: pwsh -Command ".\scripts\windows\run_unit_test.ps1"
+    command: pwsh -File ./scripts/windows/run_unit_test.ps1
 
   windows-test-shell:
     build:

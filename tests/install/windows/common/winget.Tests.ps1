@@ -49,7 +49,7 @@ Describe "winget.ps1 Script Tests" {
             . $ScriptPath
         }
 
-        It "Should support Windows 10 or later" {
+        It "Should support Windows 10 or later" -Skip:($IsLinux -or $IsMacOS) {
             $osVersion = [System.Environment]::OSVersion.Version
             $osVersion.Major | Should -BeGreaterOrEqual 10
         }
