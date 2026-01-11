@@ -1,6 +1,23 @@
 # dotfiles
 
+<!-- CI/CD & Code Quality -->
+[![CI](https://github.com/yellow-seed/dotfiles/workflows/CI/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/ci.yml)
+[![Actionlint](https://github.com/yellow-seed/dotfiles/workflows/Actionlint/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/actionlint.yml)
 [![codecov](https://codecov.io/gh/yellow-seed/dotfiles/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/dotfiles)
+
+<!-- Project Info -->
+[![License](https://img.shields.io/github/license/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/commits/main)
+
+<!-- Repository Activity -->
+[![GitHub stars](https://img.shields.io/github/stars/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/pulls)
+
+<!-- Other Workflows -->
+[![Claude Code](https://github.com/yellow-seed/dotfiles/workflows/Claude%20Code/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/claude.yml)
+[![Copilot Setup Steps](https://github.com/yellow-seed/dotfiles/workflows/Copilot%20Setup%20Steps/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/copilot-setup-steps.yml)
 
 chezmoiを使用したdotfiles管理のガイドです。
 
