@@ -526,6 +526,56 @@ docker compose run ubuntu-test actionlint
   - shfmt（シェルスクリプトフォーマッター）
   - actionlint（GitHub Actionsワークフロー検証）
 
+### macOS向けDocker環境
+
+macOS環境でBATSテスト、ShellCheck、shfmt、actionlintを実行できます。
+
+#### 環境構築
+
+```bash
+# Dockerイメージをビルド
+cd docker/macos-test
+docker compose build
+```
+
+#### テスト実行
+
+```bash
+# BATSテストを実行
+cd docker/macos-test
+docker compose run macos-test bats tests/
+
+# 特定のテストファイルのみ実行
+docker compose run macos-test bats tests/example.bats
+```
+
+#### Lint実行
+
+```bash
+# ShellCheckによる静的解析
+cd docker/macos-test
+docker compose run macos-test lint-shell
+
+# shfmtによるフォーマットチェック
+docker compose run macos-test shfmt -d -i 2 .
+
+# shfmtで自動フォーマット
+docker compose run macos-test shfmt -i 2 -w .
+
+# actionlintでGitHub Actionsワークフローを検証
+docker compose run macos-test actionlint
+```
+
+#### 環境の詳細
+
+- **ベースイメージ**: Ubuntu 22.04
+- **インストール済みツール**:
+  - Ruby + bashcov（カバレッジ計測）
+  - BATS（Bash Automated Testing System）
+  - ShellCheck（シェルスクリプト静的解析）
+  - shfmt（シェルスクリプトフォーマッター）
+  - actionlint（GitHub Actionsワークフロー検証）
+
 ### Windows向けDocker環境
 
 Windows PowerShell環境でPesterテストを実行できます。
