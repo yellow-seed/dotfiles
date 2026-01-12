@@ -472,6 +472,72 @@ chezmoi status
 chezmoi cat ~/.zshrc
 ```
 
+## ローカルテスト環境（Docker）
+
+開発者向けに、Docker環境でテストやLintを実行できます。
+
+### Ubuntu向けDocker環境
+
+Ubuntu環境でBATSテスト、ShellCheck、shfmt、actionlintを実行できます。
+
+#### 環境構築
+
+```bash
+# Dockerイメージをビルド
+cd docker/ubuntu-test
+docker compose build
+```
+
+#### テスト実行
+
+```bash
+# BATSテストを実行
+cd docker/ubuntu-test
+docker compose run ubuntu-test bats tests/
+
+# 特定のテストファイルのみ実行
+docker compose run ubuntu-test bats tests/example.bats
+```
+
+#### Lint実行
+
+```bash
+# ShellCheckによる静的解析
+cd docker/ubuntu-test
+docker compose run ubuntu-test lint-shell
+
+# shfmtによるフォーマットチェック
+docker compose run ubuntu-test shfmt -d -i 2 .
+
+# shfmtで自動フォーマット
+docker compose run ubuntu-test shfmt -i 2 -w .
+
+# actionlintでGitHub Actionsワークフローを検証
+docker compose run ubuntu-test actionlint
+```
+
+#### 環境の詳細
+
+- **ベースイメージ**: Ubuntu 22.04
+- **インストール済みツール**:
+  - Ruby + bashcov（カバレッジ計測）
+  - BATS（Bash Automated Testing System）
+  - ShellCheck（シェルスクリプト静的解析）
+  - shfmt（シェルスクリプトフォーマッター）
+  - actionlint（GitHub Actionsワークフロー検証）
+
+### Windows向けDocker環境
+
+Windows PowerShell環境でPesterテストを実行できます。
+
+```bash
+# PowerShellテストを実行
+cd docker/windows-test
+docker compose run --rm windows-test
+```
+
+詳細は [install/windows/README.md](install/windows/README.md) を参照してください。
+
 ## その他規約
 
 - 開発に関する規約は`AGENTS.md`に記載

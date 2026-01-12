@@ -1,0 +1,11 @@
+services:
+  ubuntu-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspace
+    working_dir: /workspace
+    environment:
+      - BATS_LIB_PATH=/usr/local/lib
+    command: bash
