@@ -1,7 +1,9 @@
 # dotfiles
 
 <!-- CI/CD & Code Quality -->
-[![CI](https://github.com/yellow-seed/dotfiles/workflows/CI/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/ci.yml)
+[![CI - macOS](https://github.com/yellow-seed/dotfiles/workflows/CI%20-%20macOS/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/ci-macos.yml)
+[![CI - Ubuntu](https://github.com/yellow-seed/dotfiles/workflows/CI%20-%20Ubuntu/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/ci-ubuntu.yml)
+[![CI - Windows](https://github.com/yellow-seed/dotfiles/workflows/CI%20-%20Windows/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/ci-windows.yml)
 [![Actionlint](https://github.com/yellow-seed/dotfiles/workflows/Actionlint/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/actionlint.yml)
 [![codecov](https://codecov.io/gh/yellow-seed/dotfiles/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/dotfiles)
 

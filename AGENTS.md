@@ -459,7 +459,7 @@ bats tests/install/macos/common/brew.bats
   shellcheck install/**/*.sh scripts/**/*.sh setup.sh
   ```
 
-- **CI統合**: `.github/workflows/ci.yml`で自動実行
+- **CI統合**: `.github/workflows/ci-macos.yml`、`.github/workflows/ci-ubuntu.yml`で自動実行
 
 #### shfmt
 
@@ -484,7 +484,7 @@ bats tests/install/macos/common/brew.bats
   shfmt -w -d -i 2 .
   ```
 
-- **CI統合**: `.github/workflows/ci.yml`で自動実行
+- **CI統合**: `.github/workflows/ci-macos.yml`、`.github/workflows/ci-ubuntu.yml`で自動実行
 
 ## コーディング規約とベストプラクティス
 
