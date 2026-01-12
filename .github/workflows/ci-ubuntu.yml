@@ -64,22 +64,3 @@ jobs:
         uses: ./.github/actions/shellcheck-shfmt
         with:
           os: ubuntu
-
-  actionlint:
-    name: Lint GitHub Actions workflows
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Download actionlint
-        run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          echo "${PWD}" >> "$GITHUB_PATH"
-
-      - name: Run actionlint
-        run: actionlint

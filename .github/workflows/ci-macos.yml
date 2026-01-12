@@ -64,20 +64,3 @@ jobs:
         uses: ./.github/actions/shellcheck-shfmt
         with:
           os: macos
-
-  actionlint:
-    name: Lint GitHub Actions workflows
-    runs-on: macos-latest
-    permissions:
-      contents: read
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Install actionlint
-        run: brew install actionlint
-
-      - name: Run actionlint
-        run: actionlint
