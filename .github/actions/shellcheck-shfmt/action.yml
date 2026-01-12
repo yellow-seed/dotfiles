@@ -1,0 +1,43 @@
+name: 'ShellCheck and shfmt'
+description: 'Run ShellCheck and shfmt on shell scripts'
+inputs:
+  os:
+    description: 'Operating system (macos or ubuntu)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install ShellCheck (macOS)
+      if: inputs.os == 'macos'
+      shell: bash
+      run: brew install shellcheck
+
+    - name: Install ShellCheck (Ubuntu)
+      if: inputs.os == 'ubuntu'
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+    - name: Run ShellCheck
+      shell: bash
+      run: |
+        # Find all shell scripts and run ShellCheck
+        find . -type f -name '*.sh' \
+          -not -path './.git/*' \
+          -exec shellcheck --severity=warning {} +
+
+    - name: Install shfmt (macOS)
+      if: inputs.os == 'macos'
+      shell: bash
+      run: brew install shfmt
+
+    - name: Install shfmt (Ubuntu)
+      if: inputs.os == 'ubuntu'
+      shell: bash
+      run: |
+        curl -sS https://webi.sh/shfmt | sh
+        echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+    - name: Run shfmt check
+      shell: bash
+      run: shfmt -f . | grep '\.sh$' | xargs shfmt -d -i 2

@@ -60,19 +60,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@2.0.0
+      - name: Run ShellCheck and shfmt
+        uses: ./.github/actions/shellcheck-shfmt
         with:
-          severity: warning
-          ignore_paths: .git
-
-      - name: Install shfmt
-        run: |
-          curl -sS https://webi.sh/shfmt | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Run shfmt check
-        run: shfmt -f . | grep '\.sh$' | xargs shfmt -d -i 2
+          os: ubuntu
 
   actionlint:
     name: Lint GitHub Actions workflows
