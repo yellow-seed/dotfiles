@@ -1,0 +1,94 @@
+name: CI - macOS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-coverage:
+    name: macOS Tests with Coverage
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+
+      - name: Install bashcov and simplecov_json_formatter
+        run: gem install bashcov simplecov_json_formatter
+
+      - name: Install Bats
+        run: brew install bats-core
+
+      - name: Run tests with coverage
+        run: |
+          # Set environment variables for SimpleCov
+          export CI=true
+          export RUNNER_OS=macos
+          export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
+
+          # Run tests with coverage
+          # BATS internal scripts are excluded via .simplecov configuration
+          bashcov -- bats tests/install/ tests/files/ tests/scripts/
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/coverage.json
+          flags: macos
+          name: coverage-macos
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+  shellcheck:
+    name: ShellCheck and shfmt
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install ShellCheck
+        run: brew install shellcheck
+
+      - name: Run ShellCheck
+        run: |
+          # Find all shell scripts and run ShellCheck
+          find . -type f -name '*.sh' \
+            -not -path './.git/*' \
+            -exec shellcheck --severity=warning {} +
+
+      - name: Install shfmt
+        run: brew install shfmt
+
+      - name: Run shfmt check
+        run: shfmt -f . | grep '\.sh$' | xargs shfmt -d -i 2
+
+  actionlint:
+    name: Lint GitHub Actions workflows
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install actionlint
+        run: brew install actionlint
+
+      - name: Run actionlint
+        run: actionlint

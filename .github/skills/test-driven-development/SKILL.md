@@ -243,7 +243,10 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 プロジェクトでは以下のCI/CDチェックが自動実行されます:
 
 - **Actionlint**: GitHub Actions ワークフローファイルの構文チェック ([actionlint.yml](.github/workflows/actionlint.yml))
-- **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック ([ci.yml](.github/workflows/ci.yml))
-- **Test**: プロジェクト固有のテスト実行 ([ci.yml](.github/workflows/ci.yml))
+- **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック ([ci-macos.yml](.github/workflows/ci-macos.yml), [ci-ubuntu.yml](.github/workflows/ci-ubuntu.yml))
+- **Test**: プロジェクト固有のテスト実行
+  - macOS: [ci-macos.yml](.github/workflows/ci-macos.yml)
+  - Ubuntu: [ci-ubuntu.yml](.github/workflows/ci-ubuntu.yml)
+  - Windows: [ci-windows.yml](.github/workflows/ci-windows.yml)
 
 CI/CDパイプラインのURL: `https://github.com/{owner}/{repo}/actions`
