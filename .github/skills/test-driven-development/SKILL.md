@@ -41,7 +41,7 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/example.bats
 
   # Shell Script Testing (bats) - macOS環境
-  docker compose run shell-dev bats tests/
+  cd docker/macos-test && docker compose run macos-test bats tests/
 
   # Windows PowerShell Testing (Pester)
   docker compose run --rm windows-test
@@ -68,7 +68,7 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/
 
   # Shell Script Testing (bats) - macOS環境
-  docker compose run shell-dev bats tests/
+  cd docker/macos-test && docker compose run macos-test bats tests/
 
   # Windows PowerShell Testing (Pester)
   docker compose run --rm windows-test
@@ -94,7 +94,7 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/
 
   # Shell Script Testing (bats) - macOS環境
-  docker compose run shell-dev bats tests/
+  cd docker/macos-test && docker compose run macos-test bats tests/
 
   # Windows PowerShell Testing (Pester)
   docker compose run --rm windows-test
@@ -109,7 +109,7 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   cd docker/ubuntu-test && docker compose run ubuntu-test lint-shell
 
   # Shell Script Linting - macOS環境
-  docker compose run shell-dev lint-shell
+  cd docker/macos-test && docker compose run macos-test lint-shell
   ```
 
 - Lintで問題がある場合には、コードフォーマットを適用する、個別に修正するなどして対応する
@@ -122,10 +122,10 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   cd docker/ubuntu-test && docker compose run ubuntu-test shfmt -i 2 -w .
 
   # Shell Script Formatting (check) - macOS環境
-  docker compose run shell-dev shfmt -d -i 2 .
+  cd docker/macos-test && docker compose run macos-test shfmt -d -i 2 .
 
   # Shell Script Formatting (apply) - macOS環境
-  docker compose run shell-dev shfmt -i 2 -w .
+  cd docker/macos-test && docker compose run macos-test shfmt -i 2 -w .
   ```
 
 - **Windows環境のPowerShell開発の場合**: PSScriptAnalyzerによる静的解析を実行
@@ -170,7 +170,7 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   cd docker/ubuntu-test && docker compose run ubuntu-test actionlint
 
   # GitHub Actions Linting - macOS環境
-  docker compose run shell-dev actionlint
+  cd docker/macos-test && docker compose run macos-test actionlint
   ```
 
 #### 3.4. Git Commit & Push
