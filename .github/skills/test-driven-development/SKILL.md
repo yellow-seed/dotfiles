@@ -34,11 +34,14 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   ```bash
   # プロジェクト固有のテストコマンドを実行
 
-  # Shell Script Testing (bats)
-  docker compose run shell-dev bats tests/
+  # Shell Script Testing (bats) - Ubuntu環境
+  cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/
 
   # 特定のテストファイルのみ実行
-  docker compose run shell-dev bats tests/example.bats
+  cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/example.bats
+
+  # Shell Script Testing (bats) - macOS環境
+  docker compose run shell-dev bats tests/
 
   # Windows PowerShell Testing (Pester)
   docker compose run --rm windows-test
@@ -61,7 +64,10 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - テストが全て通ることを確認
 
   ```bash
-  # Shell Script Testing (bats)
+  # Shell Script Testing (bats) - Ubuntu環境
+  cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/
+
+  # Shell Script Testing (bats) - macOS環境
   docker compose run shell-dev bats tests/
 
   # Windows PowerShell Testing (Pester)
@@ -84,7 +90,10 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - テストが全て通り続けることを確認
 
   ```bash
-  # Shell Script Testing (bats)
+  # Shell Script Testing (bats) - Ubuntu環境
+  cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/
+
+  # Shell Script Testing (bats) - macOS環境
   docker compose run shell-dev bats tests/
 
   # Windows PowerShell Testing (Pester)
@@ -96,17 +105,26 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - Lintチェックを実行して警告がないことを確認
 
   ```bash
-  # Shell Script Linting
+  # Shell Script Linting - Ubuntu環境
+  cd docker/ubuntu-test && docker compose run ubuntu-test lint-shell
+
+  # Shell Script Linting - macOS環境
   docker compose run shell-dev lint-shell
   ```
 
 - Lintで問題がある場合には、コードフォーマットを適用する、個別に修正するなどして対応する
 
   ```bash
-  # Shell Script Formatting (check)
+  # Shell Script Formatting (check) - Ubuntu環境
+  cd docker/ubuntu-test && docker compose run ubuntu-test shfmt -d -i 2 .
+
+  # Shell Script Formatting (apply) - Ubuntu環境
+  cd docker/ubuntu-test && docker compose run ubuntu-test shfmt -i 2 -w .
+
+  # Shell Script Formatting (check) - macOS環境
   docker compose run shell-dev shfmt -d -i 2 .
 
-  # Shell Script Formatting (apply)
+  # Shell Script Formatting (apply) - macOS環境
   docker compose run shell-dev shfmt -i 2 -w .
   ```
 
@@ -148,7 +166,10 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - GitHub Actionsワークフローを修正した場合はActionLintを実行
 
   ```bash
-  # GitHub Actions Linting
+  # GitHub Actions Linting - Ubuntu環境
+  cd docker/ubuntu-test && docker compose run ubuntu-test actionlint
+
+  # GitHub Actions Linting - macOS環境
   docker compose run shell-dev actionlint
   ```
 

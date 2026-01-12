@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Run ShellCheck on all shell scripts in the repository
+set -Eeuo pipefail
+
+echo "Running ShellCheck on shell scripts..."
+
+# Find and check all shell scripts
+find . -type f \( -name "*.sh" -o -name "*.bash" \) \
+  ! -path "*/node_modules/*" \
+  ! -path "*/.git/*" \
+  ! -path "*/vendor/*" \
+  -print0 | xargs -0 shellcheck
+
+echo "ShellCheck completed successfully"
