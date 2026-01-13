@@ -54,8 +54,8 @@
 │   │   │   └── Brewfile
 │   │   └── private/        # プライベート環境用Brewfile
 │   │       └── Brewfile
-│   ├── ubuntu/             # Ubuntu専用
-│   │   └── common/
+│   ├── ubuntu/             # Ubuntu専用（仮実装/Stub）
+│   │   └── README.md       # 仮実装の説明
 │   └── windows/            # Windows専用
 │       ├── winget.ps1              # Wingetインストール
 │       ├── winget.Tests.ps1        # Wingetテスト
@@ -100,12 +100,27 @@
 
 **新しい構造の特徴**：テストコードと実装コードが同じディレクトリに配置され、OS別に明確に分離されています。
 
-- **macos/brew.sh**: Homebrewの自動インストール
-- **macos/brewfile.sh**: Brewfileからパッケージを一括インストール
-- **macos/brew-dump-explicit.sh**: 明示的にインストールされたパッケージをBrewfileにダンプ
-- **windows/winget.ps1**: Windows用パッケージマネージャー設定
-- **windows/dev-tools.ps1**: Windows用開発ツールインストール
-- **windows/packages.ps1**: Windows用パッケージ一括インストール
+#### OS共通 (common/)
+- **chezmoi.bats**: chezmoiインストールスクリプトのテスト（実装はペンディング）
+  - chezmoiはOS非依存のツールのため、common/に配置
+
+#### macOS専用 (macos/)
+- **brew.sh**: Homebrewの自動インストール
+- **brewfile.sh**: Brewfileからパッケージを一括インストール
+- **brew-dump-explicit.sh**: 明示的にインストールされたパッケージをBrewfileにダンプ
+- 各スクリプトに対応する .bats テストファイル
+
+#### Windows専用 (windows/)
+- **winget.ps1**: Windows用パッケージマネージャー設定
+- **dev-tools.ps1**: Windows用開発ツールインストール
+- **packages.ps1**: Windows用パッケージ一括インストール
+- 各スクリプトに対応する .Tests.ps1 テストファイル
+
+#### Ubuntu専用 (ubuntu/)
+- **現在は仮実装（Stub）**: 実用優先度が低いため、スクリプトは未実装
+- 今後、必要に応じて実装予定
+
+#### その他
 - **template.sh**: 新しいインストールスクリプトのテンプレート
 
 ### テストスイート

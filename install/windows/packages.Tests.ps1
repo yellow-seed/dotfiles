@@ -1,7 +1,7 @@
 BeforeAll {
     # Script paths
-    $ScriptPath = Join-Path $PSScriptRoot "..\..\..\..\install\windows\common\packages.ps1"
-    $PackageJsonPath = Join-Path $PSScriptRoot "..\..\..\..\install\windows\common\packages.json"
+    $ScriptPath = Join-Path $PSScriptRoot "packages.ps1"
+    $PackageJsonPath = Join-Path $PSScriptRoot "packages.json"
 }
 
 Describe "packages.ps1 Script Tests" {

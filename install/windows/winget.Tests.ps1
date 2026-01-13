@@ -1,6 +1,6 @@
 BeforeAll {
     # Script path
-    $ScriptPath = Join-Path $PSScriptRoot "..\..\..\..\install\windows\common\winget.ps1"
+    $ScriptPath = Join-Path $PSScriptRoot "winget.ps1"
 }
 
 Describe "winget.ps1 Script Tests" {
