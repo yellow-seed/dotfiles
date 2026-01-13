@@ -1,15 +1,15 @@
 #!/usr/bin/env bats
 
 @test "brew installation script exists" {
-  [ -f "install/macos/common/brew.sh" ]
+  [ -f "install/macos/brew.sh" ]
 }
 
 @test "brew installation script is executable" {
-  [ -x "install/macos/common/brew.sh" ]
+  [ -x "install/macos/brew.sh" ]
 }
 
 @test "brew installation script runs without errors" {
-  run bash install/macos/common/brew.sh
+  run bash install/macos/brew.sh
   [ "$status" -eq 0 ]
 }
 

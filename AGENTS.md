@@ -24,13 +24,14 @@
 ├── .chezmoiroot              # chezmoiのルートディレクトリ指定
 ├── .github/                  # GitHub Actions ワークフロー
 │   └── workflows/
+│       ├── ci-macos.yml             # macOS CI/CD
+│       ├── ci-ubuntu.yml            # Ubuntu CI/CD
+│       ├── ci-windows.yml           # Windows CI/CD
 │       ├── copilot-setup-steps.yml  # Copilot検証環境構築
-│       ├── test_bats.yml            # BATS単体テスト
-│       └── test_chezmoi_apply.yml   # chezmoi適用テスト
+│       └── e2e-setup-test.yml       # E2Eセットアップテスト
 ├── home/                     # chezmoi管理下のdotfiles
 │   ├── .chezmoi.toml.tmpl   # chezmoiメイン設定
 │   ├── .chezmoiignore       # chezmoi無視ファイル
-│   ├── dot_Brewfile         # Homebrewパッケージ定義
 │   ├── dot_config/          # アプリケーション設定
 │   │   ├── gh/             # GitHub CLI設定
 │   │   └── mise/           # mise設定
@@ -38,27 +39,38 @@
 │   ├── dot_gitconfig        # Git設定
 │   ├── dot_gitignore_global # Gitグローバル無視設定
 │   └── dot_zshrc            # Zsh設定
-├── install/                 # インストールスクリプト
-│   ├── macos/
-│   │   └── common/
-│   │       ├── brew.sh      # Homebrew自動インストール
-│   │       ├── brewfile.sh  # Brewfile自動適用
-│   │       └── Brewfile     # Homebrewパッケージ定義（旧版）
-│   └── ubuntu/
-├── scripts/                 # ユーティリティスクリプト
-│   ├── macos/
-│   │   └── run_unit_test.sh  # macOS用テスト実行
-│   ├── ubuntu/
-│   │   └── run_unit_test.sh  # Ubuntu用テスト実行
-│   └── run_unit_test_common.sh
-├── tests/                   # 自動テストスイート
-│   ├── files/
-│   │   └── common.bats      # 共通ファイルテスト
-│   └── install/
-│       └── macos/
-│           └── common/
-│               ├── brew.bats     # Homebrewテスト
-│               └── brewfile.bats # Brewfileテスト
+├── install/                 # インストールスクリプト（テストと実装が同じ階層）
+│   ├── common/              # OS共通
+│   │   └── chezmoi.bats    # chezmoiテスト
+│   ├── macos/              # macOS専用
+│   │   ├── brew.sh         # Homebrew自動インストール
+│   │   ├── brew.bats       # Homebrewテスト
+│   │   ├── brewfile.sh     # Brewfile自動適用
+│   │   ├── brewfile.bats   # Brewfileテスト
+│   │   ├── Brewfile        # Homebrewパッケージ定義
+│   │   ├── brew-dump-explicit.sh    # Brewfileダンプスクリプト
+│   │   ├── brew-dump-explicit.bats  # Brewfileダンプテスト
+│   │   ├── work/           # 仕事環境用Brewfile
+│   │   │   └── Brewfile
+│   │   └── private/        # プライベート環境用Brewfile
+│   │       └── Brewfile
+│   ├── ubuntu/             # Ubuntu専用（仮実装/Stub）
+│   │   └── README.md       # 仮実装の説明
+│   └── windows/            # Windows専用
+│       ├── winget.ps1              # Wingetインストール
+│       ├── winget.Tests.ps1        # Wingetテスト
+│       ├── dev-tools.ps1           # 開発ツールインストール
+│       ├── dev-tools.Tests.ps1     # 開発ツールテスト
+│       ├── packages.ps1            # パッケージインストール
+│       ├── packages.Tests.ps1      # パッケージテスト
+│       ├── packages.json           # パッケージ定義
+│       └── run_unit_test.ps1       # Windows用テスト実行
+├── tests/                   # ファイル系のテストのみ
+│   └── files/
+│       ├── common.bats      # 共通ファイルテスト
+│       ├── shellcheck.bats  # ShellCheckテスト
+│       ├── templates.bats   # テンプレートテスト
+│       └── setup.bats       # セットアップテスト
 ├── setup.sh                 # クイックセットアップスクリプト
 └── README.md                # ユーザー向けドキュメント
 ```
@@ -86,15 +98,41 @@
 
 ### インストールスクリプト (install/)
 
-- **macos/common/brew.sh**: Homebrewの自動インストール
-- **macos/common/brewfile.sh**: Brewfileからパッケージを一括インストール
+**新しい構造の特徴**：テストコードと実装コードが同じディレクトリに配置され、OS別に明確に分離されています。
+
+#### OS共通 (common/)
+- **chezmoi.bats**: chezmoiインストールスクリプトのテスト（実装はペンディング）
+  - chezmoiはOS非依存のツールのため、common/に配置
+
+#### macOS専用 (macos/)
+- **brew.sh**: Homebrewの自動インストール
+- **brewfile.sh**: Brewfileからパッケージを一括インストール
+- **brew-dump-explicit.sh**: 明示的にインストールされたパッケージをBrewfileにダンプ
+- 各スクリプトに対応する .bats テストファイル
+
+#### Windows専用 (windows/)
+- **winget.ps1**: Windows用パッケージマネージャー設定
+- **dev-tools.ps1**: Windows用開発ツールインストール
+- **packages.ps1**: Windows用パッケージ一括インストール
+- 各スクリプトに対応する .Tests.ps1 テストファイル
+
+#### Ubuntu専用 (ubuntu/)
+- **現在は仮実装（Stub）**: 実用優先度が低いため、スクリプトは未実装
+- 今後、必要に応じて実装予定
+
+#### その他
 - **template.sh**: 新しいインストールスクリプトのテンプレート
 
-### テストスイート (tests/)
+### テストスイート
 
-- **BATS (Bash Automated Testing System)** を使用
-- macOSとUbuntuの両方でテストを実行
-- インストールスクリプトと設定ファイルの検証
+**責務別の配置**：
+- **install/\*/\*.bats, \*.Tests.ps1**: インストールスクリプトのテスト（実装と同じディレクトリ）
+- **tests/files/**: ファイル系の共通テスト（ShellCheck、テンプレート検証など）
+
+**テストフレームワーク**：
+- **BATS (Bash Automated Testing System)**: macOS/Ubuntuのシェルスクリプトテスト
+- **Pester**: Windows PowerShellスクリプトテスト
+- macOS、Ubuntu、Windowsの3つのOS環境でCIが実行される
 
 ## セットアップ手順
 
@@ -164,18 +202,36 @@ gh pr view 123 -R yellow-seed/dotfiles
 #### macOSでテスト実行
 
 ```bash
-bash scripts/macos/run_unit_test.sh
+# すべてのテストを実行
+bats install/macos/ install/common/ tests/files/
+
+# 特定のテストのみ実行
+bats install/macos/brew.bats
 ```
 
 #### Ubuntuでテスト実行
 
 ```bash
-bash scripts/ubuntu/run_unit_test.sh
+# すべてのテストを実行
+bats install/ubuntu/ install/common/ tests/files/
+
+# 特定のテストのみ実行
+bats install/common/chezmoi.bats
+```
+
+#### Windowsでテスト実行
+
+```powershell
+# すべてのテストを実行
+.\install\windows\run_unit_test.ps1
+
+# 特定のテストのみ実行
+Invoke-Pester -Path install/windows/winget.Tests.ps1
 ```
 
 ### BATSテストの書き方
 
-テストファイルは`tests/`ディレクトリに配置:
+テストファイルは実装と同じディレクトリに配置（`install/*/`）、またはファイル系テストは `tests/files/` に配置:
 
 ```bash
 #!/usr/bin/env bats
@@ -197,33 +253,33 @@ bash scripts/ubuntu/run_unit_test.sh
 
 まず、期待する動作を定義するテストを書きます。この時点でテストは失敗します。
 
-**例**: 新しいインストールスクリプト `install/macos/common/git.sh` のテスト作成
+**例**: 新しいインストールスクリプト `install/macos/git.sh` のテスト作成
 
 ```bash
-# tests/install/macos/common/git.bats
+# install/macos/git.bats
 #!/usr/bin/env bats
 
 @test "git installation script exists" {
-    [ -f "install/macos/common/git.sh" ]
+    [ -f "install/macos/git.sh" ]
 }
 
 @test "git installation script is executable" {
-    [ -x "install/macos/common/git.sh" ]
+    [ -x "install/macos/git.sh" ]
 }
 
 @test "git installation script has proper error handling" {
-    run head -1 install/macos/common/git.sh
+    run head -1 install/macos/git.sh
     [[ "$output" =~ "#!/usr/bin/env bash" ]] || [[ "$output" =~ "#!/bin/bash" ]]
 }
 
 @test "git installation script uses set -Eeuo pipefail" {
-    run grep "set -Eeuo pipefail" install/macos/common/git.sh
+    run grep "set -Eeuo pipefail" install/macos/git.sh
     [ "$status" -eq 0 ]
 }
 
 @test "git installation script runs without errors in dry-run mode" {
     # 環境変数でドライランモードを有効化
-    DRY_RUN=true run bash install/macos/common/git.sh
+    DRY_RUN=true run bash install/macos/git.sh
     [ "$status" -eq 0 ]
 }
 
@@ -238,10 +294,10 @@ bash scripts/ubuntu/run_unit_test.sh
 
 ```bash
 # macOSの場合
-bash scripts/macos/run_unit_test.sh
+bats install/macos/git.bats
 
 # Ubuntuの場合
-bash scripts/ubuntu/run_unit_test.sh
+bats install/ubuntu/git.bats
 ```
 
 この段階では、スクリプトがまだ存在しないため、テストは失敗します。
@@ -251,7 +307,7 @@ bash scripts/ubuntu/run_unit_test.sh
 テストをパスする最小限の実装を行います。
 
 ```bash
-# install/macos/common/git.sh
+# install/macos/git.sh
 #!/usr/bin/env bash
 
 # エラーハンドリング設定
@@ -291,7 +347,7 @@ git --version
 実装後、テストを再実行してすべてパスすることを確認します。
 
 ```bash
-bash scripts/macos/run_unit_test.sh
+bats install/macos/git.bats
 ```
 
 #### 5. リファクタリング（Refactor フェーズ）
@@ -388,11 +444,14 @@ brew install package
 ### テスト実行コマンド
 
 ```bash
-# すべてのテストを実行
-bats tests/
+# macOS: すべてのテストを実行
+bats install/macos/ install/common/ tests/files/
+
+# Ubuntu: すべてのテストを実行
+bats install/ubuntu/ install/common/ tests/files/
 
 # 特定のテストファイルのみ実行
-bats tests/install/macos/common/brew.bats
+bats install/macos/brew.bats
 ```
 
 ### テストカバレッジの確認

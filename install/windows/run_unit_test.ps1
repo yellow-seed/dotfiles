@@ -28,7 +28,7 @@ try {
     # Pester configuration
     $configuration = [PesterConfiguration]@{
         Run    = @{
-            Path = "tests/install/windows"
+            Path = "install/windows"
             Exit = $true
         }
         Output = @{

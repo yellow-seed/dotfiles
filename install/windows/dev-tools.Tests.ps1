@@ -1,6 +1,6 @@
 BeforeAll {
     # Script path
-    $ScriptPath = Join-Path $PSScriptRoot "..\..\..\..\install\windows\common\dev-tools.ps1"
+    $ScriptPath = Join-Path $PSScriptRoot "dev-tools.ps1"
 }
 
 Describe "dev-tools.ps1 Script Tests" {

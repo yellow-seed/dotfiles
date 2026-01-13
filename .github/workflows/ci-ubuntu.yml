@@ -7,47 +7,25 @@ on:
     branches: [ main ]
 
 jobs:
-  test-and-coverage:
-    name: Ubuntu Tests with Coverage
+  test:
+    name: Ubuntu Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4'
-
-      - name: Install bashcov and simplecov_json_formatter
-        run: gem install bashcov simplecov_json_formatter
-
       - name: Install Bats
         run: sudo apt-get update && sudo apt-get install -y bats
 
-      - name: Run tests with coverage
+      - name: Run tests
         run: |
-          # Set environment variables for SimpleCov
-          export CI=true
-          export RUNNER_OS=ubuntu
-          export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
-
-          # Run tests with coverage
-          # BATS internal scripts are excluded via .simplecov configuration
-          bashcov -- bats tests/install/ tests/files/ tests/scripts/
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage/coverage.json
-          flags: ubuntu
-          name: coverage-ubuntu
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false
+          # Run tests without coverage for Ubuntu (sub-environment, coverage measured on macOS)
+          # Note: install/ubuntu/ is excluded as it's currently a stub implementation
+          bats install/common/ tests/files/
 
   shellcheck:
     name: ShellCheck and shfmt

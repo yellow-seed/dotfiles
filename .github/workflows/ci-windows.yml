@@ -31,12 +31,18 @@ jobs:
       - name: Run Pester tests
         shell: pwsh
         run: |
-          .\scripts\windows\run_unit_test.ps1
+          .\install\windows\run_unit_test.ps1
 
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
-          $results = Invoke-ScriptAnalyzer -Path install/windows -Recurse -Settings PSGallery
+          $scripts = @(
+            "install/windows/packages.ps1",
+            "install/windows/winget.ps1",
+            "install/windows/dev-tools.ps1",
+            "install/windows/run_unit_test.ps1"
+          )
+          $results = $scripts | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Settings PSGallery }
           if ($results) {
             $results | Format-Table -AutoSize
             Write-Error "PSScriptAnalyzer found issues"
