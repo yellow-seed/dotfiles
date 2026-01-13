@@ -31,7 +31,7 @@ jobs:
       - name: Run Pester tests
         shell: pwsh
         run: |
-          .\scripts\windows\run_unit_test.ps1
+          .\install\windows\run_unit_test.ps1
 
       - name: Run PSScriptAnalyzer
         shell: pwsh

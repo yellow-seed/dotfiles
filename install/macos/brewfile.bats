@@ -1,11 +1,11 @@
 #!/usr/bin/env bats
 
 @test "brewfile installation script exists" {
-  [ -f "install/macos/common/brewfile.sh" ]
+  [ -f "install/macos/brewfile.sh" ]
 }
 
 @test "brewfile installation script is executable" {
-  [ -x "install/macos/common/brewfile.sh" ]
+  [ -x "install/macos/brewfile.sh" ]
 }
 
 # Actual installation tests take time, so only basic operation checks are performed

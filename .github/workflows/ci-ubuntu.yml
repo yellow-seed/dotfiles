@@ -38,7 +38,7 @@ jobs:
 
           # Run tests with coverage
           # BATS internal scripts are excluded via .simplecov configuration
-          bashcov -- bats tests/install/ tests/files/ tests/scripts/
+          bashcov -- bats install/ubuntu/ install/common/ tests/files/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
