@@ -3,7 +3,7 @@
 setup() {
   # Create a temporary directory for test outputs
   TEST_TEMP_DIR="$(mktemp -d)"
-  SCRIPT_PATH="scripts/macos/brew-dump-explicit.sh"
+  SCRIPT_PATH="install/macos/brew-dump-explicit.sh"
 }
 
 teardown() {
