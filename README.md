@@ -282,13 +282,13 @@ Homebrewでパッケージをインストール・アンインストールした
 
 ```bash
 # 現在のHomebrewパッケージをBrewfileに出力
-brew bundle dump --no-vscode --describe --force --file=./install/macos/common/Brewfile
+brew bundle dump --no-vscode --describe --force --file=./install/macos/Brewfile
 
 # chezmoiで管理対象に追加（初回のみ）
-chezmoi add ./install/macos/common/Brewfile
+chezmoi add ./install/macos/Brewfile
 
 # または、設定ファイルを更新（ホームディレクトリの変更をchezmoiに反映）
-chezmoi re-add ./install/macos/common/Brewfile
+chezmoi re-add ./install/macos/Brewfile
 
 # 変更をコミット
 git add .
@@ -305,17 +305,17 @@ git push origin main
 
 ### 自動インストールスクリプトの使用
 
-`install/macos/common/brewfile.sh` を使用することで、Brewfileからのパッケージインストールを自動化できます。
+`install/macos/02-brewfile.sh` を使用することで、Brewfileからのパッケージインストールを自動化できます。
 
 ```bash
 # Brewfileからパッケージを一括インストール
-bash install/macos/common/brewfile.sh
+bash install/macos/02-brewfile.sh
 ```
 
 このスクリプトは以下の処理を行います：
 
 - Homebrewがインストールされているか確認
-- `install/macos/common/Brewfile` が存在するか確認
+- `install/macos/Brewfile` が存在するか確認
 - `brew bundle` を実行してパッケージをインストール
 
 ### パッケージの追加・削除方法
@@ -327,10 +327,10 @@ bash install/macos/common/brewfile.sh
 brew install <package-name>
 
 # Brewfileを更新
-brew bundle dump --describe --force --file=install/macos/common/Brewfile
+brew bundle dump --describe --force --file=install/macos/Brewfile
 
 # 変更をコミット
-git add install/macos/common/Brewfile
+git add install/macos/Brewfile
 git commit -m "chore: <package-name>をBrewfileに追加"
 git push origin main
 ```
@@ -342,10 +342,10 @@ git push origin main
 brew uninstall <package-name>
 
 # Brewfileを更新
-brew bundle dump --describe --force --file=install/macos/common/Brewfile
+brew bundle dump --describe --force --file=install/macos/Brewfile
 
 # 変更をコミット
-git add install/macos/common/Brewfile
+git add install/macos/Brewfile
 git commit -m "chore: <package-name>をBrewfileから削除"
 git push origin main
 ```
@@ -356,16 +356,16 @@ git push origin main
 
 ```bash
 # 1. Brewfileの構文チェック
-brew bundle check --file=install/macos/common/Brewfile
+brew bundle check --file=install/macos/Brewfile
 
 # 2. インストールする内容を確認（実際にはインストールしない）
-brew bundle list --file=install/macos/common/Brewfile
+brew bundle list --file=install/macos/Brewfile
 
 # 3. 実際にインストールを実行
-brew bundle install --file=install/macos/common/Brewfile
+brew bundle install --file=install/macos/Brewfile
 
 # または自動インストールスクリプトを使用
-bash install/macos/common/brewfile.sh
+bash install/macos/02-brewfile.sh
 ```
 
 ## mise設定管理
