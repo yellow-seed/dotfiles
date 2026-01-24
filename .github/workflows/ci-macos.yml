@@ -30,15 +30,22 @@ jobs:
         run: brew install bats-core
 
       - name: Run tests with coverage
+        timeout-minutes: 15
         run: |
           # Set environment variables for SimpleCov
           export CI=true
           export RUNNER_OS=macos
           export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
 
-          # Run macOS-specific tests with coverage (bashcov is time-consuming)
-          # Only measure coverage for macOS-specific scripts
-          bashcov -- bats install/macos/
+          # Run a smaller macOS test subset with coverage (bashcov is time-consuming)
+          bashcov -- bats \
+            install/macos/01-brew.bats \
+            install/macos/02-brewfile.bats \
+            install/macos/03-profile.bats \
+            install/macos/setup.bats
+
+          # Run remaining macOS tests without coverage for speed
+          bats install/macos/brew-dump-explicit.bats
 
           # Run common and file tests without coverage for speed
           bats install/common/ tests/files/
