@@ -6,6 +6,8 @@ if [ "${DOTFILES_DEBUG:-}" ]; then
   set -x
 fi
 
+export DRY_RUN="${DRY_RUN:-false}"
+
 # Brewfile関連の関数群
 function is_brew_exists() {
   command -v brew &>/dev/null
@@ -24,6 +26,11 @@ function install_brewfile() {
   if [ ! -f "$brewfile" ]; then
     echo "Error: Brewfile not found at ${brewfile}"
     exit 1
+  fi
+
+  if [ "${DRY_RUN}" = "true" ]; then
+    echo "[DRY RUN] Would install packages from ${brewfile}"
+    return 0
   fi
 
   echo "Installing packages from Brewfile..."
