@@ -1,4 +1,4 @@
-# macOS test environment for BATS testing, coverage, and linting
+# Linux-based test environment for macOS install scripts (BATS testing, coverage, and linting)
 FROM ubuntu:22.04
 
 # Prevent interactive prompts during installation
@@ -9,14 +9,9 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     ca-certificates \
-    build-essential \
-    ruby \
-    ruby-dev \
+    kcov \
     wget \
     && rm -rf /var/lib/apt/lists/*
-
-# Install bashcov for coverage measurement
-RUN gem install bashcov simplecov-cobertura
 
 # Install BATS (Bash Automated Testing System)
 RUN git clone --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core && \

@@ -456,13 +456,13 @@ bats install/macos/brew.bats
 
 ### テストカバレッジの確認
 
-このリポジトリでは、**bashcov**（SimpleCov-based coverage tool）を使用してBashスクリプトのテストカバレッジを計測し、**Codecov**で可視化しています。
+このリポジトリでは、**kcov**（C実装のカバレッジツール）を使用してBashスクリプトのテストカバレッジを計測し、**Codecov**で可視化しています。
 
 カバレッジツールの特徴
 
-- **bashcov**: RubyGems経由でインストール可能なBashカバレッジツール
-  - SimpleCovベースの成熟したツール
-  - JSON形式でのレポート生成（Codecov連携）
+- **kcov**: 低オーバーヘッドでBashを計測できるカバレッジツール
+  - C実装で高速
+  - Cobertura形式のレポート出力に対応（Codecov連携）
   - CI/CD環境のみでインストール（dotfiles本体には依存なし）
 
 ### テスト環境の優先順位
@@ -484,7 +484,7 @@ bats install/macos/brew.bats
 ### CI/CDワークフロー
 
 1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行（カバレッジなし、高速実行）
-2. **coverage.yml**: bashcovによるカバレッジ計測とCodecovへのレポート送信
+2. **coverage.yml**: kcovによるカバレッジ計測とCodecovへのレポート送信
 3. **test_chezmoi_apply.yml**: chezmoiの適用が正常に動作するか検証
 4. **shellcheck.yml**: ShellCheckによるシェルスクリプトの静的解析
 5. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
