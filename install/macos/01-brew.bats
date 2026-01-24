@@ -9,8 +9,9 @@
 }
 
 @test "brew installation script runs without errors" {
-  run bash install/macos/01-brew.sh
+  run env DRY_RUN=true bash install/macos/01-brew.sh
   [ "$status" -eq 0 ]
+  [[ "$output" =~ "\[DRY RUN\]" ]]
 }
 
 @test "brew command is available after installation" {
