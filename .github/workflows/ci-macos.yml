@@ -37,8 +37,15 @@ jobs:
           export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
 
           # Run macOS-specific tests with coverage (bashcov is time-consuming)
-          # Only measure coverage for macOS-specific scripts
-          bashcov -- bats install/macos/
+          # Focus coverage on the step-based installers to reduce runtime
+          bashcov -- bats \
+            install/macos/01-brew.bats \
+            install/macos/02-brewfile.bats \
+            install/macos/03-profile.bats \
+            install/macos/setup.bats
+
+          # Run remaining macOS tests without coverage for speed
+          bats install/macos/brew-dump-explicit.bats
 
           # Run common and file tests without coverage for speed
           bats install/common/ tests/files/
