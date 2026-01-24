@@ -6,12 +6,19 @@ if [ "${DOTFILES_DEBUG:-}" ]; then
   set -x
 fi
 
+DRY_RUN="${DRY_RUN:-false}"
+
 # Homebrew関連の関数群
 function is_brew_exists() {
   command -v brew &>/dev/null
 }
 
 function install_brew() {
+  if [ "${DRY_RUN}" = "true" ]; then
+    echo "[DRY RUN] Would install Homebrew if missing"
+    return 0
+  fi
+
   if ! is_brew_exists; then
     echo "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

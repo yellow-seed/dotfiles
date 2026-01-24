@@ -6,28 +6,35 @@ if [ "${DOTFILES_DEBUG:-}" ]; then
   set -x
 fi
 
+DRY_RUN="${DRY_RUN:-false}"
+
 # Brewfile関連の関数群
 function is_brew_exists() {
   command -v brew &>/dev/null
 }
 
 function install_brewfile() {
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local brewfile="${script_dir}/Brewfile"
+
+  if [ ! -f "${brewfile}" ]; then
+    echo "Error: Brewfile not found at ${brewfile}"
+    exit 1
+  fi
+
+  if [ "${DRY_RUN}" = "true" ]; then
+    echo "[DRY RUN] Would install packages from Brewfile: ${brewfile}"
+    return 0
+  fi
+
   if ! is_brew_exists; then
     echo "Error: Homebrew is not installed"
     exit 1
   fi
 
-  local script_dir
-  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  local brewfile="${script_dir}/Brewfile"
-
-  if [ ! -f "$brewfile" ]; then
-    echo "Error: Brewfile not found at ${brewfile}"
-    exit 1
-  fi
-
   echo "Installing packages from Brewfile..."
-  brew bundle --file="$brewfile"
+  brew bundle --file="${brewfile}"
 }
 
 # メイン処理
