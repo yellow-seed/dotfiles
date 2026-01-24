@@ -10,13 +10,20 @@ RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
     build-essential \
-    ruby \
-    ruby-dev \
+    cmake \
+    libcurl4-openssl-dev \
+    libdw-dev \
+    libiberty-dev \
+    binutils-dev \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Install bashcov for coverage measurement
-RUN gem install bashcov simplecov-cobertura
+# Install kcov for coverage measurement (direct build)
+RUN curl -sL https://github.com/SimonKagstrom/kcov/archive/refs/tags/v43.tar.gz -o /tmp/kcov.tar.gz && \
+    tar -xzf /tmp/kcov.tar.gz -C /tmp && \
+    cmake -S /tmp/kcov-43 -B /tmp/kcov-43/build -DCMAKE_BUILD_TYPE=Release && \
+    cmake --build /tmp/kcov-43/build --target install && \
+    rm -rf /tmp/kcov-43 /tmp/kcov.tar.gz
 
 # Install BATS (Bash Automated Testing System)
 RUN git clone --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core && \

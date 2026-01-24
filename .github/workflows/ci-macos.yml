@@ -18,13 +18,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4'
-
-      - name: Install bashcov and simplecov_json_formatter
-        run: gem install bashcov simplecov_json_formatter
+      - name: Install kcov (direct build)
+        run: |
+          brew install cmake pkg-config
+          curl -sL https://github.com/SimonKagstrom/kcov/archive/refs/tags/v43.tar.gz -o /tmp/kcov.tar.gz
+          tar -xzf /tmp/kcov.tar.gz -C /tmp
+          cmake -S /tmp/kcov-43 -B /tmp/kcov-43/build -DCMAKE_BUILD_TYPE=Release
+          sudo cmake --build /tmp/kcov-43/build --target install
 
       - name: Install Bats
         run: brew install bats-core
@@ -36,9 +36,10 @@ jobs:
           export RUNNER_OS=macos
           export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
 
-          # Run macOS-specific tests with coverage (bashcov is time-consuming)
+          # Run macOS-specific tests with coverage (kcov for performance)
           # Only measure coverage for macOS-specific scripts
-          bashcov -- bats install/macos/
+          mkdir -p coverage
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage bats install/macos/
 
           # Run common and file tests without coverage for speed
           bats install/common/ tests/files/

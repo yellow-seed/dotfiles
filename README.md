@@ -522,7 +522,7 @@ docker compose run ubuntu-test actionlint
 
 - **ベースイメージ**: Ubuntu 22.04
 - **インストール済みツール**:
-  - Ruby + bashcov（カバレッジ計測）
+  - kcov（カバレッジ計測）
   - BATS（Bash Automated Testing System）
   - ShellCheck（シェルスクリプト静的解析）
   - shfmt（シェルスクリプトフォーマッター）
@@ -572,7 +572,7 @@ docker compose run macos-test actionlint
 
 - **ベースイメージ**: Ubuntu 22.04
 - **インストール済みツール**:
-  - Ruby + bashcov（カバレッジ計測）
+  - kcov（カバレッジ計測）
   - BATS（Bash Automated Testing System）
   - ShellCheck（シェルスクリプト静的解析）
   - shfmt（シェルスクリプトフォーマッター）
