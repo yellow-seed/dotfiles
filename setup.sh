@@ -102,7 +102,7 @@ function keepalive_sudo() {
 # macOS環境の初期化
 function initialize_os_macos() {
   local script_dir
-  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || return 1
 
   echo "Initializing macOS environment..."
 

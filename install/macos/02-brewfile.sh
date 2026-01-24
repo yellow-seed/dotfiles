@@ -15,7 +15,7 @@ function is_brew_exists() {
 
 function install_brewfile() {
   local script_dir
-  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || return 1
   local brewfile="${script_dir}/Brewfile"
 
   if [ ! -f "${brewfile}" ]; then

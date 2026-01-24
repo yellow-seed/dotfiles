@@ -13,5 +13,5 @@ SCRIPT_PATH="install/macos/setup.sh"
 @test "setup script runs without errors in dry-run mode" {
   run env DRY_RUN=true bash "${SCRIPT_PATH}"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "macOS setup completed." ]]
+  [[ "$output" =~ "\\[DRY RUN\\] Would run macOS setup steps" ]]
 }

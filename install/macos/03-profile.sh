@@ -45,7 +45,7 @@ function get_profile_brewfile() {
   fi
 
   local script_dir
-  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || return 1
   echo "${script_dir}/${profile}/Brewfile"
 }
 
