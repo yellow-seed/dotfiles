@@ -9,9 +9,8 @@
 }
 
 @test "brew installation script runs without errors" {
-  run env DRY_RUN=true bash install/macos/01-brew.sh
+  run bash -c 'DRY_RUN=true bash install/macos/01-brew.sh >"$BATS_TEST_TMPDIR/output"; grep -q "\\[DRY RUN\\]" "$BATS_TEST_TMPDIR/output"'
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "\\[DRY RUN\\]" ]]
 }
 
 @test "brew command is available after installation" {

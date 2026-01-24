@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 @test "profile detection honors DOTFILES_PROFILE override" {
-  run bash -c 'DOTFILES_PROFILE=work source install/macos/03-profile.sh; detect_profile'
+  run bash -c 'DOTFILES_PROFILE=work; source install/macos/03-profile.sh; detect_profile'
   [ "$status" -eq 0 ]
   [ "$output" = "work" ]
 }
@@ -13,7 +13,6 @@
 }
 
 @test "profile script runs in dry-run mode" {
-  run env DRY_RUN=true DOTFILES_PROFILE=work bash install/macos/03-profile.sh
+  run bash -c 'DRY_RUN=true DOTFILES_PROFILE=work bash install/macos/03-profile.sh >"$BATS_TEST_TMPDIR/output"; grep -q "\\[DRY RUN\\]" "$BATS_TEST_TMPDIR/output"'
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "\[DRY RUN\]" ]]
 }

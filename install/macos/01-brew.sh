@@ -14,11 +14,12 @@ function is_brew_exists() {
 }
 
 function install_brew() {
+  if [ "${DRY_RUN}" = "true" ]; then
+    echo "[DRY RUN] Would install Homebrew..."
+    return 0
+  fi
+
   if ! is_brew_exists; then
-    if [ "${DRY_RUN}" = "true" ]; then
-      echo "[DRY RUN] Would install Homebrew..."
-      return 0
-    fi
     echo "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   else
