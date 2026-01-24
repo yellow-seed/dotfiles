@@ -18,13 +18,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install kcov (direct build)
-        run: |
-          brew install cmake pkg-config
-          curl -sL https://github.com/SimonKagstrom/kcov/archive/refs/tags/v43.tar.gz -o /tmp/kcov.tar.gz
-          tar -xzf /tmp/kcov.tar.gz -C /tmp
-          cmake -S /tmp/kcov-43 -B /tmp/kcov-43/build -DCMAKE_BUILD_TYPE=Release
-          sudo cmake --build /tmp/kcov-43/build --target install
+      - name: Install kcov
+        run: brew install kcov
 
       - name: Install Bats
         run: brew install bats-core
