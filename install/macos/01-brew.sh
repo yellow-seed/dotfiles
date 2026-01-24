@@ -10,7 +10,15 @@ DRY_RUN="${DRY_RUN:-false}"
 
 # Homebrew関連の関数群
 function is_brew_exists() {
-  command -v brew &>/dev/null
+  if command -v brew &>/dev/null; then
+    return 0
+  fi
+
+  if [ -x "/opt/homebrew/bin/brew" ] || [ -x "/usr/local/bin/brew" ]; then
+    return 0
+  fi
+
+  return 1
 }
 
 function install_brew() {
