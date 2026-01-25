@@ -1,5 +1,9 @@
 #!/usr/bin/env bats
 
+setup() {
+  export DRY_RUN=true
+}
+
 @test "brewfile installation script exists" {
   [ -f "install/macos/02-brewfile.sh" ]
 }

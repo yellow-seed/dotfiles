@@ -1,5 +1,9 @@
 #!/usr/bin/env bats
 
+setup() {
+  export DRY_RUN=true
+}
+
 @test "profile installation script exists" {
   [ -f "install/macos/03-profile.sh" ]
 }

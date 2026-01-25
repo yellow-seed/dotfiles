@@ -1,5 +1,9 @@
 #!/usr/bin/env bats
 
+setup() {
+  export DRY_RUN=true
+}
+
 @test "macOS setup script exists" {
   [ -f "install/macos/setup.sh" ]
 }
