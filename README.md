@@ -203,7 +203,7 @@ Windows環境では、wingetを使用してパッケージを管理します。�
 
 ```powershell
 # Windows PowerShell向け chezmoi セットアップ
-.\install\windows\setup.ps1
+.\install\windows\chezmoi.ps1
 ```
 
 #### クイックスタート
