@@ -1,9 +1,5 @@
 #!/usr/bin/env bats
 
-setup() {
-  export DRY_RUN=true
-}
-
 @test "brewfile installation script exists" {
   [ -f "install/macos/02-brewfile.sh" ]
 }
@@ -12,8 +8,13 @@ setup() {
   [ -x "install/macos/02-brewfile.sh" ]
 }
 
-@test "brewfile script runs without errors in dry-run mode" {
-  DRY_RUN=true run bash install/macos/02-brewfile.sh
+@test "brewfile installation script has proper error handling" {
+  run grep "set -Eeuo pipefail" install/macos/02-brewfile.sh
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "\\[DRY RUN\\]" ]] || [[ "$output" =~ "Installing packages" ]]
+}
+
+@test "brewfile script runs without errors in dry-run mode" {
+  run env DRY_RUN=true bash install/macos/02-brewfile.sh
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "[DRY RUN]" ]] || [[ "$output" =~ "Installing packages" ]]
 }
