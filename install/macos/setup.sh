@@ -11,6 +11,42 @@ export DRY_RUN="${DRY_RUN:-false}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+function is_ci() {
+  [ -n "${CI:-}" ]
+}
+
+function is_tty() {
+  [ -t 0 ]
+}
+
+function is_not_tty() {
+  ! is_tty
+}
+
+function is_ci_or_not_tty() {
+  is_ci || is_not_tty
+}
+
+function keepalive_sudo_macos() {
+  sudo -v
+
+  local parent_pid=$$
+  (while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$parent_pid" || exit
+  done) &
+}
+
+function keepalive_sudo() {
+  if is_ci_or_not_tty; then
+    echo "Skipping sudo keepalive in CI or non-TTY environment"
+    return 0
+  fi
+
+  keepalive_sudo_macos
+}
+
 function configure_homebrew_path() {
   if [[ $(arch) == "arm64" ]]; then
     if [ -x "/opt/homebrew/bin/brew" ]; then
@@ -42,6 +78,7 @@ function run_step() {
 function main() {
   echo "Initializing macOS environment..."
 
+  keepalive_sudo
   run_step "Step 1: Installing Homebrew..." "${SCRIPT_DIR}/01-brew.sh"
   configure_homebrew_path
   run_step "Step 2: Installing common packages..." "${SCRIPT_DIR}/02-brewfile.sh"
