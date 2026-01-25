@@ -8,8 +8,10 @@
 
   # Find all shell scripts and run ShellCheck
   run shellcheck \
-    install/macos/brew.sh \
-    install/macos/brewfile.sh \
+    install/macos/01-brew.sh \
+    install/macos/02-brewfile.sh \
+    install/macos/03-profile.sh \
+    install/macos/setup.sh \
     install/macos/brew-dump-explicit.sh \
     install/template.sh \
     setup.sh

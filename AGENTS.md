@@ -43,10 +43,14 @@
 │   ├── common/              # OS共通
 │   │   └── chezmoi.bats    # chezmoiテスト
 │   ├── macos/              # macOS専用
-│   │   ├── brew.sh         # Homebrew自動インストール
-│   │   ├── brew.bats       # Homebrewテスト
-│   │   ├── brewfile.sh     # Brewfile自動適用
-│   │   ├── brewfile.bats   # Brewfileテスト
+│   │   ├── 01-brew.sh      # Homebrew自動インストール
+│   │   ├── 01-brew.bats    # Homebrewテスト
+│   │   ├── 02-brewfile.sh  # Brewfile自動適用
+│   │   ├── 02-brewfile.bats # Brewfileテスト
+│   │   ├── 03-profile.sh  # プロファイル固有パッケージインストール
+│   │   ├── 03-profile.bats # プロファイル固有パッケージテスト
+│   │   ├── setup.sh       # macOS用オーケストレーター
+│   │   ├── setup.bats     # macOS用オーケストレーターテスト
 │   │   ├── Brewfile        # Homebrewパッケージ定義
 │   │   ├── brew-dump-explicit.sh    # Brewfileダンプスクリプト
 │   │   ├── brew-dump-explicit.bats  # Brewfileダンプテスト
@@ -105,8 +109,10 @@
   - chezmoiはOS非依存のツールのため、common/に配置
 
 #### macOS専用 (macos/)
-- **brew.sh**: Homebrewの自動インストール
-- **brewfile.sh**: Brewfileからパッケージを一括インストール
+- **01-brew.sh**: Homebrewの自動インストール
+- **02-brewfile.sh**: Brewfileからパッケージを一括インストール
+- **03-profile.sh**: プロファイル固有パッケージのインストール
+- **setup.sh**: macOS用オーケストレーター
 - **brew-dump-explicit.sh**: 明示的にインストールされたパッケージをBrewfileにダンプ
 - 各スクリプトに対応する .bats テストファイル
 
@@ -577,7 +583,7 @@ bats install/macos/brew.bats
 
      ```bash
      # 単一ファイルをチェック
-     shellcheck install/macos/common/brew.sh
+     shellcheck install/macos/01-brew.sh
      
      # すべてのシェルスクリプトをチェック
      shellcheck **/*.sh
