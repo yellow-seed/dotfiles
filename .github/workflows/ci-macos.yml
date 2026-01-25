@@ -27,10 +27,7 @@ jobs:
       - name: Run tests with coverage
         run: |
           # Set environment variables for SimpleCov
-          export CI=true
           export DRY_RUN=true
-          export RUNNER_OS=macos
-          export GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
 
           # Run macOS-specific tests with coverage (kcov for performance)
           # Only measure coverage for macOS-specific scripts
