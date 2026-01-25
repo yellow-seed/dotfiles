@@ -199,6 +199,13 @@ mise install
 
 Windows環境では、wingetを使用してパッケージを管理します。詳細な手順は [install/windows/README.md](install/windows/README.md) を参照してください。
 
+#### chezmoiセットアップ
+
+```powershell
+# Windows PowerShell向け chezmoi セットアップ
+.\install\windows\setup.ps1
+```
+
 #### クイックスタート
 
 ```powershell
