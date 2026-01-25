@@ -1,8 +1,6 @@
 #!/usr/bin/env bats
 
-# テスト用のセットアップ関数
 setup() {
-  # setup.shのパスを取得
   SETUP_SCRIPT="${BATS_TEST_DIRNAME}/../../setup.sh"
 }
 
@@ -11,158 +9,128 @@ setup() {
   [ -x "${SETUP_SCRIPT}" ]
 }
 
-@test "get_os_type function returns valid OS type" {
-  source "${SETUP_SCRIPT}"
-  result="$(get_os_type)"
-  # Darwin (macOS) or Linux を返すことを確認
-  [[ "${result}" == "Darwin" || "${result}" == "Linux" ]]
+@test "ubuntu setup script exists and is executable" {
+  [ -f "${BATS_TEST_DIRNAME}/../../install/ubuntu/setup.sh" ]
+  [ -x "${BATS_TEST_DIRNAME}/../../install/ubuntu/setup.sh" ]
 }
 
-@test "GITHUB_USERNAME has default value" {
-  source "${SETUP_SCRIPT}"
-  [ "${GITHUB_USERNAME}" = "yellow-seed" ]
-}
-
-@test "DOTFILES_REPO has correct default value" {
-  source "${SETUP_SCRIPT}"
-  [ "${DOTFILES_REPO}" = "https://github.com/yellow-seed/dotfiles.git" ]
-}
-
-@test "BRANCH_NAME has default value" {
-  source "${SETUP_SCRIPT}"
-  [ "${BRANCH_NAME}" = "main" ]
-}
-
-@test "GITHUB_USERNAME can be overridden by environment variable" {
-  # 新しいシェルで実行してreadonlyの影響を受けないようにする
-  # 一時ラッパースクリプトを作成してBASH_SOURCE問題を回避
-  local wrapper_script
-  wrapper_script=$(mktemp)
-  cat >"${wrapper_script}" <<'EOF'
-source "$1"
-echo "${GITHUB_USERNAME}"
-EOF
-  result=$(GITHUB_USERNAME="test-user" bash "${wrapper_script}" "${SETUP_SCRIPT}")
-  rm -f "${wrapper_script}"
-  [ "${result}" = "test-user" ]
-}
-
-@test "DOTFILES_REPO uses GITHUB_USERNAME in URL" {
-  # 新しいシェルで実行してreadonlyの影響を受けないようにする
-  # 一時ラッパースクリプトを作成してBASH_SOURCE問題を回避
-  local wrapper_script
-  wrapper_script=$(mktemp)
-  cat >"${wrapper_script}" <<'EOF'
-source "$1"
-echo "${DOTFILES_REPO}"
-EOF
-  result=$(GITHUB_USERNAME="custom-user" bash "${wrapper_script}" "${SETUP_SCRIPT}")
-  rm -f "${wrapper_script}"
-  [ "${result}" = "https://github.com/custom-user/dotfiles.git" ]
-}
-
-@test "initialize_os_env handles Darwin OS" {
-  source "${SETUP_SCRIPT}"
-  # get_os_type をモック
-  get_os_type() {
-    echo "Darwin"
-  }
-  export -f get_os_type
-  # initialize_os_macos をモック
-  initialize_os_macos() {
-    echo "Mock macOS initialization"
-  }
-  export -f initialize_os_macos
-  # Darwin の場合はエラーなく終了することを確認
-  run initialize_os_env
+@test "setup.sh delegates to OS-specific and chezmoi scripts" {
+  run grep "install/macos/setup.sh" "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+  run grep "install/ubuntu/setup.sh" "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+  run grep "install/common/chezmoi.sh" "${SETUP_SCRIPT}"
   [ "$status" -eq 0 ]
 }
 
-@test "initialize_os_env handles Linux OS" {
-  source "${SETUP_SCRIPT}"
-  # get_os_type をモック
-  get_os_type() {
-    echo "Linux"
-  }
-  export -f get_os_type
-  # initialize_os_linux をモック
-  initialize_os_linux() {
-    echo "Mock Linux initialization"
-  }
-  export -f initialize_os_linux
-  # Linux の場合はエラーなく終了することを確認
-  run initialize_os_env
+@test "setup.sh runs macOS delegation" {
+  local temp_dir
+  temp_dir="$(mktemp -d)"
+
+  cp "${SETUP_SCRIPT}" "${temp_dir}/setup.sh"
+  mkdir -p "${temp_dir}/install/macos" "${temp_dir}/install/ubuntu" "${temp_dir}/install/common" "${temp_dir}/bin"
+
+  cat >"${temp_dir}/install/macos/setup.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "macOS setup called"
+EOF
+  cat >"${temp_dir}/install/ubuntu/setup.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "Linux setup called"
+EOF
+  cat >"${temp_dir}/install/common/chezmoi.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "chezmoi setup called"
+EOF
+  cat >"${temp_dir}/bin/uname" <<'EOF'
+#!/usr/bin/env bash
+echo "Darwin"
+EOF
+
+  chmod +x "${temp_dir}/setup.sh" "${temp_dir}/install/macos/setup.sh" \
+    "${temp_dir}/install/ubuntu/setup.sh" "${temp_dir}/install/common/chezmoi.sh" \
+    "${temp_dir}/bin/uname"
+
+  run env PATH="${temp_dir}/bin:${PATH}" bash "${temp_dir}/setup.sh"
+
+  rm -rf "${temp_dir}"
+
   [ "$status" -eq 0 ]
+  [[ "${output}" == *"Detected macOS environment"* ]]
+  [[ "${output}" == *"macOS setup called"* ]]
+  [[ "${output}" == *"chezmoi setup called"* ]]
 }
 
-@test "initialize_os_env fails on unsupported OS" {
-  source "${SETUP_SCRIPT}"
-  # get_os_type をモック
-  get_os_type() {
-    echo "Windows"
-  }
-  export -f get_os_type
-  # Unsupported OS の場合は失敗することを確認
-  run initialize_os_env
+@test "setup.sh runs Linux delegation" {
+  local temp_dir
+  temp_dir="$(mktemp -d)"
+
+  cp "${SETUP_SCRIPT}" "${temp_dir}/setup.sh"
+  mkdir -p "${temp_dir}/install/macos" "${temp_dir}/install/ubuntu" "${temp_dir}/install/common" "${temp_dir}/bin"
+
+  cat >"${temp_dir}/install/macos/setup.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "macOS setup called"
+EOF
+  cat >"${temp_dir}/install/ubuntu/setup.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "Linux setup called"
+EOF
+  cat >"${temp_dir}/install/common/chezmoi.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "chezmoi setup called"
+EOF
+  cat >"${temp_dir}/bin/uname" <<'EOF'
+#!/usr/bin/env bash
+echo "Linux"
+EOF
+
+  chmod +x "${temp_dir}/setup.sh" "${temp_dir}/install/macos/setup.sh" \
+    "${temp_dir}/install/ubuntu/setup.sh" "${temp_dir}/install/common/chezmoi.sh" \
+    "${temp_dir}/bin/uname"
+
+  run env PATH="${temp_dir}/bin:${PATH}" bash "${temp_dir}/setup.sh"
+
+  rm -rf "${temp_dir}"
+
+  [ "$status" -eq 0 ]
+  [[ "${output}" == *"Detected Linux environment"* ]]
+  [[ "${output}" == *"Linux setup called"* ]]
+  [[ "${output}" == *"chezmoi setup called"* ]]
+}
+
+@test "setup.sh fails on unsupported OS" {
+  local temp_dir
+  temp_dir="$(mktemp -d)"
+
+  cp "${SETUP_SCRIPT}" "${temp_dir}/setup.sh"
+  mkdir -p "${temp_dir}/install/macos" "${temp_dir}/install/ubuntu" "${temp_dir}/install/common" "${temp_dir}/bin"
+
+  cat >"${temp_dir}/install/macos/setup.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "macOS setup called"
+EOF
+  cat >"${temp_dir}/install/ubuntu/setup.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "Linux setup called"
+EOF
+  cat >"${temp_dir}/install/common/chezmoi.sh" <<'EOF'
+#!/usr/bin/env bash
+echo "chezmoi setup called"
+EOF
+  cat >"${temp_dir}/bin/uname" <<'EOF'
+#!/usr/bin/env bash
+echo "Windows"
+EOF
+
+  chmod +x "${temp_dir}/setup.sh" "${temp_dir}/install/macos/setup.sh" \
+    "${temp_dir}/install/ubuntu/setup.sh" "${temp_dir}/install/common/chezmoi.sh" \
+    "${temp_dir}/bin/uname"
+
+  run env PATH="${temp_dir}/bin:${PATH}" bash "${temp_dir}/setup.sh"
+
+  rm -rf "${temp_dir}"
+
   [ "$status" -eq 1 ]
   [[ "${output}" == *"Unsupported OS"* ]]
-}
-
-@test "debug mode is disabled by default" {
-  # デバッグモードが無効の場合、set -x が有効でないことを確認
-  # これは直接的には検証しにくいが、スクリプトが正常に読み込めることを確認
-  source "${SETUP_SCRIPT}"
-  # エラーが発生しないことを確認
-  [ $? -eq 0 ]
-}
-
-@test "debug mode can be enabled with DOTFILES_DEBUG" {
-  # 新しいシェルで実行してDOTFILES_DEBUGを設定
-  # 一時ラッパースクリプトを作成してBASH_SOURCE問題を回避
-  local wrapper_script
-  wrapper_script=$(mktemp)
-  cat >"${wrapper_script}" <<'EOF'
-source "$1" 2>&1
-echo "success"
-EOF
-  result=$(DOTFILES_DEBUG=1 bash "${wrapper_script}" "${SETUP_SCRIPT}")
-  rm -f "${wrapper_script}"
-  [[ "${result}" == *"success"* ]]
-}
-
-@test "script works when BASH_SOURCE is undefined (curl/wget scenario)" {
-  # BASH_SOURCEが未定義の状態をシミュレート（bash -c "$(curl ...)" のような実行）
-  # スクリプトが unbound variable エラーなく実行できることを確認
-
-  # テスト用のスクリプトを作成（initialize_os_envとrun_chezmoiを無害化）
-  TEST_SCRIPT=$(mktemp)
-  # initialize_os_env関数とrun_chezmoi関数をモックに置換
-  sed -e '/^function initialize_os_env()/,/^}$/c\
-function initialize_os_env() {\
-    echo "Mock OS environment initialization"\
-}' -e '/^function run_chezmoi()/,/^}$/c\
-function run_chezmoi() {\
-    echo "Mock chezmoi install"\
-}' "${SETUP_SCRIPT}" >"${TEST_SCRIPT}"
-
-  # bash -c "$(cat script)" の形式で実行（curlシナリオのシミュレート）
-  run bash -c "$(cat "${TEST_SCRIPT}")"
-
-  # クリーンアップ
-  rm -f "${TEST_SCRIPT}"
-
-  # エラーなく実行できることを確認
-  [ "$status" -eq 0 ]
-  # unbound variable エラーが出ていないことを確認
-  [[ ! "$output" =~ "unbound variable" ]]
-}
-
-@test "script does not execute main when sourced with BASH_SOURCE defined" {
-  # sourceで読み込んだ場合はmainが実行されないことを確認
-  # mainが実行されないことを検証するため、mainをモック化
-  run bash -c 'main() { echo "Main was called"; }; export -f main; source '"${SETUP_SCRIPT}"
-
-  # sourceは成功するが、mainは実行されないことを確認
-  [ "$status" -eq 0 ]
-  [[ ! "$output" =~ "Main was called" ]]
 }
