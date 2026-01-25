@@ -103,74 +103,15 @@ function keepalive_sudo() {
 function initialize_os_macos() {
   local script_dir
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local macos_setup_script="${script_dir}/install/macos/setup.sh"
 
-  # プロファイルの検出（共通をデフォルト、ホスト名による自動判定、環境変数で上書き）
-  local profile="common"
-  local hostname_lower
-  hostname_lower="$(hostname | tr '[:upper:]' '[:lower:]')"
-  if [ -z "${hostname_lower}" ]; then
-    echo "Warning: hostname could not be detected; using profile=common (only common packages will be installed)"
+  if [ -f "${macos_setup_script}" ]; then
+    echo "Running macOS setup script..."
+    bash "${macos_setup_script}"
   else
-    local work_hostnames=("work-laptop" "work-desktop" "corp-mac")
-    local work_host
-    for work_host in "${work_hostnames[@]}"; do
-      if [ "${hostname_lower}" = "${work_host}" ]; then
-        profile="work"
-        break
-      fi
-    done
-  fi
-  if [ -n "${DOTFILES_PROFILE:-}" ]; then
-    profile="${DOTFILES_PROFILE}"
-  fi
-  echo "Using profile: ${profile}"
-
-  local common_dir="${script_dir}/install/macos/common"
-  local profile_dir="${script_dir}/install/macos/${profile}"
-
-  echo "Initializing macOS environment..."
-
-  # Homebrewのインストール
-  local brew_script="${common_dir}/brew.sh"
-  if [ -f "${brew_script}" ]; then
-    echo "Running Homebrew installation script..."
-    bash "${brew_script}"
-  else
-    echo "Error: brew.sh not found at ${brew_script}" >&2
+    echo "Error: macOS setup script not found at ${macos_setup_script}" >&2
     exit 1
   fi
-
-  # Apple Silicon/IntelでのPATH設定
-  if [[ $(arch) == "arm64" ]]; then
-    echo "Detected Apple Silicon, setting up Homebrew path..."
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [[ $(arch) == "x86_64" ]]; then
-    echo "Detected Intel Mac, setting up Homebrew path..."
-    eval "$(/usr/local/bin/brew shellenv)"
-  fi
-
-  # Common Brewfileのインストール
-  local common_brewfile_script="${common_dir}/brewfile.sh"
-  if [ -f "${common_brewfile_script}" ]; then
-    echo "Installing common packages..."
-    bash "${common_brewfile_script}"
-  else
-    echo "Error: brewfile.sh not found at ${common_brewfile_script}" >&2
-    exit 1
-  fi
-
-  # プロファイル固有のBrewfileのインストール
-  local profile_brewfile="${profile_dir}/Brewfile"
-  if [ "${profile}" = "common" ]; then
-    echo "Profile is common; skipping profile-specific Brewfile (common packages already installed)"
-  elif [ -f "${profile_brewfile}" ]; then
-    echo "Installing ${profile}-specific packages..."
-    brew bundle --file="${profile_brewfile}"
-  else
-    echo "Warning: ${profile} Brewfile not found at ${profile_brewfile}, skipping profile-specific packages"
-  fi
-
-  echo "macOS environment initialization completed."
 }
 
 # Linux環境の初期化

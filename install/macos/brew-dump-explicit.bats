@@ -2,6 +2,7 @@
 
 setup() {
   # Create a temporary directory for test outputs
+  export DRY_RUN=true
   TEST_TEMP_DIR="$(mktemp -d)"
   SCRIPT_PATH="install/macos/brew-dump-explicit.sh"
 }
