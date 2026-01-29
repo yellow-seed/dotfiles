@@ -139,8 +139,8 @@ function Main {
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "Next steps:"
-    Write-Host "1. Run tests: .\scripts\windows\run_unit_test.ps1"
-    Write-Host "2. Install packages: .\install\windows\common\packages.ps1"
+    Write-Host "1. Run tests: .\install\windows\run_unit_test.ps1"
+    Write-Host "2. Install packages: .\install\windows\03-packages.ps1"
     Write-Host ""
 }
 

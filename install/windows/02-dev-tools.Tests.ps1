@@ -1,9 +1,9 @@
 BeforeAll {
     # Script path
-    $ScriptPath = Join-Path $PSScriptRoot "dev-tools.ps1"
+    $ScriptPath = Join-Path $PSScriptRoot "02-dev-tools.ps1"
 }
 
-Describe "dev-tools.ps1 Script Tests" {
+Describe "02-dev-tools.ps1 Script Tests" {
     Context "Script File Validation" {
         It "Script file should exist" {
             $ScriptPath | Should -Exist
