@@ -61,14 +61,16 @@
 │   ├── ubuntu/             # Ubuntu専用（仮実装/Stub）
 │   │   └── README.md       # 仮実装の説明
 │   └── windows/            # Windows専用
-│       ├── winget.ps1              # Wingetインストール
-│       ├── winget.Tests.ps1        # Wingetテスト
-│       ├── dev-tools.ps1           # 開発ツールインストール
-│       ├── dev-tools.Tests.ps1     # 開発ツールテスト
-│       ├── packages.ps1            # パッケージインストール
-│       ├── packages.Tests.ps1      # パッケージテスト
+│       ├── 01-winget.ps1           # Wingetインストール
+│       ├── 01-winget.Tests.ps1     # Wingetテスト
+│       ├── 02-dev-tools.ps1        # 開発ツールインストール
+│       ├── 02-dev-tools.Tests.ps1  # 開発ツールテスト
+│       ├── 03-packages.ps1         # パッケージインストール
+│       ├── 03-packages.Tests.ps1   # パッケージテスト
 │       ├── packages.json           # パッケージ定義
-│       └── run_unit_test.ps1       # Windows用テスト実行
+│       ├── run_unit_test.ps1       # Windows用テスト実行
+│       ├── setup.ps1               # Windows用オーケストレーター
+│       └── setup.Tests.ps1         # Windows用オーケストレーターテスト
 ├── tests/                   # ファイル系のテストのみ
 │   └── files/
 │       ├── common.bats      # 共通ファイルテスト
@@ -117,9 +119,10 @@
 - 各スクリプトに対応する .bats テストファイル
 
 #### Windows専用 (windows/)
-- **winget.ps1**: Windows用パッケージマネージャー設定
-- **dev-tools.ps1**: Windows用開発ツールインストール
-- **packages.ps1**: Windows用パッケージ一括インストール
+- **01-winget.ps1**: Windows用パッケージマネージャー設定
+- **02-dev-tools.ps1**: Windows用開発ツールインストール
+- **03-packages.ps1**: Windows用パッケージ一括インストール
+- **setup.ps1**: Windows用オーケストレーター
 - 各スクリプトに対応する .Tests.ps1 テストファイル
 
 #### Ubuntu専用 (ubuntu/)
@@ -232,7 +235,7 @@ bats install/common/chezmoi.bats
 .\install\windows\run_unit_test.ps1
 
 # 特定のテストのみ実行
-Invoke-Pester -Path install/windows/winget.Tests.ps1
+Invoke-Pester -Path install/windows/01-winget.Tests.ps1
 ```
 
 ### BATSテストの書き方

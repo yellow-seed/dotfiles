@@ -13,14 +13,17 @@ Windows環境でのdotfilesセットアップ用スクリプト集です。
 開発者向けのクイックセットアップ：
 
 ```powershell
+# 0. セットアップ（Winget確認・開発ツール・パッケージを順次実行）
+.\install\windows\setup.ps1
+
 # 1. 開発ツールをインストール（Pester, PSScriptAnalyzerなど）
-.\install\windows\common\dev-tools.ps1
+.\install\windows\02-dev-tools.ps1
 
 # 2. テストを実行
-.\scripts\windows\run_unit_test.ps1
+.\install\windows\run_unit_test.ps1
 
 # 3. パッケージをインストール
-.\install\windows\common\packages.ps1
+.\install\windows\03-packages.ps1
 ```
 
 ## 使い方
@@ -30,7 +33,7 @@ Windows環境でのdotfilesセットアップ用スクリプト集です。
 dotfilesの開発やテストを行う場合は、まず開発ツールをインストールしてください：
 
 ```powershell
-.\install\windows\common\dev-tools.ps1
+.\install\windows\02-dev-tools.ps1
 ```
 
 このスクリプトは以下をインストールします：
@@ -44,7 +47,7 @@ dotfilesの開発やテストを行う場合は、まず開発ツールをイン
 
 ```powershell
 # Wingetが利用可能か確認
-.\install\windows\common\winget.ps1
+.\install\windows\01-winget.ps1
 ```
 
 Wingetがインストールされていない場合は、Microsoft Storeから「アプリ インストーラー」をインストールしてください。
@@ -53,30 +56,30 @@ Wingetがインストールされていない場合は、Microsoft Storeから�
 
 ```powershell
 # packages.jsonからパッケージをインストール
-.\install\windows\common\packages.ps1
+.\install\windows\03-packages.ps1
 
 # 特定のファイルを指定してインストール
-.\install\windows\common\packages.ps1 -File "C:\path\to\packages.json"
+.\install\windows\03-packages.ps1 -File "C:\path\to\packages.json"
 ```
 
 ### 3. 現在のパッケージをエクスポート
 
 ```powershell
 # デフォルト位置（~/.winget.json）にエクスポート
-.\install\windows\common\packages.ps1 -Action export
+.\install\windows\03-packages.ps1 -Action export
 
 # 特定のファイルにエクスポート
-.\install\windows\common\packages.ps1 -Action export -File ".\my-packages.json"
+.\install\windows\03-packages.ps1 -Action export -File ".\my-packages.json"
 ```
 
 ## パッケージファイルの検索順序
 
-`packages.ps1`は以下の順序でパッケージファイルを検索します：
+`03-packages.ps1`は以下の順序でパッケージファイルを検索します：
 
 1. `$env:USERPROFILE\.winget.json`（ホームディレクトリの.winget.json）
 2. `$env:USERPROFILE\winget.json`（ホームディレクトリのwinget.json）
-3. `install\windows\common\packages.json`（スクリプトと同じディレクトリ）
-4. `install\windows\common\winget.json`
+3. `install\windows\packages.json`（スクリプトと同じディレクトリ）
+4. `install\windows\winget.json`
 
 ## パッケージリストのカスタマイズ
 
@@ -141,7 +144,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ```powershell
 $env:DOTFILES_DEBUG = "1"
-.\install\windows\common\packages.ps1
+.\install\windows\03-packages.ps1
 ```
 
 ## 参考リンク

@@ -37,10 +37,11 @@ jobs:
         shell: pwsh
         run: |
           $scripts = @(
-            "install/windows/packages.ps1",
-            "install/windows/winget.ps1",
-            "install/windows/dev-tools.ps1",
-            "install/windows/run_unit_test.ps1"
+            "install/windows/01-winget.ps1",
+            "install/windows/02-dev-tools.ps1",
+            "install/windows/03-packages.ps1",
+            "install/windows/run_unit_test.ps1",
+            "install/windows/setup.ps1"
           )
           $results = $scripts | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Settings PSGallery }
           if ($results) {

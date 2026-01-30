@@ -209,17 +209,20 @@ Windows環境では、wingetを使用してパッケージを管理します。�
 #### クイックスタート
 
 ```powershell
-# 1. 開発ツールのインストール（Pester, PSScriptAnalyzerなど）
-.\install\windows\common\dev-tools.ps1
+# 1. セットアップ（Winget確認・開発ツール・パッケージを順次実行）
+.\install\windows\setup.ps1
 
 # 2. Wingetの確認
-.\install\windows\common\winget.ps1
+.\install\windows\01-winget.ps1
 
-# 3. パッケージのインストール
-.\install\windows\common\packages.ps1
+# 3. 開発ツールのインストール（Pester, PSScriptAnalyzerなど）
+.\install\windows\02-dev-tools.ps1
 
-# 4. テストの実行（開発者向け）
-.\scripts\windows\run_unit_test.ps1
+# 4. パッケージのインストール
+.\install\windows\03-packages.ps1
+
+# 5. テストの実行（開発者向け）
+.\install\windows\run_unit_test.ps1
 ```
 
 #### Windows環境の管理対象

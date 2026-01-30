@@ -1,10 +1,10 @@
 BeforeAll {
     # Script paths
-    $ScriptPath = Join-Path $PSScriptRoot "packages.ps1"
+    $ScriptPath = Join-Path $PSScriptRoot "03-packages.ps1"
     $PackageJsonPath = Join-Path $PSScriptRoot "packages.json"
 }
 
-Describe "packages.ps1 Script Tests" {
+Describe "03-packages.ps1 Script Tests" {
     Context "Script File Validation" {
         It "Script file should exist" {
             $ScriptPath | Should -Exist

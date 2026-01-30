@@ -98,7 +98,7 @@ function Main {
 
     # Check if winget is installed
     if (-not (Test-WingetExists)) {
-        Write-Error "Winget is not installed. Please run winget.ps1 first."
+        Write-Error "Winget is not installed. Please run 01-winget.ps1 first."
         exit 1
     }
 
@@ -123,7 +123,7 @@ function Main {
             Write-Error "No package file found. Please create a winget.json or packages.json file."
             Write-Host ""
             Write-Host "To export current packages, run:"
-            Write-Host "  .\packages.ps1 -Action export"
+            Write-Host "  .\03-packages.ps1 -Action export"
             exit 1
         }
 
