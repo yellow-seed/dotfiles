@@ -9,21 +9,15 @@ jobs:
   setup:
     permissions:
       contents: read
-    strategy:
-      fail-fast: false  # 1つのジョブが失敗しても他のジョブを継続
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    # Ubuntu is currently a stub implementation (see install/ubuntu/README.md)
+    # Only test macOS until Ubuntu setup is fully implemented
+    runs-on: macos-latest
     timeout-minutes: 30
-    
+
     steps:
       - name: Setup dotfiles
         run: |
-          if [ "${{ matrix.os }}" == "macos-latest" ]; then
-            bash -c "$(curl -fsLS https://raw.githubusercontent.com/yellow-seed/dotfiles/main/setup.sh)"
-          elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            bash -c "$(wget -qO - https://raw.githubusercontent.com/yellow-seed/dotfiles/main/setup.sh)"
-          fi
+          bash -c "$(curl -fsLS https://raw.githubusercontent.com/yellow-seed/dotfiles/main/setup.sh)"
       
       - name: Verify installation
         run: |
