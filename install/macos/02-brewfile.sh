@@ -38,8 +38,15 @@ function install_brewfile() {
     return 0
   fi
 
+  local bundle_args=("--file=$brewfile")
+
+  if [ -n "${CI:-}" ]; then
+    echo "CI environment detected; skipping cask installations."
+    bundle_args+=("--no-cask")
+  fi
+
   echo "Installing packages from Brewfile..."
-  brew bundle --file="$brewfile"
+  brew bundle "${bundle_args[@]}"
 }
 
 # メイン処理
