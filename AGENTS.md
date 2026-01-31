@@ -45,13 +45,13 @@
 │   ├── macos/              # macOS専用
 │   │   ├── 01-brew.sh      # Homebrew自動インストール
 │   │   ├── 01-brew.bats    # Homebrewテスト
-│   │   ├── 02-brewfile.sh  # Brewfile自動適用
-│   │   ├── 02-brewfile.bats # Brewfileテスト
+│   │   ├── 02-brewfile.sh  # スクリプト内定義のパッケージをインストール
+│   │   ├── 02-brewfile.bats # パッケージインストールテスト
 │   │   ├── 03-profile.sh  # プロファイル固有パッケージインストール
 │   │   ├── 03-profile.bats # プロファイル固有パッケージテスト
 │   │   ├── setup.sh       # macOS用オーケストレーター
 │   │   ├── setup.bats     # macOS用オーケストレーターテスト
-│   │   ├── Brewfile        # Homebrewパッケージ定義
+│   │   ├── Brewfile        # brew-dump-explicit.sh の出力先
 │   │   ├── brew-dump-explicit.sh    # Brewfileダンプスクリプト
 │   │   ├── brew-dump-explicit.bats  # Brewfileダンプテスト
 │   │   ├── work/           # 仕事環境用Brewfile
@@ -112,7 +112,7 @@
 
 #### macOS専用 (macos/)
 - **01-brew.sh**: Homebrewの自動インストール
-- **02-brewfile.sh**: Brewfileからパッケージを一括インストール
+- **02-brewfile.sh**: スクリプト内で定義したタップ・パッケージを一括インストール
 - **03-profile.sh**: プロファイル固有パッケージのインストール
 - **setup.sh**: macOS用オーケストレーター
 - **brew-dump-explicit.sh**: 明示的にインストールされたパッケージをBrewfileにダンプ
