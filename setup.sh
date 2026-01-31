@@ -5,7 +5,7 @@ if [ "${DOTFILES_DEBUG:-}" ]; then
   set -x
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 
 function run_script() {
   local script_path="$1"
@@ -43,6 +43,6 @@ function main() {
   echo "Dotfiles setup completed successfully!"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+if [[ "${BASH_SOURCE[0]:-$0}" == "${0}" ]]; then
   main
 fi
