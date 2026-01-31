@@ -15,9 +15,12 @@ jobs:
     timeout-minutes: 30
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup dotfiles
         run: |
-          bash -c "$(curl -fsLS https://raw.githubusercontent.com/yellow-seed/dotfiles/main/setup.sh)"
+          bash setup.sh
       
       - name: Verify installation
         run: |
