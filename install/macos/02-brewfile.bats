@@ -1,20 +1,20 @@
 #!/usr/bin/env bats
 
-@test "brewfile installation script exists" {
+@test "brew installation script exists" {
   [ -f "install/macos/02-brewfile.sh" ]
 }
 
-@test "brewfile installation script is executable" {
+@test "brew installation script is executable" {
   [ -x "install/macos/02-brewfile.sh" ]
 }
 
-@test "brewfile installation script has proper error handling" {
+@test "brew installation script has proper error handling" {
   run grep "set -Eeuo pipefail" install/macos/02-brewfile.sh
   [ "$status" -eq 0 ]
 }
 
-@test "brewfile script runs without errors in dry-run mode" {
+@test "brew script runs without errors in dry-run mode" {
   run env DRY_RUN=true bash install/macos/02-brewfile.sh
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "[DRY RUN]" ]] || [[ "$output" =~ "Installing packages" ]]
+  [[ "$output" =~ "[DRY RUN]" ]] || [[ "$output" =~ "Installing Homebrew" ]]
 }
