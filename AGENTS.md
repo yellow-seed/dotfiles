@@ -11,7 +11,7 @@
    - テンプレート機能による環境別の設定
 2. **Homebrew**: macOSアプリケーション管理
    - GUIアプリケーションとシステムツールのインストール
-   - Brewfileによる一括管理
+   - スクリプト内でパッケージリストを直接管理
 
 3. **mise**: プログラミング言語とCLIツールの管理
    - 複数言語のバージョン管理（Node.js, Python, Go, Rubyなど）
@@ -45,8 +45,8 @@
 │   ├── macos/              # macOS専用
 │   │   ├── 01-brew.sh      # Homebrew自動インストール
 │   │   ├── 01-brew.bats    # Homebrewテスト
-│   │   ├── 02-brewfile.sh  # Brewfile自動適用
-│   │   ├── 02-brewfile.bats # Brewfileテスト
+│   │   ├── 02-brew-packages.sh  # パッケージ自動インストール
+│   │   ├── 02-brew-packages.bats # パッケージインストールテスト
 │   │   ├── 03-profile.sh  # プロファイル固有パッケージインストール
 │   │   ├── 03-profile.bats # プロファイル固有パッケージテスト
 │   │   ├── setup.sh       # macOS用オーケストレーター
@@ -112,7 +112,7 @@
 
 #### macOS専用 (macos/)
 - **01-brew.sh**: Homebrewの自動インストール
-- **02-brewfile.sh**: Brewfileからパッケージを一括インストール
+- **02-brew-packages.sh**: スクリプト内のパッケージリストからtap/formulae/caskを一括インストール
 - **03-profile.sh**: プロファイル固有パッケージのインストール
 - **setup.sh**: macOS用オーケストレーター
 - **brew-dump-explicit.sh**: 明示的にインストールされたパッケージをBrewfileにダンプ

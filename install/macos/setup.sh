@@ -81,7 +81,7 @@ function main() {
   keepalive_sudo
   run_step "Step 1: Installing Homebrew..." "${SCRIPT_DIR}/01-brew.sh"
   configure_homebrew_path
-  run_step "Step 2: Installing common packages..." "${SCRIPT_DIR}/02-brewfile.sh"
+  run_step "Step 2: Installing common packages..." "${SCRIPT_DIR}/02-brew-packages.sh"
   run_step "Step 3: Installing profile-specific packages..." "${SCRIPT_DIR}/03-profile.sh"
 
   echo "macOS setup completed."

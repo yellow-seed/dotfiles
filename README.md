@@ -56,7 +56,7 @@ chezmoiを使用したdotfiles管理のガイドです。
 
 - **目的**: グローバルに適用したいアプリケーションの管理
 - **管理対象**: GUIアプリケーション、システム全体で使用するCLIツール
-- **役割**: macOSアプリケーションのインストール・管理、Brewfileによる一括管理
+- **役割**: macOSアプリケーションのインストール・管理、スクリプト内でパッケージリストを直接管理
 
 ### mise
 
@@ -315,18 +315,17 @@ git push origin main
 
 ### 自動インストールスクリプトの使用
 
-`install/macos/02-brewfile.sh` を使用することで、Brewfileからのパッケージインストールを自動化できます。
+`install/macos/02-brew-packages.sh` を使用することで、パッケージインストールを自動化できます。
 
 ```bash
-# Brewfileからパッケージを一括インストール
-bash install/macos/02-brewfile.sh
+# パッケージを一括インストール
+bash install/macos/02-brew-packages.sh
 ```
 
 このスクリプトは以下の処理を行います：
 
 - Homebrewがインストールされているか確認
-- `install/macos/Brewfile` が存在するか確認
-- `brew bundle` を実行してパッケージをインストール
+- スクリプト内に定義されたtap/formulae/caskリストからパッケージをインストール
 
 ### パッケージの追加・削除方法
 
@@ -375,7 +374,7 @@ brew bundle list --file=install/macos/Brewfile
 brew bundle install --file=install/macos/Brewfile
 
 # または自動インストールスクリプトを使用
-bash install/macos/02-brewfile.sh
+bash install/macos/02-brew-packages.sh
 ```
 
 ## mise設定管理
