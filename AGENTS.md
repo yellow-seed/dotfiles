@@ -11,7 +11,7 @@
    - テンプレート機能による環境別の設定
 2. **Homebrew**: macOSアプリケーション管理
    - GUIアプリケーションとシステムツールのインストール
-   - Brewfileによる一括管理
+   - スクリプト内でパッケージリストを直接管理
 
 3. **mise**: プログラミング言語とCLIツールの管理
    - 複数言語のバージョン管理（Node.js, Python, Go, Rubyなど）
@@ -45,8 +45,8 @@
 │   ├── macos/              # macOS専用
 │   │   ├── 01-brew.sh      # Homebrew自動インストール
 │   │   ├── 01-brew.bats    # Homebrewテスト
-│   │   ├── 02-brewfile.sh  # Brewfile自動適用
-│   │   ├── 02-brewfile.bats # Brewfileテスト
+│   │   ├── 02-brew-packages.sh  # パッケージ自動インストール
+│   │   ├── 02-brew-packages.bats # パッケージインストールテスト
 │   │   ├── 03-profile.sh  # プロファイル固有パッケージインストール
 │   │   ├── 03-profile.bats # プロファイル固有パッケージテスト
 │   │   ├── setup.sh       # macOS用オーケストレーター
@@ -112,7 +112,7 @@
 
 #### macOS専用 (macos/)
 - **01-brew.sh**: Homebrewの自動インストール
-- **02-brewfile.sh**: Brewfileからパッケージを一括インストール
+- **02-brew-packages.sh**: スクリプト内のパッケージリストからtap/formulae/caskを一括インストール
 - **03-profile.sh**: プロファイル固有パッケージのインストール
 - **setup.sh**: macOS用オーケストレーター
 - **brew-dump-explicit.sh**: 明示的にインストールされたパッケージをBrewfileにダンプ
@@ -624,15 +624,15 @@ bats install/macos/brew.bats
 # パッケージをインストール
 brew install <package-name>
 
-# Brewfileを更新
-brew bundle dump --describe --force --file=~/.local/share/chezmoi/home/dot_Brewfile
+# install/macos/02-brew-packages.sh 内の該当配列（taps/formulae/casks）にパッケージを追加
+# ※ 新しいマシンでのセットアップ時に自動インストールされるようにするため
 
-# chezmoiに反映
-chezmoi re-add ~/.Brewfile
+# （任意）Brewfileをダンプして現在の状態を記録
+bash install/macos/brew-dump-explicit.sh install/macos/Brewfile
 
 # コミットしてプッシュ
-git add .
-git commit -m "chore: <package-name>をBrewfileに追加"
+git add install/macos/02-brew-packages.sh install/macos/Brewfile
+git commit -m "chore: <package-name>を追加"
 git push
 ```
 
@@ -689,7 +689,7 @@ git push
 3. **変更時の注意点**:
    - 設定ファイルは必ず`chezmoi add`または`chezmoi re-add`で管理
    - 直接ホームディレクトリを編集せず、`chezmoi edit`を使用
-   - Brewfile更新時は`brew bundle dump`を実行
+   - パッケージ追加・削除時は`install/macos/02-brew-packages.sh`の配列を更新
 
 4. **PR作成時の必須事項（Chezmoi設定変更の場合）**:
    - Chezmoiの設定変更（テンプレートファイルや設定ファイルの追加・変更）を含むPRでは、必ず以下を実施しPRに記載すること：
@@ -713,8 +713,8 @@ git push
 
 2. **Homebrewパッケージの管理**:
    - `brew install`/`brew uninstall`でパッケージを操作
-   - `brew bundle dump`でBrewfileを更新
-   - `chezmoi re-add ~/.Brewfile`でchezmoiに反映
+   - `install/macos/02-brew-packages.sh` 内の配列を更新
+   - （任意）`brew-dump-explicit.sh`でBrewfileをダンプ
 
 3. **開発ツールのバージョン管理**:
    - `mise use <tool>@<version>`でツールを追加

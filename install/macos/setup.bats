@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-# Note: Execution tests are performed in individual step tests (01-brew.bats, 02-brewfile.bats, 03-profile.bats)
+# Note: Execution tests are performed in individual step tests (01-brew.bats, 02-brew-packages.bats, 03-profile.bats)
 # This file only tests the structure of setup.sh to avoid duplicate test runs with kcov
 
 @test "macOS setup script exists" {
@@ -19,7 +19,7 @@
 @test "macOS setup script calls all step scripts" {
   run grep "01-brew.sh" install/macos/setup.sh
   [ "$status" -eq 0 ]
-  run grep "02-brewfile.sh" install/macos/setup.sh
+  run grep "02-brew-packages.sh" install/macos/setup.sh
   [ "$status" -eq 0 ]
   run grep "03-profile.sh" install/macos/setup.sh
   [ "$status" -eq 0 ]
