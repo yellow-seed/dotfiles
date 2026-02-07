@@ -1,6 +1,8 @@
 #!/usr/bin/env bats
 
-SCRIPT_PATH="install/macos/02-brew-packages.sh"
+setup() {
+  SCRIPT_PATH="install/macos/02-brew-packages.sh"
+}
 
 @test "brew packages script exists" {
   [ -f "$SCRIPT_PATH" ]
@@ -16,29 +18,29 @@ SCRIPT_PATH="install/macos/02-brew-packages.sh"
 }
 
 @test "brew packages script does not reference external Brewfile" {
-  run grep -E "brew bundle|--file=" "$SCRIPT_PATH"
+  run grep -E "brew bundle|Brewfile" "$SCRIPT_PATH"
   [ "$status" -ne 0 ]
 }
 
 @test "brew packages script defines taps array" {
-  run grep -E '^\s+local taps=\(' "$SCRIPT_PATH"
+  run grep -E '^[[:space:]]*(local[[:space:]]+(-a[[:space:]]+)?)?taps=\(' "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
 }
 
 @test "brew packages script defines formulae array" {
-  run grep -E '^\s+local formulae=\(' "$SCRIPT_PATH"
+  run grep -E '^[[:space:]]*(local[[:space:]]+(-a[[:space:]]+)?)?formulae=\(' "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
 }
 
 @test "brew packages script defines casks array" {
-  run grep -E '^\s+local casks=\(' "$SCRIPT_PATH"
+  run grep -E '^[[:space:]]*(local[[:space:]]+(-a[[:space:]]+)?)?casks=\(' "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
 }
 
 @test "brew packages script runs without errors in dry-run mode" {
   run env DRY_RUN=true bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "[DRY RUN]" ]]
+  [[ "$output" == *"[DRY RUN]"* ]]
 }
 
 @test "brew packages dry-run output includes tap commands" {
@@ -47,8 +49,8 @@ SCRIPT_PATH="install/macos/02-brew-packages.sh"
   fi
   run env DRY_RUN=true bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "Tapping Homebrew repositories" ]]
-  [[ "$output" =~ "[DRY RUN] brew tap" ]]
+  [[ "$output" == *"Tapping Homebrew repositories"* ]]
+  [[ "$output" == *"[DRY RUN] brew tap"* ]]
 }
 
 @test "brew packages dry-run output includes formulae commands" {
@@ -57,8 +59,8 @@ SCRIPT_PATH="install/macos/02-brew-packages.sh"
   fi
   run env DRY_RUN=true bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "Installing Homebrew formulae" ]]
-  [[ "$output" =~ "[DRY RUN] brew install" ]]
+  [[ "$output" == *"Installing Homebrew formulae"* ]]
+  [[ "$output" == *"[DRY RUN] brew install"* ]]
 }
 
 @test "brew packages dry-run output includes cask commands" {
@@ -67,8 +69,8 @@ SCRIPT_PATH="install/macos/02-brew-packages.sh"
   fi
   run env DRY_RUN=true bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "Installing Homebrew casks" ]]
-  [[ "$output" =~ "[DRY RUN] brew install --cask" ]]
+  [[ "$output" == *"Installing Homebrew casks"* ]]
+  [[ "$output" == *"[DRY RUN] brew install --cask"* ]]
 }
 
 @test "brew packages dry-run skips gracefully without Homebrew" {
@@ -77,5 +79,5 @@ SCRIPT_PATH="install/macos/02-brew-packages.sh"
   fi
   run env DRY_RUN=true bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "[DRY RUN] Homebrew is not installed" ]]
+  [[ "$output" == *"[DRY RUN] Homebrew is not installed"* ]]
 }

@@ -284,34 +284,18 @@ chezmoi re-add ~/.zshrc
 chezmoi cat ~/.zshrc
 ```
 
-## Homebrew Bundle管理
+## Homebrewパッケージ管理
 
-Homebrewでパッケージをインストール・アンインストールした際は、以下の一連の流れを実行してBrewfileを更新し、chezmoiで管理します。
+Homebrewでパッケージをインストール・アンインストールした際は、`install/macos/02-brew-packages.sh` 内のパッケージ配列を更新してください。新しいマシンでのセットアップ時にこのスクリプトが自動実行されます。
 
-### Homebrew Bundle更新の手順
+### Brewfileダンプ（任意）
+
+現在インストール済みのパッケージ一覧を `Brewfile` に記録したい場合は、ダンプスクリプトを使用できます。Brewfile はあくまで記録用であり、セットアップ時のインストールには `02-brew-packages.sh` が使用されます。
 
 ```bash
-# 現在のHomebrewパッケージをBrewfileに出力
-brew bundle dump --no-vscode --describe --force --file=./install/macos/Brewfile
-
-# chezmoiで管理対象に追加（初回のみ）
-chezmoi add ./install/macos/Brewfile
-
-# または、設定ファイルを更新（ホームディレクトリの変更をchezmoiに反映）
-chezmoi re-add ./install/macos/Brewfile
-
-# 変更をコミット
-git add .
-git commit -m "chore: Brewfileを更新"
-git push origin main
+# 現在のHomebrewパッケージをBrewfileにダンプ
+bash install/macos/brew-dump-explicit.sh install/macos/Brewfile
 ```
-
-### 注意事項
-
-- Homebrewでパッケージをインストール・アンインストールした後は必ず上記の手順を実行する
-- `--describe`オプションでパッケージの説明も含めて出力
-- `--force`オプションで既存のBrewfileを上書き
-- 新しいPCでの環境構築時は`brew bundle install`でBrewfileからパッケージを一括インストール可能
 
 ### 自動インストールスクリプトの使用
 
@@ -335,12 +319,15 @@ bash install/macos/02-brew-packages.sh
 # Homebrewでパッケージをインストール
 brew install <package-name>
 
-# Brewfileを更新
-brew bundle dump --describe --force --file=install/macos/Brewfile
+# install/macos/02-brew-packages.sh 内の該当配列（formulae または casks）にパッケージを追加
+# ※ 新しいマシンでのセットアップ時に自動インストールされるようにするため
+
+# （任意）Brewfileをダンプして現在の状態を記録
+bash install/macos/brew-dump-explicit.sh install/macos/Brewfile
 
 # 変更をコミット
-git add install/macos/Brewfile
-git commit -m "chore: <package-name>をBrewfileに追加"
+git add install/macos/02-brew-packages.sh install/macos/Brewfile
+git commit -m "chore: <package-name>を追加"
 git push origin main
 ```
 
@@ -350,12 +337,14 @@ git push origin main
 # Homebrewでパッケージをアンインストール
 brew uninstall <package-name>
 
-# Brewfileを更新
-brew bundle dump --describe --force --file=install/macos/Brewfile
+# install/macos/02-brew-packages.sh 内の該当配列からパッケージを削除
+
+# （任意）Brewfileをダンプして現在の状態を記録
+bash install/macos/brew-dump-explicit.sh install/macos/Brewfile
 
 # 変更をコミット
-git add install/macos/Brewfile
-git commit -m "chore: <package-name>をBrewfileから削除"
+git add install/macos/02-brew-packages.sh install/macos/Brewfile
+git commit -m "chore: <package-name>を削除"
 git push origin main
 ```
 
@@ -364,16 +353,10 @@ git push origin main
 新しいパッケージを追加した際は、以下の手順でテストできます：
 
 ```bash
-# 1. Brewfileの構文チェック
-brew bundle check --file=install/macos/Brewfile
+# ドライランモードで動作確認
+DRY_RUN=true bash install/macos/02-brew-packages.sh
 
-# 2. インストールする内容を確認（実際にはインストールしない）
-brew bundle list --file=install/macos/Brewfile
-
-# 3. 実際にインストールを実行
-brew bundle install --file=install/macos/Brewfile
-
-# または自動インストールスクリプトを使用
+# 実際にインストールを実行
 bash install/macos/02-brew-packages.sh
 ```
 
