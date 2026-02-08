@@ -17,23 +17,23 @@ description: "Pull Request作成スキル。.github/PULL_REQUEST_TEMPLATE.mdに�
 
 ## PR概要の構成要素
 
-| 要素 | 必須/任意 | 説明 |
-| ----- | ------------- | ------------- |
-| Summary | 必須 | PRの目的と背景を2-3文で説明 |
-| Type of Change | 必須 | 変更種別を選択 |
-| Related Issues | 必須 | 関連Issue番号を記載 |
-| Changes | 必須 | 変更内容を詳細に列挙 |
-| Test Plan | 必須 | テスト方法と確認事項 |
-| Screenshots | 任意 | UI変更時のスクリーンショット |
-| Additional Notes | 任意 | その他の注意事項 |
+| 要素             | 必須/任意 | 説明                         |
+| ---------------- | --------- | ---------------------------- |
+| Summary          | 必須      | PRの目的と背景を2-3文で説明  |
+| Type of Change   | 必須      | 変更種別を選択               |
+| Related Issues   | 必須      | 関連Issue番号を記載          |
+| Changes          | 必須      | 変更内容を詳細に列挙         |
+| Test Plan        | 必須      | テスト方法と確認事項         |
+| Screenshots      | 任意      | UI変更時のスクリーンショット |
+| Additional Notes | 任意      | その他の注意事項             |
 
 ## What/Why/How の明確化
 
-| 要素 | 記述場所 | 説明 |
-|------|----------|------|
-| **What（何を）** | Summary, Changes | 何を変更したか |
-| **Why（なぜ）** | Summary | なぜ変更したか（目的、背景、効果） |
-| **How（どのように）** | Changes | どのように変更したか（実装方法、詳細） |
+| 要素                  | 記述場所         | 説明                                   |
+| --------------------- | ---------------- | -------------------------------------- |
+| **What（何を）**      | Summary, Changes | 何を変更したか                         |
+| **Why（なぜ）**       | Summary          | なぜ変更したか（目的、背景、効果）     |
+| **How（どのように）** | Changes          | どのように変更したか（実装方法、詳細） |
 
 ## PR作成手順
 
@@ -53,24 +53,37 @@ git diff main...HEAD --name-only
 git diff main...HEAD
 ```
 
-### 2. Summary を生成
+### 2. セルフレビュー（ブランチ差分チェック）
+
+**PR作成前の必須プロセス**として、自分の変更内容を客観的に確認します。
+
+```bash
+# self-review スキルを使用
+"実装が完了しました。セルフレビューをお願いします"
+```
+
+詳細な手順とチェックリストは [self-review/SKILL.md](../self-review/SKILL.md) を参照してください。
+
+### 3. Summary を生成
 
 **目的**: PRの「何を」「なぜ」「効果」を2-3文で説明
 
 **生成方法**:
+
 1. コミットメッセージのtype（feat, fix, docsなど）を確認
 2. 複数のコミットから共通の目的を抽出
 3. Issueの説明文を参考に背景を記述
 4. 2-3文で簡潔にまとめる
 
 **例**:
+
 ```markdown
 ## Summary
 
 シェルスクリプトの品質を保証するため、shellcheck と shfmt を使用したリンティング環境を構築します。これにより、バグの早期発見とコードスタイルの統一が可能になります。
 ```
 
-### 3. Type of Change を選択
+### 4. Type of Change を選択
 
 変更の性質に応じて適切な種別を選択:
 
@@ -82,7 +95,7 @@ git diff main...HEAD
 - Performance improvement
 - Test update
 
-### 4. Related Issues を記載
+### 5. Related Issues を記載
 
 Issue番号を正確に記載:
 
@@ -91,6 +104,7 @@ Issue番号を正確に記載:
 - `Related to #YYY`: 関連するが自動クローズしないIssue
 
 **例**:
+
 ```markdown
 ## Related Issues
 
@@ -98,25 +112,29 @@ Closes #20
 Related to #15
 ```
 
-### 5. Changes を構成
+### 6. Changes を構成
 
 **目的**: 「何を」「どのように」変更したかを詳細に説明
 
 **生成方法**:
+
 1. `git diff --name-only` でファイル一覧を取得
 2. 関連ファイルをグループ化（例: GitHub Actions, Docker, Docs）
 3. 各グループで変更内容を階層的に記述
 
 **例**:
+
 ```markdown
 ## Changes
 
 - GitHub Actions ワークフロー (.github/workflows/shell-linting.yml) を追加
+
   - PR と main ブランチへのプッシュで自動実行
   - shellcheck による静的解析
   - shfmt によるフォーマットチェック
 
 - Docker 環境を追加
+
   - Dockerfile.shell-linting: shellcheck と shfmt をインストール
   - docker-compose.shell-linting.yml: 簡単に実行可能な設定
 
@@ -125,16 +143,18 @@ Related to #15
   - docs/shell-linting.md: ユーザー向けガイド
 ```
 
-### 6. Test Plan を生成
+### 7. Test Plan を生成
 
 **目的**: テスト方法と確認事項を明確にする
 
 **生成方法**:
+
 1. Issueの受け入れ基準をTest Planに変換
 2. テストコミットからテスト項目を抽出
 3. チェックリスト形式で記述（実施済みは`[x]`、未実施は`[ ]`）
 
 **例**:
+
 ```markdown
 ## Test Plan
 
@@ -144,7 +164,7 @@ Related to #15
 - [ ] Docker 環境でリンティングが実行できる
 ```
 
-### 7. Checklist を確認
+### 8. Checklist を確認
 
 PR提出前に以下を確認:
 
@@ -156,7 +176,7 @@ PR提出前に以下を確認:
 - テストを追加/更新した
 - すべてのテストが通過する
 
-### 8. PR作成コマンドを実行
+### 9. PR作成コマンドを実行
 
 ```bash
 # PRを作成（タイトルと本文を指定）
@@ -205,16 +225,16 @@ EOF
 
 ## PR品質チェックポイント
 
-| 項目 | チェック内容 |
-|------|--------------|
-| **タイトル** | Conventional Commits形式（type: description） |
-| **Summary** | 目的と背景が2-3文で明確 |
-| **Type of Change** | 適切な変更種別を選択 |
-| **Related Issues** | Issue番号が正確（Closes/Fixes/Related to） |
-| **Changes** | 変更内容が階層的で詳細 |
-| **Test Plan** | テスト方法が具体的でチェックリスト形式 |
-| **Checklist** | 全項目を確認済み |
-| **Breaking Change** | 破壊的変更がある場合は明記 |
+| 項目                | チェック内容                                  |
+| ------------------- | --------------------------------------------- |
+| **タイトル**        | Conventional Commits形式（type: description） |
+| **Summary**         | 目的と背景が2-3文で明確                       |
+| **Type of Change**  | 適切な変更種別を選択                          |
+| **Related Issues**  | Issue番号が正確（Closes/Fixes/Related to）    |
+| **Changes**         | 変更内容が階層的で詳細                        |
+| **Test Plan**       | テスト方法が具体的でチェックリスト形式        |
+| **Checklist**       | 全項目を確認済み                              |
+| **Breaking Change** | 破壊的変更がある場合は明記                    |
 
 ## 良い例・悪い例
 
@@ -236,11 +256,13 @@ Closes #20
 ## Changes
 
 - GitHub Actions ワークフロー (.github/workflows/shell-linting.yml) を追加
+
   - PR と main ブランチへのプッシュで自動実行
   - shellcheck による静的解析
   - shfmt によるフォーマットチェック
 
 - Docker 環境を追加
+
   - Dockerfile.shell-linting: shellcheck と shfmt をインストール
   - docker-compose.shell-linting.yml: 簡単に実行可能な設定
 
@@ -259,6 +281,7 @@ Closes #20
 ```
 
 **なぜ良いか**:
+
 - Summary で目的と効果が明確
 - Type of Change が適切に選択されている
 - Related Issues で正確にIssueを参照
@@ -274,6 +297,7 @@ Added some files for shell linting.
 ```
 
 **なぜ悪いか**:
+
 - Summary が不明確（なぜ必要か、効果は何か）
 - Type of Change が選択されていない
 - Related Issues が記載されていない
@@ -330,13 +354,16 @@ Closes #30
 ## Changes
 
 - 認証ミドルウェアを追加 (middleware/auth.js)
+
   - JWTトークンの検証
   - 認証エラーハンドリング
 
 - ログインエンドポイントを追加 (routes/auth.js)
+
   - POST /api/login: ユーザー認証とトークン発行
 
 - テストを追加 (tests/auth.test.js)
+
   - 認証成功・失敗のテストケース
   - トークン検証のテストケース
 
@@ -380,6 +407,7 @@ Fixes #45
 ## Changes
 
 - データ処理のメモリリークを修正 (services/data-processor.js)
+
   - リソース解放処理を追加
   - try-finallyブロックで確実にクリーンアップ
 
@@ -423,11 +451,13 @@ Closes #24
 ## Changes
 
 - PR作成スキルを追加 (.claude/skills/pull-request/SKILL.md)
+
   - フォーマット定義
   - 良い例・悪い例
   - AIエージェント向けガイド
 
 - AGENTS.mdを更新
+
   - PR作成ガイドラインへの参照を追加
 
 - PRテンプレートを更新 (.github/PULL_REQUEST_TEMPLATE.md)

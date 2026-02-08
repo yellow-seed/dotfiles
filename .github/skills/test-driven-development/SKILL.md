@@ -9,11 +9,11 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 ## TDDサイクル
 
-| フェーズ | 説明 | 実施内容 |
-| ----- | ------------- | ------------- |
-| Red | 失敗するテストを書く | 要件を満たすテストケースを作成し、実行して失敗を確認 |
-| Green | テストを通す最小限のコード | テストが通る最小限の実装を追加 |
-| Refactor | コードを改善 | 重複排除、可読性向上、設計改善を実施 |
+| フェーズ | 説明                       | 実施内容                                             |
+| -------- | -------------------------- | ---------------------------------------------------- |
+| Red      | 失敗するテストを書く       | 要件を満たすテストケースを作成し、実行して失敗を確認 |
+| Green    | テストを通す最小限のコード | テストが通る最小限の実装を追加                       |
+| Refactor | コードを改善               | 重複排除、可読性向上、設計改善を実施                 |
 
 ## TDD原則
 
@@ -34,24 +34,18 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
   ```bash
   # プロジェクト固有のテストコマンドを実行
 
-  # Shell Script Testing (bats) - Ubuntu環境
-  cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
 
   # 特定のテストファイルのみ実行
-  cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/example.bats
-
-  # Shell Script Testing (bats) - macOS環境
-  cd docker/macos-test && docker compose run macos-test bats tests/
-
-  # Windows PowerShell Testing (Pester)
-  docker compose run --rm windows-test
+  docker compose run shell-dev bats tests/example.bats
   ```
 
 - 失敗理由が意図通りであることを確認
 
 **テストファイルの扱い**:
 
-- **コード開発**: 作成したテストファイルは最終成果物として残す（例: tests/*.bats）
+- **コード開発**: 作成したテストファイルは最終成果物として残す（例: tests/\*.bats）
 - **ドキュメント開発**: 検証用のテストチェックリスト（TEST.md など）は、Greenフェーズ完了後に以下のいずれかを実施
   - 不要な場合は削除する
   - 継続的な品質確認が必要な場合は残す
@@ -64,14 +58,8 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - テストが全て通ることを確認
 
   ```bash
-  # Shell Script Testing (bats) - Ubuntu環境
-  cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/
-
-  # Shell Script Testing (bats) - macOS環境
-  cd docker/macos-test && docker compose run macos-test bats tests/
-
-  # Windows PowerShell Testing (Pester)
-  docker compose run --rm windows-test
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
   ```
 
 - 新しいテストで既存テストが壊れていないか確認
@@ -90,14 +78,8 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - テストが全て通り続けることを確認
 
   ```bash
-  # Shell Script Testing (bats) - Ubuntu環境
-  cd docker/ubuntu-test && docker compose run ubuntu-test bats tests/
-
-  # Shell Script Testing (bats) - macOS環境
-  cd docker/macos-test && docker compose run macos-test bats tests/
-
-  # Windows PowerShell Testing (Pester)
-  docker compose run --rm windows-test
+  # Shell Script Testing (bats)
+  docker compose run shell-dev bats tests/
   ```
 
 #### 3.3. ローカルLint/Format実行
@@ -105,72 +87,25 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 - Lintチェックを実行して警告がないことを確認
 
   ```bash
-  # Shell Script Linting - Ubuntu環境
-  cd docker/ubuntu-test && docker compose run ubuntu-test lint-shell
-
-  # Shell Script Linting - macOS環境
-  cd docker/macos-test && docker compose run macos-test lint-shell
+  # Shell Script Linting
+  docker compose run shell-dev lint-shell
   ```
 
 - Lintで問題がある場合には、コードフォーマットを適用する、個別に修正するなどして対応する
 
   ```bash
-  # Shell Script Formatting (check) - Ubuntu環境
-  cd docker/ubuntu-test && docker compose run ubuntu-test shfmt -d -i 2 .
+  # Shell Script Formatting (check)
+  docker compose run shell-dev shfmt -d -i 2 .
 
-  # Shell Script Formatting (apply) - Ubuntu環境
-  cd docker/ubuntu-test && docker compose run ubuntu-test shfmt -i 2 -w .
-
-  # Shell Script Formatting (check) - macOS環境
-  cd docker/macos-test && docker compose run macos-test shfmt -d -i 2 .
-
-  # Shell Script Formatting (apply) - macOS環境
-  cd docker/macos-test && docker compose run macos-test shfmt -i 2 -w .
-  ```
-
-- **Windows環境のPowerShell開発の場合**: PSScriptAnalyzerによる静的解析を実行
-
-  ```bash
-  # Windows PowerShell Linting (PSScriptAnalyzer)
-  # CIと同じ設定（PSGallery）で実行して警告がないことを確認
-  docker compose run --rm windows-test-shell pwsh -Command \
-    '$results = Invoke-ScriptAnalyzer -Path install/windows -Recurse -Settings PSGallery; if ($results) { $results | Format-Table -AutoSize; Write-Error "PSScriptAnalyzer found issues"; exit 1 } else { Write-Host "No issues found" -ForegroundColor Green }'
-  ```
-
-  - 警告が出た場合の対応:
-    - 警告の原因を修正する
-    - 正当な理由がある場合は `SuppressMessageAttribute` で抑制
-
-- **PSScriptAnalyzer警告の抑制例**（Windows PowerShell開発時、正当な理由がある場合のみ）
-
-  ```powershell
-  # 例: 複数形の関数名が意図的な場合
-  function Install-Packages {
-      [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '',
-          Justification='Packages refers to multiple items, plural is intentional')]
-      param (
-          [string]$PackageFile
-      )
-      # 実装...
-  }
-
-  # 例: 状態変更関数でShouldProcessが不要な場合
-  function Set-GitConfig {
-      [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '',
-          Justification='User consent implied by running script')]
-      param()
-      # 実装...
-  }
+  # Shell Script Formatting (apply)
+  docker compose run shell-dev shfmt -i 2 -w .
   ```
 
 - GitHub Actionsワークフローを修正した場合はActionLintを実行
 
   ```bash
-  # GitHub Actions Linting - Ubuntu環境
-  cd docker/ubuntu-test && docker compose run ubuntu-test actionlint
-
-  # GitHub Actions Linting - macOS環境
-  cd docker/macos-test && docker compose run macos-test actionlint
+  # GitHub Actions Linting
+  docker compose run shell-dev actionlint
   ```
 
 #### 3.4. Git Commit & Push
@@ -205,13 +140,13 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 
 ## テスト品質チェックポイント
 
-| 項目 | チェック内容 |
-| ----- | ------------- |
+| 項目       | チェック内容                                 |
+| ---------- | -------------------------------------------- |
 | カバレッジ | 重要なパス、エッジケース、エラーケースを網羅 |
-| 独立性 | テスト間の依存関係がない |
-| 明確性 | テストの意図が明確で可読性が高い |
-| 速度 | テストが高速に実行できる |
-| 信頼性 | テストが安定して同じ結果を返す |
+| 独立性     | テスト間の依存関係がない                     |
+| 明確性     | テストの意図が明確で可読性が高い             |
+| 速度       | テストが高速に実行できる                     |
+| 信頼性     | テストが安定して同じ結果を返す               |
 
 ## 出力形式
 
@@ -243,10 +178,7 @@ Red-Green-Refactorサイクルに基づくテスト駆動開発を支援しま�
 プロジェクトでは以下のCI/CDチェックが自動実行されます:
 
 - **Actionlint**: GitHub Actions ワークフローファイルの構文チェック ([actionlint.yml](.github/workflows/actionlint.yml))
-- **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック ([ci-macos.yml](.github/workflows/ci-macos.yml), [ci-ubuntu.yml](.github/workflows/ci-ubuntu.yml))
-- **Test**: プロジェクト固有のテスト実行
-  - macOS: [ci-macos.yml](.github/workflows/ci-macos.yml)
-  - Ubuntu: [ci-ubuntu.yml](.github/workflows/ci-ubuntu.yml)
-  - Windows: [ci-windows.yml](.github/workflows/ci-windows.yml)
+- **ShellCheck + shfmt**: シェルスクリプトの静的解析とフォーマットチェック ([ci.yml](.github/workflows/ci.yml))
+- **Test**: プロジェクト固有のテスト実行 ([ci.yml](.github/workflows/ci.yml))
 
 CI/CDパイプラインのURL: `https://github.com/{owner}/{repo}/actions`

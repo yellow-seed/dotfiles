@@ -4,12 +4,25 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/*, claude/* ]
+    branches:
+      [
+        main,
+        feat/*,
+        fix/*,
+        docs/*,
+        style/*,
+        refactor/*,
+        perf/*,
+        test/*,
+        chore/*,
+        copilot/*,
+        claude/*,
+      ]
 
 jobs:
   actionlint:
     name: Lint GitHub Actions
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6

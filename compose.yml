@@ -1,22 +1,10 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  windows-test:
+  shell-dev:
     build:
       context: .
-      dockerfile: docker/windows-test/Dockerfile
+      dockerfile: Dockerfile
     volumes:
       - .:/workspace
     working_dir: /workspace
-    command: pwsh -File ./scripts/windows/run_unit_test.ps1
-
-  windows-test-shell:
-    build:
-      context: .
-      dockerfile: docker/windows-test/Dockerfile
-    volumes:
-      - .:/workspace
-    working_dir: /workspace
-    command: pwsh
-    stdin_open: true
-    tty: true
