@@ -114,3 +114,73 @@ EOF
     # ただし、基本的な構造は確認できる
     assert_success || assert_failure  # どちらでもOK（モックのため）
 }
+
+@test "gh repo viewが失敗した場合にgit configから取得する" {
+    # gh repo viewを失敗させるモック
+    cat > "$TEST_DIR/gh" <<'EOF'
+#!/bin/bash
+case "$1" in
+    auth)
+        if [ "$2" = "status" ]; then
+            exit 0
+        fi
+        ;;
+    repo)
+        if [ "$2" = "view" ]; then
+            exit 1  # 失敗させる
+        fi
+        ;;
+    api)
+        if echo "$2" | grep -q "repos/fallback-owner/fallback-repo"; then
+            echo '{"delete_branch_on_merge":false}'
+        fi
+        ;;
+esac
+exit 0
+EOF
+    chmod +x "$TEST_DIR/gh"
+
+    # git configのモックを作成
+    cat > "$TEST_DIR/git" <<'EOF'
+#!/bin/bash
+if [ "$1" = "config" ] && [ "$2" = "--get" ] && [ "$3" = "remote.origin.url" ]; then
+    echo "https://github.com/fallback-owner/fallback-repo.git"
+fi
+exit 0
+EOF
+    chmod +x "$TEST_DIR/git"
+
+    export DRY_RUN=1
+    run bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
+    assert_output --partial "fallback-owner/fallback-repo"
+}
+
+@test "gh repo viewとgit configの両方が失敗した場合にエラー" {
+    # gh repo viewを失敗させるモック
+    cat > "$TEST_DIR/gh" <<'EOF'
+#!/bin/bash
+case "$1" in
+    auth)
+        if [ "$2" = "status" ]; then
+            exit 0
+        fi
+        ;;
+    *)
+        exit 1
+        ;;
+esac
+exit 1
+EOF
+    chmod +x "$TEST_DIR/gh"
+
+    # git configも失敗させる
+    cat > "$TEST_DIR/git" <<'EOF'
+#!/bin/bash
+exit 1
+EOF
+    chmod +x "$TEST_DIR/git"
+
+    run bash "$SCRIPT_DIR/setup-branch-auto-delete.sh"
+    assert_failure
+    assert_output --partial "リポジトリ情報を取得できませんでした"
+}
