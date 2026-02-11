@@ -20,11 +20,6 @@
 [![GitHub issues](https://img.shields.io/github/issues/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/pulls)
 
-<!-- Other Workflows -->
-
-[![Claude Code](https://github.com/yellow-seed/dotfiles/workflows/Claude%20Code/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/claude.yml)
-[![Copilot Setup Steps](https://github.com/yellow-seed/dotfiles/workflows/Copilot%20Setup%20Steps/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/copilot-setup-steps.yml)
-
 chezmoiを使用したdotfiles管理のガイドです。
 
 ## ディレクトリ構造
