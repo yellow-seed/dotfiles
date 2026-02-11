@@ -72,6 +72,18 @@
 │       ├── run_unit_test.ps1       # Windows用テスト実行
 │       ├── setup.ps1               # Windows用オーケストレーター
 │       └── setup.Tests.ps1         # Windows用オーケストレーターテスト
+├── docker/                  # OS別Dockerテスト環境
+│   ├── macos-test/          # macOSスクリプト用テスト環境
+│   │   ├── Dockerfile
+│   │   ├── docker-compose.yml
+│   │   └── lint-shell
+│   ├── ubuntu-test/         # Ubuntuスクリプト用テスト環境
+│   │   ├── Dockerfile
+│   │   ├── docker-compose.yml
+│   │   └── lint-shell
+│   └── windows-test/        # Windowsスクリプト用テスト環境
+│       ├── Dockerfile
+│       └── docker-compose.yml
 ├── tests/                   # ファイル系のテストのみ
 │   └── files/
 │       ├── common.bats      # 共通ファイルテスト
@@ -105,6 +117,27 @@
 
 - **dot_gitconfig**: Git設定
   - ユーザー情報、エイリアス、デフォルト動作
+
+### Dockerテスト環境 (docker/)
+
+一般的なリポジトリではDockerfileやdocker-compose.ymlはリポジトリルートに配置されますが、このリポジトリでは`docker/`ディレクトリの下にOS別に分けて配置しています。これは、dotfilesリポジトリが複数OS（macOS/Ubuntu/Windows）のセットアップスクリプトを1つのリポジトリで管理しているため、テスト環境もOS別に分離する必要があるためです。
+
+各テスト環境はリポジトリ全体を`/workspace`にマウントし、対応するOS向けのテスト・Lint・カバレッジ計測を実行します。
+
+- **macos-test/**: macOS向けシェルスクリプトのテスト環境（Ubuntu 22.04ベース）
+
+  - BATS、ShellCheck、shfmt、actionlint、kcovを含む
+  - `lint-shell`: ShellCheckを全`.sh`/`.bash`ファイルに実行するスクリプト
+
+- **ubuntu-test/**: Ubuntu向けシェルスクリプトのテスト環境
+
+  - macos-testと同等のツールセット
+  - `lint-shell`: macos-testと同等のLintスクリプト
+
+- **windows-test/**: Windows向けPowerShellスクリプトのテスト環境
+  - PowerShell Core（mcr.microsoft.com/powershell）ベース
+  - Pester（テストフレームワーク）、PSScriptAnalyzer（静的解析）を含む
+  - `windows-test`サービス（テスト実行）と`windows-test-shell`サービス（対話シェル）の2サービス構成
 
 ### インストールスクリプト (install/)
 
