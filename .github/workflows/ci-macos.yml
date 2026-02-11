@@ -2,9 +2,22 @@ name: CI - macOS
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main, feat/*, fix/*, docs/*, style/*, refactor/*, perf/*, test/*, chore/*, copilot/*, claude/* ]
+    branches:
+      [
+        main,
+        feat/*,
+        fix/*,
+        docs/*,
+        style/*,
+        refactor/*,
+        perf/*,
+        test/*,
+        chore/*,
+        copilot/*,
+        claude/*,
+      ]
 
 jobs:
   test-and-coverage:

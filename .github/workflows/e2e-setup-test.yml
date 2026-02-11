@@ -2,8 +2,8 @@ name: E2E Setup Test
 
 on:
   schedule:
-    - cron: "0 0 * * 5"  # 毎週金曜日
-  workflow_dispatch:  # 手動実行も可能に
+    - cron: "0 0 * * 5" # 毎週金曜日
+  workflow_dispatch: # 手動実行も可能に
 
 jobs:
   setup:
@@ -21,7 +21,7 @@ jobs:
       - name: Setup dotfiles
         run: |
           bash setup.sh
-      
+
       - name: Verify installation
         run: |
           # 基本的な動作確認

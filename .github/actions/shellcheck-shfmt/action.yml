@@ -1,12 +1,12 @@
-name: 'ShellCheck and shfmt'
-description: 'Run ShellCheck and shfmt on shell scripts'
+name: "ShellCheck and shfmt"
+description: "Run ShellCheck and shfmt on shell scripts"
 inputs:
   os:
-    description: 'Operating system (macos or ubuntu)'
+    description: "Operating system (macos or ubuntu)"
     required: true
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Install ShellCheck (macOS)
       if: inputs.os == 'macos'
