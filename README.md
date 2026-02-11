@@ -1,6 +1,7 @@
 # dotfiles
 
 <!-- CI/CD & Code Quality -->
+
 [![CI - macOS](https://github.com/yellow-seed/dotfiles/workflows/CI%20-%20macOS/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/ci-macos.yml)
 [![CI - Ubuntu](https://github.com/yellow-seed/dotfiles/workflows/CI%20-%20Ubuntu/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/ci-ubuntu.yml)
 [![CI - Windows](https://github.com/yellow-seed/dotfiles/workflows/CI%20-%20Windows/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/ci-windows.yml)
@@ -8,16 +9,19 @@
 [![codecov](https://codecov.io/gh/yellow-seed/dotfiles/branch/main/graph/badge.svg)](https://codecov.io/gh/yellow-seed/dotfiles)
 
 <!-- Project Info -->
+
 [![License](https://img.shields.io/github/license/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/blob/main/LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/commits/main)
 
 <!-- Repository Activity -->
+
 [![GitHub stars](https://img.shields.io/github/stars/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/network/members)
 [![GitHub issues](https://img.shields.io/github/issues/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/yellow-seed/dotfiles)](https://github.com/yellow-seed/dotfiles/pulls)
 
 <!-- Other Workflows -->
+
 [![Claude Code](https://github.com/yellow-seed/dotfiles/workflows/Claude%20Code/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/claude.yml)
 [![Copilot Setup Steps](https://github.com/yellow-seed/dotfiles/workflows/Copilot%20Setup%20Steps/badge.svg)](https://github.com/yellow-seed/dotfiles/actions/workflows/copilot-setup-steps.yml)
 
@@ -76,7 +80,7 @@ chezmoiのテンプレート機能を活用することで、環境やOS固有�
 [data]
     name = "your-name"
     email = "your-email@example.com"
-    
+
     # OS固有の設定
     isMac = true    # macOSの場合はtrue、そうでなければfalse
     isLinux = false # Linuxの場合はtrue、そうでなければfalse
@@ -575,9 +579,15 @@ docker compose run macos-test actionlint
 Windows PowerShell環境でPesterテストを実行できます。
 
 ```bash
-# PowerShellテストを実行
+# Dockerイメージをビルド
 cd docker/windows-test
+docker compose build
+
+# PowerShellテストを実行
 docker compose run --rm windows-test
+
+# PowerShellシェルに入る
+docker compose run --rm windows-test-shell
 ```
 
 詳細は [install/windows/README.md](install/windows/README.md) を参照してください。

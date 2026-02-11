@@ -19,7 +19,9 @@ matches_markdown() {
 
 matches_yaml() {
   local file="$1"
-  [[ "$file" == "compose.yml" ]] ||
+  [[ "$file" == "docker/ubuntu-test/docker-compose.yml" ]] ||
+    [[ "$file" == "docker/macos-test/docker-compose.yml" ]] ||
+    [[ "$file" == "docker/windows-test/docker-compose.yml" ]] ||
     [[ "$file" == "codecov.yml" ]] ||
     [[ "$file" == .github/*.yml ]] ||
     [[ "$file" == .github/**/*.yml ]] ||
@@ -46,7 +48,7 @@ if [ "$#" -gt 0 ]; then
   done
 else
   markdown_files=("README.md" "AGENTS.md" "CLAUDE.md" "docs/**/*.md" ".github/**/*.md")
-  yaml_files=("compose.yml" "codecov.yml" ".github/**/*.{yml,yaml}")
+  yaml_files=("docker/*/docker-compose.yml" "codecov.yml" ".github/**/*.{yml,yaml}")
   json_files=(".github/**/*.json")
 fi
 

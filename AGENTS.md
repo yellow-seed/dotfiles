@@ -10,6 +10,7 @@
    - 設定ファイルのバージョン管理と同期
    - テンプレート機能による環境別の設定
 2. **Homebrew**: macOSアプリケーション管理
+
    - GUIアプリケーションとシステムツールのインストール
    - スクリプト内でパッケージリストを直接管理
 
@@ -86,16 +87,19 @@
 ### 設定ファイル (home/)
 
 - **dot_Brewfile**: Homebrewでインストールするパッケージのリスト
+
   - brew: CLIツール
   - cask: GUIアプリケーション
   - mas: Mac App Storeアプリ
   - vscode: VS Code拡張機能
 
 - **dot_config/mise/config.toml**: miseで管理する開発ツール
+
   - 言語ランタイム: Node.js, Python, Go, Ruby
   - CLIツール: act, aws-sam-cli, awscli, chezmoi, docker-compose, gh, pnpm, uv
 
 - **dot_zshrc**: Zshシェル設定
+
   - miseの初期化設定を含む
   - 環境変数とエイリアスの定義
 
@@ -107,10 +111,12 @@
 **新しい構造の特徴**：テストコードと実装コードが同じディレクトリに配置され、OS別に明確に分離されています。
 
 #### OS共通 (common/)
+
 - **chezmoi.bats**: chezmoiインストールスクリプトのテスト（実装はペンディング）
   - chezmoiはOS非依存のツールのため、common/に配置
 
 #### macOS専用 (macos/)
+
 - **01-brew.sh**: Homebrewの自動インストール
 - **02-brew-packages.sh**: スクリプト内のパッケージリストからtap/formulae/caskを一括インストール
 - **03-profile.sh**: プロファイル固有パッケージのインストール
@@ -119,6 +125,7 @@
 - 各スクリプトに対応する .bats テストファイル
 
 #### Windows専用 (windows/)
+
 - **01-winget.ps1**: Windows用パッケージマネージャー設定
 - **02-dev-tools.ps1**: Windows用開発ツールインストール
 - **03-packages.ps1**: Windows用パッケージ一括インストール
@@ -126,19 +133,23 @@
 - 各スクリプトに対応する .Tests.ps1 テストファイル
 
 #### Ubuntu専用 (ubuntu/)
+
 - **現在は仮実装（Stub）**: 実用優先度が低いため、スクリプトは未実装
 - 今後、必要に応じて実装予定
 
 #### その他
+
 - **template.sh**: 新しいインストールスクリプトのテンプレート
 
 ### テストスイート
 
 **責務別の配置**：
+
 - **install/\*/\*.bats, \*.Tests.ps1**: インストールスクリプトのテスト（実装と同じディレクトリ）
 - **tests/files/**: ファイル系の共通テスト（ShellCheck、テンプレート検証など）
 
 **テストフレームワーク**：
+
 - **BATS (Bash Automated Testing System)**: macOS/Ubuntuのシェルスクリプトテスト
 - **Pester**: Windows PowerShellスクリプトテスト
 - macOS、Ubuntu、Windowsの3つのOS環境でCIが実行される
@@ -479,6 +490,7 @@ bats install/macos/brew.bats
 **重要**: このリポジトリでは、macOSを主要な開発・運用環境としているため、テスト検証とカバレッジ拡充は**macOSを優先**します。
 
 - **macOS**: 主要環境であり、テストパターンの拡充と検証を優先的に実施
+
   - 新しいインストールスクリプトやツールの追加時は、まずmacOS環境でのテストを充実させる
   - カバレッジの向上もmacOS環境を優先して取り組む
   - ローカル開発環境として実際に使用されるため、実践的なテストが重要
@@ -512,7 +524,7 @@ bats install/macos/brew.bats
   ```bash
   # macOS
   brew install shellcheck
-  
+
   # Ubuntu
   sudo apt-get install shellcheck
   ```
@@ -522,7 +534,7 @@ bats install/macos/brew.bats
   ```bash
   # ローカルでの実行
   shellcheck script.sh
-  
+
   # すべてのスクリプトを一括チェック
   shellcheck install/**/*.sh scripts/**/*.sh setup.sh
   ```
@@ -537,7 +549,7 @@ bats install/macos/brew.bats
   ```bash
   # mise経由（推奨）
   mise use shfmt@latest
-  
+
   # または Homebrew
   brew install shfmt
   ```
@@ -547,7 +559,7 @@ bats install/macos/brew.bats
   ```bash
   # チェックのみ
   shfmt -d -i 2 .
-  
+
   # 自動フォーマット
   shfmt -w -d -i 2 .
   ```
@@ -570,6 +582,7 @@ bats install/macos/brew.bats
    - `-o pipefail`: パイプライン内のエラーを検出
 
 2. **変数の命名**:
+
    - 環境変数: `UPPER_CASE`
    - ローカル変数: `lower_case`
 
@@ -580,6 +593,7 @@ bats install/macos/brew.bats
    ```
 
 4. **ShellCheckによる静的解析**:
+
    - すべてのシェルスクリプトは[ShellCheck](https://www.shellcheck.net/)で検証されます
    - CI/CDパイプラインで自動チェックが実行されます
    - ローカルでの検証方法:
@@ -587,10 +601,10 @@ bats install/macos/brew.bats
      ```bash
      # 単一ファイルをチェック
      shellcheck install/macos/01-brew.sh
-     
+
      # すべてのシェルスクリプトをチェック
      shellcheck **/*.sh
-     
+
      # shfmtでフォーマット
      shfmt -w .
      ```
@@ -677,21 +691,25 @@ git push
 ### コンテキスト理解のポイント
 
 1. **ツールの優先順位**:
+
    - chezmoi: 設定ファイル管理（最優先）
    - Homebrew: macOSアプリケーション管理
    - mise: 開発言語・ツール管理
 
 2. **ディレクトリ構造の重要性**:
+
    - `home/`: chezmoiのソースディレクトリ（設定ファイルの実体）
    - ファイル名の`dot_`プレフィックスは`.`に変換される
    - テンプレートファイル（`.tmpl`拡張子）は環境変数を展開
 
 3. **変更時の注意点**:
+
    - 設定ファイルは必ず`chezmoi add`または`chezmoi re-add`で管理
    - 直接ホームディレクトリを編集せず、`chezmoi edit`を使用
    - パッケージ追加・削除時は`install/macos/02-brew-packages.sh`の配列を更新
 
 4. **PR作成時の必須事項（Chezmoi設定変更の場合）**:
+
    - Chezmoiの設定変更（テンプレートファイルや設定ファイルの追加・変更）を含むPRでは、必ず以下を実施しPRに記載すること：
      - `chezmoi apply --dry-run --verbose` の実行結果を提示
      - または `chezmoi diff` の出力を提示
@@ -707,11 +725,13 @@ git push
 ### よくある作業パターン
 
 1. **新しい設定ファイルの追加**:
+
    - ホームディレクトリに設定ファイルを作成
    - `chezmoi add ~/.config/newapp/config.yml`
    - `git commit` & `git push`
 
 2. **Homebrewパッケージの管理**:
+
    - `brew install`/`brew uninstall`でパッケージを操作
    - `install/macos/02-brew-packages.sh` 内の配列を更新
    - （任意）`brew-dump-explicit.sh`でBrewfileをダンプ
