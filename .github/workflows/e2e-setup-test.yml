@@ -18,9 +18,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Prepare debug directory
+        run: mkdir -p /tmp/dotfiles-debug
+
       - name: Record environment (before setup)
         run: |
-          mkdir -p /tmp/dotfiles-debug
           {
             echo "::group::Environment Info (before setup)"
             echo "--- PATH ---"
@@ -44,7 +46,6 @@ jobs:
       - name: Record environment (after setup)
         if: always()
         run: |
-          mkdir -p /tmp/dotfiles-debug
           {
             echo "::group::Environment Info (after setup)"
             echo "--- PATH ---"
@@ -62,8 +63,6 @@ jobs:
       - name: Verify installation
         if: always()
         run: |
-          mkdir -p /tmp/dotfiles-debug
-
           {
             echo "::group::PATH"
             echo "$PATH" | tr ':' '\n'
@@ -73,7 +72,15 @@ jobs:
             echo "--- command -v chezmoi ---"
             command -v chezmoi || echo "chezmoi not in PATH"
             echo "--- find chezmoi ---"
-            find /usr/local/bin /opt/homebrew/bin "$HOME/bin" "$HOME/.local/bin" -name chezmoi 2>/dev/null || echo "chezmoi binary not found in common locations"
+            chezmoi_search_dirs=()
+            for d in /usr/local/bin /opt/homebrew/bin "$HOME/bin" "$HOME/.local/bin"; do
+              [ -d "$d" ] && chezmoi_search_dirs+=("$d")
+            done
+            if [ ${#chezmoi_search_dirs[@]} -gt 0 ]; then
+              find "${chezmoi_search_dirs[@]}" -name chezmoi 2>/dev/null || echo "chezmoi binary not found in common locations"
+            else
+              echo "No common binary directories found to search"
+            fi
             echo "--- chezmoi version ---"
             chezmoi --version || echo "chezmoi --version failed"
             echo "::endgroup::"
@@ -95,7 +102,6 @@ jobs:
       - name: Collect debug info on failure
         if: failure()
         run: |
-          mkdir -p /tmp/dotfiles-debug
           {
             echo "::group::Full PATH"
             echo "$PATH" | tr ':' '\n'
@@ -112,8 +118,12 @@ jobs:
             echo "::endgroup::"
 
             echo "::group::Homebrew state"
-            brew config 2>/dev/null || echo "brew config failed"
-            brew doctor 2>/dev/null || echo "brew doctor failed"
+            if command -v brew >/dev/null 2>&1; then
+              brew config 2>/dev/null || echo "brew config failed"
+              brew doctor 2>/dev/null || echo "brew doctor failed"
+            else
+              echo "brew not found"
+            fi
             echo "::endgroup::"
           } | tee /tmp/dotfiles-debug/debug-on-failure.log
 
