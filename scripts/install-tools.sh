@@ -288,6 +288,21 @@ install_prettier() {
   fi
 }
 
+install_bats() {
+  if command_exists bats; then
+    log "bats already installed: $(bats --version)"
+    return 0
+  fi
+
+  log "Installing bats..."
+  if install_packages bats; then
+    log "bats installed successfully via apt-get"
+    return 0
+  fi
+
+  fail "Failed to install bats"
+}
+
 install_helper_script() {
   local script_name="$1"
   local dest_name="$2"
@@ -323,6 +338,7 @@ main() {
   install_actionlint
   install_node
   install_prettier
+  install_bats
 
   install_helper_script "lint-shell" "lint-shell"
   install_helper_script "lint-docs" "lint-docs"
