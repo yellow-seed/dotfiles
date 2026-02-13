@@ -2,7 +2,6 @@
 tap "aws/tap"
 tap "dotenvx/brew"
 tap "go-swagger/go-swagger"
-tap "homebrew/bundle"
 tap "stuartleeks/tap"
 
 # Formulae (explicitly installed)

@@ -37,7 +37,6 @@ function install_packages() {
     "aws/tap"
     "dotenvx/brew"
     "go-swagger/go-swagger"
-    "homebrew/bundle"
   )
 
   local formulae=(
