@@ -18,12 +18,109 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Record environment (before setup)
+        run: |
+          mkdir -p /tmp/dotfiles-debug
+          {
+            echo "::group::Environment Info (before setup)"
+            echo "--- PATH ---"
+            echo "$PATH" | tr ':' '\n'
+            echo "--- Homebrew ---"
+            command -v brew && brew --version || echo "brew not found"
+            echo "--- Disk ---"
+            df -h /
+            echo "--- Runner Info ---"
+            sw_vers
+            uname -a
+            echo "::endgroup::"
+          } | tee /tmp/dotfiles-debug/environment-before.log
+
       - name: Setup dotfiles
         run: |
           bash setup.sh
+        env:
+          DOTFILES_DEBUG: "1"
+
+      - name: Record environment (after setup)
+        if: always()
+        run: |
+          mkdir -p /tmp/dotfiles-debug
+          {
+            echo "::group::Environment Info (after setup)"
+            echo "--- PATH ---"
+            echo "$PATH" | tr ':' '\n'
+            echo "--- Homebrew ---"
+            command -v brew && brew --version || echo "brew not found"
+            echo "--- Disk ---"
+            df -h /
+            echo "--- Runner Info ---"
+            sw_vers
+            uname -a
+            echo "::endgroup::"
+          } | tee /tmp/dotfiles-debug/environment-after.log
 
       - name: Verify installation
+        if: always()
         run: |
-          # 基本的な動作確認
+          mkdir -p /tmp/dotfiles-debug
+
+          {
+            echo "::group::PATH"
+            echo "$PATH" | tr ':' '\n'
+            echo "::endgroup::"
+
+            echo "::group::chezmoi verification"
+            echo "--- command -v chezmoi ---"
+            command -v chezmoi || echo "chezmoi not in PATH"
+            echo "--- find chezmoi ---"
+            find /usr/local/bin /opt/homebrew/bin "$HOME/bin" "$HOME/.local/bin" -name chezmoi 2>/dev/null || echo "chezmoi binary not found in common locations"
+            echo "--- chezmoi version ---"
+            chezmoi --version || echo "chezmoi --version failed"
+            echo "::endgroup::"
+
+            echo "::group::mise verification"
+            command -v mise && mise --version || echo "mise not found"
+            echo "::endgroup::"
+
+            echo "::group::brew verification"
+            command -v brew && brew --version || echo "brew not found"
+            brew list --formula 2>/dev/null | head -20 || true
+            echo "::endgroup::"
+          } | tee /tmp/dotfiles-debug/verify-installation.log
+
+          # 基本的な動作確認（失敗判定）
           command -v chezmoi
           chezmoi --version
+
+      - name: Collect debug info on failure
+        if: failure()
+        run: |
+          mkdir -p /tmp/dotfiles-debug
+          {
+            echo "::group::Full PATH"
+            echo "$PATH" | tr ':' '\n'
+            echo "::endgroup::"
+
+            echo "::group::Home directory"
+            ls -la "$HOME/" || true
+            ls -la "$HOME/.local/bin/" 2>/dev/null || echo "$HOME/.local/bin does not exist"
+            echo "::endgroup::"
+
+            echo "::group::Chezmoi state"
+            ls -la "$HOME/.local/share/chezmoi/" 2>/dev/null || echo "chezmoi source dir not found"
+            cat "$HOME/.config/chezmoi/chezmoi.toml" 2>/dev/null || echo "chezmoi config not found"
+            echo "::endgroup::"
+
+            echo "::group::Homebrew state"
+            brew config 2>/dev/null || echo "brew config failed"
+            brew doctor 2>/dev/null || echo "brew doctor failed"
+            echo "::endgroup::"
+          } | tee /tmp/dotfiles-debug/debug-on-failure.log
+
+      - name: Upload debug logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-logs
+          path: /tmp/dotfiles-debug/
+          retention-days: 7
