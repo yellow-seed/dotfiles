@@ -13,6 +13,16 @@
   [ "$status" -eq 0 ]
 }
 
+@test "chezmoi installation script sets local bin directory" {
+  run grep 'CHEZMOI_BIN_DIR="${HOME}/.local/bin"' install/common/chezmoi.sh
+  [ "$status" -eq 0 ]
+}
+
+@test "chezmoi installation script installs binary to local bin" {
+  run grep -- '-b "${CHEZMOI_BIN_DIR}" init --apply' install/common/chezmoi.sh
+  [ "$status" -eq 0 ]
+}
+
 @test "chezmoi installation script runs in dry-run mode" {
   run env DRY_RUN=true GITHUB_USERNAME="test-user" bash install/common/chezmoi.sh
   [ "$status" -eq 0 ]
