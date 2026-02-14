@@ -63,7 +63,13 @@ jobs:
             name="$(basename "${script}" .sh)"
             out_dir="coverage/raw/${name}"
             raw_dirs+=("${out_dir}")
-            kcov --exclude-pattern=/usr,/opt/homebrew,/System "${out_dir}" "${BASH_BIN}" "${script}" || true
+
+            # Keep installation scripts in DRY_RUN mode to avoid long CI execution.
+            if [[ "${script}" == install/macos/brew-dump-explicit.sh ]]; then
+              kcov --exclude-pattern=/usr,/opt/homebrew,/System "${out_dir}" "${BASH_BIN}" "${script}" || true
+            else
+              DRY_RUN=true kcov --exclude-pattern=/usr,/opt/homebrew,/System "${out_dir}" "${BASH_BIN}" "${script}" || true
+            fi
           done
 
           # Merge coverage reports and keep this step non-fatal when no report is generated.
