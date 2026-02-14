@@ -46,7 +46,7 @@ teardown() {
 @test "chezmoi installation script runs in dry-run mode without creating bin dir" {
   run env DRY_RUN=true HOME="${TEMP_HOME}" GITHUB_USERNAME="test-user" bash install/common/chezmoi.sh
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "\\[DRY RUN\\]" ]]
+  [[ "$output" == *"[DRY RUN]"* ]]
   [[ "$output" =~ "test-user" ]]
   [ ! -d "${TEMP_HOME}/.local/bin" ]
 }
