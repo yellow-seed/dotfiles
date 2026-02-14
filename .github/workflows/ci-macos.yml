@@ -47,13 +47,16 @@ jobs:
           mkdir -p coverage
           kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage bats install/macos/
 
+          # kcov writes Codecov-compatible report as cobertura.xml
+          test -f coverage/cobertura.xml
+
           # Run common and file tests without coverage for speed
           bats install/common/ tests/files/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/coverage.json
+          files: ./coverage/cobertura.xml
           flags: macos
           name: coverage-macos
           token: ${{ secrets.CODECOV_TOKEN }}
