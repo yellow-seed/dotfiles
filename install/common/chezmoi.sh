@@ -10,7 +10,7 @@ DRY_RUN="${DRY_RUN:-false}"
 declare -r CHEZMOI_BIN_DIR="${CHEZMOI_BIN_DIR:-${HOME}/.local/bin}"
 
 function setup_chezmoi_bin_dir() {
-  if ! PATH="${PATH:-/usr/bin:/bin}" mkdir -p "${CHEZMOI_BIN_DIR}"; then
+  if ! /bin/mkdir -p "${CHEZMOI_BIN_DIR}"; then
     echo "Error: Failed to create CHEZMOI_BIN_DIR: ${CHEZMOI_BIN_DIR}" >&2
     return 1
   fi
