@@ -23,18 +23,18 @@ teardown() {
 }
 
 @test "setup_chezmoi_bin_dir creates bin dir and prepends PATH only once" {
-  run env HOME="${TEMP_HOME}" PATH="/usr/bin" bash -c '
+  run env HOME="${TEMP_HOME}" PATH="/usr/bin:/bin" /bin/bash -c '
     source install/common/chezmoi.sh
     setup_chezmoi_bin_dir
     setup_chezmoi_bin_dir
     [ -d "${CHEZMOI_BIN_DIR}" ]
-    [ "${PATH}" = "${CHEZMOI_BIN_DIR}:/usr/bin" ]
+    [ "${PATH}" = "${CHEZMOI_BIN_DIR}:/usr/bin:/bin" ]
   '
   [ "$status" -eq 0 ]
 }
 
 @test "setup_chezmoi_bin_dir handles unset PATH" {
-  run env -u PATH HOME="${TEMP_HOME}" bash -c '
+  run env -u PATH HOME="${TEMP_HOME}" /bin/bash -c '
     source install/common/chezmoi.sh
     setup_chezmoi_bin_dir
     [ -d "${CHEZMOI_BIN_DIR}" ]
@@ -44,7 +44,7 @@ teardown() {
 }
 
 @test "chezmoi installation script runs in dry-run mode without creating bin dir" {
-  run env DRY_RUN=true HOME="${TEMP_HOME}" GITHUB_USERNAME="test-user" bash install/common/chezmoi.sh
+  run env DRY_RUN=true HOME="${TEMP_HOME}" GITHUB_USERNAME="test-user" /bin/bash install/common/chezmoi.sh
   [ "$status" -eq 0 ]
   [[ "$output" =~ \[DRY\ RUN\] ]]
   [[ "$output" =~ "test-user" ]]
