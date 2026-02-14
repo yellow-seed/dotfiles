@@ -7,8 +7,16 @@ fi
 
 declare -r GITHUB_USERNAME="${GITHUB_USERNAME:-yellow-seed}"
 DRY_RUN="${DRY_RUN:-false}"
+CHEZMOI_BIN_DIR="${HOME}/.local/bin"
+
+function setup_chezmoi_bin_dir() {
+  mkdir -p "${CHEZMOI_BIN_DIR}"
+  export PATH="${CHEZMOI_BIN_DIR}:${PATH}"
+}
 
 function run_chezmoi() {
+  setup_chezmoi_bin_dir
+
   if [ "${DRY_RUN}" = "true" ]; then
     echo "[DRY RUN] Would install chezmoi for ${GITHUB_USERNAME}"
     return 0
@@ -16,10 +24,10 @@ function run_chezmoi() {
 
   if command -v curl &>/dev/null; then
     echo "Using curl to download chezmoi installer..."
-    sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
+    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "${CHEZMOI_BIN_DIR}" init --apply "${GITHUB_USERNAME}"
   elif command -v wget &>/dev/null; then
     echo "Using wget to download chezmoi installer..."
-    sh -c "$(wget -qO- get.chezmoi.io)" -- init --apply "${GITHUB_USERNAME}"
+    sh -c "$(wget -qO- get.chezmoi.io)" -- -b "${CHEZMOI_BIN_DIR}" init --apply "${GITHUB_USERNAME}"
   else
     echo "Error: Neither curl nor wget is available. Please install curl or wget to proceed." >&2
     echo "On Debian/Ubuntu: sudo apt-get install curl" >&2
