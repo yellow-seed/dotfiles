@@ -25,7 +25,6 @@ teardown() {
 @test "setup_chezmoi_bin_dir creates bin directory and prepends PATH once" {
   export HOME="${TEST_TEMP_HOME}"
   export CHEZMOI_BIN_DIR="${HOME}/.local/bin"
-  export PATH="/usr/bin:/bin"
 
   source install/common/chezmoi.sh
 
