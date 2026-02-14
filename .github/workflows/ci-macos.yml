@@ -39,19 +39,21 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          # Set environment variables for SimpleCov
           export DRY_RUN=true
 
-          # Run macOS-specific tests with coverage (kcov for performance)
-          # Only measure coverage for macOS-specific scripts
-          mkdir -p coverage
-          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage bats install/macos/
+          # Run tests (BATS) separately
+          bats install/macos/ install/common/ tests/files/
 
-          # kcov writes Codecov-compatible report as cobertura.xml
+          # kcov + bats can fail on some bats-core internals, so measure script coverage directly
+          mkdir -p coverage/raw
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/01-brew bash install/macos/01-brew.sh
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/02-brew-packages bash install/macos/02-brew-packages.sh
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/03-profile bash install/macos/03-profile.sh
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/setup bash install/macos/setup.sh
+
+          # Merge coverage reports and ensure Codecov input exists
+          kcov --merge coverage coverage/raw/01-brew coverage/raw/02-brew-packages coverage/raw/03-profile coverage/raw/setup
           test -f coverage/cobertura.xml
-
-          # Run common and file tests without coverage for speed
-          bats install/common/ tests/files/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
