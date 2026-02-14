@@ -7,20 +7,26 @@ fi
 
 declare -r GITHUB_USERNAME="${GITHUB_USERNAME:-yellow-seed}"
 DRY_RUN="${DRY_RUN:-false}"
-CHEZMOI_BIN_DIR="${HOME}/.local/bin"
+declare -r CHEZMOI_BIN_DIR="${CHEZMOI_BIN_DIR:-${HOME}/.local/bin}"
 
 function setup_chezmoi_bin_dir() {
-  mkdir -p "${CHEZMOI_BIN_DIR}"
-  export PATH="${CHEZMOI_BIN_DIR}:${PATH}"
+  if ! /bin/mkdir -p "${CHEZMOI_BIN_DIR}"; then
+    echo "Error: Failed to create CHEZMOI_BIN_DIR: ${CHEZMOI_BIN_DIR}" >&2
+    return 1
+  fi
+
+  if [[ ":${PATH:-}:" != *":${CHEZMOI_BIN_DIR}:"* ]]; then
+    export PATH="${CHEZMOI_BIN_DIR}:${PATH:-}"
+  fi
 }
 
 function run_chezmoi() {
-  setup_chezmoi_bin_dir
-
   if [ "${DRY_RUN}" = "true" ]; then
     echo "[DRY RUN] Would install chezmoi for ${GITHUB_USERNAME}"
     return 0
   fi
+
+  setup_chezmoi_bin_dir
 
   if command -v curl &>/dev/null; then
     echo "Using curl to download chezmoi installer..."
