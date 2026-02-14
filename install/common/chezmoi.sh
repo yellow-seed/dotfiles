@@ -10,9 +10,16 @@ declare -r CHEZMOI_BIN_DIR="${CHEZMOI_BIN_DIR:-${HOME}/.local/bin}"
 DRY_RUN="${DRY_RUN:-false}"
 
 function setup_chezmoi_bin_dir() {
-  mkdir -p "${CHEZMOI_BIN_DIR}"
-  if [[ ":${PATH}:" != *":${CHEZMOI_BIN_DIR}:"* ]]; then
-    export PATH="${CHEZMOI_BIN_DIR}:${PATH}"
+  if ! /bin/mkdir -p "${CHEZMOI_BIN_DIR}"; then
+    echo "Error: Failed to create CHEZMOI_BIN_DIR: ${CHEZMOI_BIN_DIR}" >&2
+    return 1
+  fi
+
+  local current_path
+  current_path="${PATH:-}"
+
+  if [[ ":${current_path}:" != *":${CHEZMOI_BIN_DIR}:"* ]]; then
+    export PATH="${CHEZMOI_BIN_DIR}${current_path:+:${current_path}}"
   fi
 }
 
