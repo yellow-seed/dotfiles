@@ -34,26 +34,38 @@ jobs:
       - name: Install kcov
         run: brew install kcov
 
-      - name: Install Bats
-        run: brew install bats-core
+      - name: Install Bats and Bash
+        run: brew install bats-core bash
 
       - name: Run tests with coverage
         run: |
-          # Set environment variables for SimpleCov
           export DRY_RUN=true
 
-          # Run macOS-specific tests with coverage (kcov for performance)
-          # Only measure coverage for macOS-specific scripts
-          mkdir -p coverage
-          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage bats install/macos/
+          # Run tests (BATS) separately
+          bats install/macos/ install/common/ tests/files/
 
-          # Run common and file tests without coverage for speed
-          bats install/common/ tests/files/
+          # kcov + bats can fail on some bats-core internals, so measure script coverage directly
+          # Use Homebrew bash (instead of /bin/bash) to avoid kcov open errors on macOS runner
+          brew_prefix="$(brew --prefix)"
+          BASH_BIN="${brew_prefix}/bin/bash"
+          test -x "${BASH_BIN}"
+          bash_dir="$(dirname "${BASH_BIN}")"
+          export PATH="${bash_dir}:${PATH}"
+
+          mkdir -p coverage/raw
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/01-brew "${BASH_BIN}" install/macos/01-brew.sh
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/02-brew-packages "${BASH_BIN}" install/macos/02-brew-packages.sh
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/03-profile "${BASH_BIN}" install/macos/03-profile.sh
+          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/setup "${BASH_BIN}" install/macos/setup.sh
+
+          # Merge coverage reports and ensure Codecov input exists
+          kcov --merge coverage coverage/raw/01-brew coverage/raw/02-brew-packages coverage/raw/03-profile coverage/raw/setup
+          test -f coverage/cobertura.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/coverage.json
+          files: ./coverage/cobertura.xml
           flags: macos
           name: coverage-macos
           token: ${{ secrets.CODECOV_TOKEN }}
