@@ -75,6 +75,7 @@ setup() {
 
   rm -rf "${temp_dir}" "${fake_bin}"
 
+  [ "$status" -ne 0 ]
   [[ "$output" =~ "Required scripts not found locally" ]]
 }
 

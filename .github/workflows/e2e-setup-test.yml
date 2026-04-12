@@ -28,6 +28,7 @@ jobs:
           DOTFILES_DEBUG: "1"
           DRY_RUN: "true"
           DOTFILES_REPO: ${{ github.workspace }}/dotfiles-source
+          DOTFILES_CLONE_DIR: ${{ runner.temp }}/chezmoi-source
 
       - name: Verify bootstrap completed
         run: |

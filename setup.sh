@@ -15,7 +15,12 @@ function bootstrap_clone() {
     exit 1
   fi
 
-  if [ ! -d "${DOTFILES_CLONE_DIR}" ]; then
+  if [ ! -f "${DOTFILES_CLONE_DIR}/setup.sh" ] || [ ! -d "${DOTFILES_CLONE_DIR}/install" ]; then
+    if [ -e "${DOTFILES_CLONE_DIR}" ]; then
+      echo "Error: ${DOTFILES_CLONE_DIR} exists but is not a valid dotfiles checkout." >&2
+      echo "Set DOTFILES_CLONE_DIR to an empty path, or remove the directory and retry." >&2
+      exit 1
+    fi
     echo "Required scripts not found locally. Cloning dotfiles repository..."
     mkdir -p "$(dirname "${DOTFILES_CLONE_DIR}")"
     git clone "${DOTFILES_REPO}" "${DOTFILES_CLONE_DIR}"
