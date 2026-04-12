@@ -34,3 +34,23 @@ setup() {
   run grep -q "install/common/chezmoi.sh" "${SETUP_SCRIPT}"
   [ "$status" -eq 0 ]
 }
+
+@test "setup.sh has bootstrap_clone function" {
+  run grep -q "bootstrap_clone" "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+}
+
+@test "setup.sh checks for install directory before running" {
+  run grep -q 'SCRIPT_DIR}/install' "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+}
+
+@test "setup.sh uses DOTFILES_REPO variable for clone URL" {
+  run grep -q "DOTFILES_REPO" "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+}
+
+@test "setup.sh bootstrap checks for git availability" {
+  run grep -q "command -v git" "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+}

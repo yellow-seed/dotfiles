@@ -6,6 +6,23 @@ if [ "${DOTFILES_DEBUG:-}" ]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/yellow-seed/dotfiles.git}"
+
+function bootstrap_clone() {
+  if ! command -v git &>/dev/null; then
+    echo "Error: git is not installed. Please install git and try again." >&2
+    exit 1
+  fi
+
+  local temp_dir
+  temp_dir="$(mktemp -d)"
+  echo "Required scripts not found locally. Cloning dotfiles repository..."
+  git clone "${DOTFILES_REPO}" "${temp_dir}/dotfiles"
+  bash "${temp_dir}/dotfiles/setup.sh"
+  local exit_code=$?
+  rm -rf "${temp_dir}"
+  exit ${exit_code}
+}
 
 function run_script() {
   local script_path="$1"
@@ -19,6 +36,10 @@ function run_script() {
 }
 
 function main() {
+  if [ ! -d "${SCRIPT_DIR}/install" ]; then
+    bootstrap_clone
+  fi
+
   local os_type
   os_type="$(uname)"
 
