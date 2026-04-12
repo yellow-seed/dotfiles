@@ -7,6 +7,7 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/yellow-seed/dotfiles.git}"
+DOTFILES_CLONE_DIR="${DOTFILES_CLONE_DIR:-${HOME}/.local/share/chezmoi}"
 
 function bootstrap_clone() {
   if ! command -v git &>/dev/null; then
@@ -14,14 +15,14 @@ function bootstrap_clone() {
     exit 1
   fi
 
-  local temp_dir
-  temp_dir="$(mktemp -d)"
-  echo "Required scripts not found locally. Cloning dotfiles repository..."
-  git clone "${DOTFILES_REPO}" "${temp_dir}/dotfiles"
-  bash "${temp_dir}/dotfiles/setup.sh"
-  local exit_code=$?
-  rm -rf "${temp_dir}"
-  exit ${exit_code}
+  if [ ! -d "${DOTFILES_CLONE_DIR}" ]; then
+    echo "Required scripts not found locally. Cloning dotfiles repository..."
+    mkdir -p "$(dirname "${DOTFILES_CLONE_DIR}")"
+    git clone "${DOTFILES_REPO}" "${DOTFILES_CLONE_DIR}"
+  fi
+
+  bash "${DOTFILES_CLONE_DIR}/setup.sh"
+  exit $?
 }
 
 function run_script() {

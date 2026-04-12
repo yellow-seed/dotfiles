@@ -50,22 +50,28 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
+@test "setup.sh uses DOTFILES_CLONE_DIR variable for clone destination" {
+  run grep -q "DOTFILES_CLONE_DIR" "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+}
+
 @test "setup.sh bootstrap checks for git availability" {
   run grep -q "command -v git" "${SETUP_SCRIPT}"
   [ "$status" -eq 0 ]
 }
 
 @test "setup.sh triggers bootstrap when install directory is missing" {
-  local temp_dir fake_bin
+  local temp_dir fake_bin clone_dir
   temp_dir="$(mktemp -d)"
   fake_bin="$(mktemp -d)"
+  clone_dir="${temp_dir}/clone"  # 存在しないパスでブートストラップを誘発
   cp "${SETUP_SCRIPT}" "${temp_dir}/"
 
   # Mock git to fail after bootstrap message is printed
   printf '#!/usr/bin/env bash\nexit 1\n' >"${fake_bin}/git"
   chmod +x "${fake_bin}/git"
 
-  run bash -c "PATH='${fake_bin}:${PATH}' bash '${temp_dir}/setup.sh'"
+  run bash -c "DOTFILES_CLONE_DIR='${clone_dir}' PATH='${fake_bin}:${PATH}' bash '${temp_dir}/setup.sh'"
 
   rm -rf "${temp_dir}" "${fake_bin}"
 
