@@ -6,6 +6,29 @@ if [ "${DOTFILES_DEBUG:-}" ]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/yellow-seed/dotfiles.git}"
+DOTFILES_CLONE_DIR="${DOTFILES_CLONE_DIR:-${HOME}/.local/share/chezmoi}"
+
+function bootstrap_clone() {
+  if ! command -v git &>/dev/null; then
+    echo "Error: git is not installed. Please install git and try again." >&2
+    exit 1
+  fi
+
+  if [ ! -f "${DOTFILES_CLONE_DIR}/setup.sh" ] || [ ! -d "${DOTFILES_CLONE_DIR}/install" ]; then
+    if [ -e "${DOTFILES_CLONE_DIR}" ]; then
+      echo "Error: ${DOTFILES_CLONE_DIR} exists but is not a valid dotfiles checkout." >&2
+      echo "Set DOTFILES_CLONE_DIR to an empty path, or remove the directory and retry." >&2
+      exit 1
+    fi
+    echo "Required scripts not found locally. Cloning dotfiles repository..."
+    mkdir -p "$(dirname "${DOTFILES_CLONE_DIR}")"
+    git clone "${DOTFILES_REPO}" "${DOTFILES_CLONE_DIR}"
+  fi
+
+  bash "${DOTFILES_CLONE_DIR}/setup.sh"
+  exit $?
+}
 
 function run_script() {
   local script_path="$1"
@@ -19,6 +42,10 @@ function run_script() {
 }
 
 function main() {
+  if [ ! -d "${SCRIPT_DIR}/install" ]; then
+    bootstrap_clone
+  fi
+
   local os_type
   os_type="$(uname)"
 

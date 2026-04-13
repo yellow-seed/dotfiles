@@ -6,6 +6,34 @@ on:
   workflow_dispatch: # 手動実行も可能に
 
 jobs:
+  setup-bootstrap:
+    name: Bootstrap (without pre-cloning)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          path: dotfiles-source
+
+      - name: Run setup.sh from standalone location (bootstrap test)
+        run: |
+          mkdir -p /tmp/bootstrap-test
+          cp dotfiles-source/setup.sh /tmp/bootstrap-test/
+          bash /tmp/bootstrap-test/setup.sh
+        env:
+          DOTFILES_DEBUG: "1"
+          DRY_RUN: "true"
+          DOTFILES_REPO: ${{ github.workspace }}/dotfiles-source
+          DOTFILES_CLONE_DIR: ${{ runner.temp }}/chezmoi-source
+
+      - name: Verify bootstrap completed
+        run: |
+          echo "Bootstrap test passed: setup.sh ran successfully without pre-cloning"
+
   setup:
     permissions:
       contents: read
