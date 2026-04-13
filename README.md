@@ -22,6 +22,22 @@
 
 chezmoiを使用したdotfiles管理のガイドです。
 
+## クイックスタート
+
+新しいマシンで環境をセットアップするには、以下の1コマンドを実行してください：
+
+```bash
+bash <(curl -fsLS https://raw.githubusercontent.com/yellow-seed/dotfiles/main/setup.sh)
+```
+
+このコマンドは以下を自動的に行います：
+
+- dotfilesリポジトリのクローン
+- OS（macOS / Ubuntu）に応じたセットアップスクリプトの実行
+- chezmoiを使った設定ファイルの適用
+
+> **Windows の場合**: PowerShell スクリプトを使用します。詳細は[初期セットアップ](#初期セットアップ)を参照してください。
+
 ## ディレクトリ構造
 
 ```bash
