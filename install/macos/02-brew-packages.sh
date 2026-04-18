@@ -10,6 +10,7 @@ fi
 DRY_RUN="${DRY_RUN:-false}"
 INSTALLED_FORMULAE=""
 INSTALLED_CASKS=""
+INSTALLED_MAS_APPS=""
 
 # Homebrew関連の関数群
 function is_brew_exists() {
@@ -25,9 +26,28 @@ function run_brew() {
   brew "$@"
 }
 
+function is_mas_exists() {
+  command -v mas &>/dev/null
+}
+
+function run_mas() {
+  if [ "${DRY_RUN}" = "true" ]; then
+    echo "[DRY RUN] mas $*"
+    return 0
+  fi
+
+  mas "$@"
+}
+
 function load_installed_packages() {
   INSTALLED_FORMULAE="$(brew list --formula)"
   INSTALLED_CASKS="$(brew list --cask)"
+
+  if is_mas_exists; then
+    INSTALLED_MAS_APPS="$(mas list | awk '{print $1}')"
+  else
+    INSTALLED_MAS_APPS=""
+  fi
 }
 
 function is_formula_installed() {
@@ -58,6 +78,41 @@ function install_cask_if_missing() {
   fi
 
   run_brew install --cask "$cask"
+}
+
+function is_mas_app_installed() {
+  local app_id="$1"
+  grep -Fxq "$app_id" <<<"${INSTALLED_MAS_APPS}"
+}
+
+function ensure_mas_available() {
+  if is_mas_exists; then
+    return 0
+  fi
+
+  echo "Installing mas..."
+  run_brew install mas
+
+  if ! is_mas_exists; then
+    echo "  [WARN] mas command is unavailable; skipping Mac App Store apps"
+    return 1
+  fi
+
+  return 0
+}
+
+function install_mas_app_if_missing() {
+  local app_id="$1"
+
+  if is_mas_app_installed "$app_id"; then
+    echo "  [SKIP] mas app ${app_id} is already installed"
+    return 0
+  fi
+
+  if ! run_mas get "$app_id"; then
+    echo "  [INFO] mas get failed for ${app_id}; falling back to mas install"
+    run_mas install "$app_id"
+  fi
 }
 
 function install_packages() {
@@ -101,6 +156,10 @@ function install_packages() {
     "warp"
   )
 
+  local mas_apps=(
+    "1429033973" # RunCat
+  )
+
   echo "Tapping Homebrew repositories..."
   for tap in "${taps[@]}"; do
     run_brew tap "$tap"
@@ -116,6 +175,16 @@ function install_packages() {
   echo "Installing Homebrew casks..."
   for cask in "${casks[@]}"; do
     install_cask_if_missing "$cask"
+  done
+
+  if ! ensure_mas_available; then
+    return 0
+  fi
+  load_installed_packages
+
+  echo "Installing Mac App Store apps..."
+  for app_id in "${mas_apps[@]}"; do
+    install_mas_app_if_missing "$app_id"
   done
 }
 
