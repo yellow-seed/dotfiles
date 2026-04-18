@@ -208,14 +208,13 @@ EOF
   [[ "$output" == *"INSTALL install --cask claude"* ]]
 }
 
-@test "brew packages installs mas via brew when mas command is missing" {
+@test "brew packages installs mas formula when mas is missing from installed formulae" {
   write_brew_stub $'bash\nmise\npython@3.12\ntree' $'1password\ngoogle-chrome'
+  write_mas_stub ""
 
   run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Installing mas..."* ]]
   [[ "$output" == *"INSTALL install mas"* ]]
-  [[ "$output" == *"[WARN] mas command is unavailable; skipping Mac App Store apps"* ]]
 }
 
 @test "brew packages skips installed mas app and installs missing mas app" {

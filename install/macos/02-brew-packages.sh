@@ -85,22 +85,6 @@ function is_mas_app_installed() {
   grep -Fxq "$app_id" <<<"${INSTALLED_MAS_APPS}"
 }
 
-function ensure_mas_available() {
-  if is_mas_exists; then
-    return 0
-  fi
-
-  echo "Installing mas..."
-  run_brew install mas
-
-  if ! is_mas_exists; then
-    echo "  [WARN] mas command is unavailable; skipping Mac App Store apps"
-    return 1
-  fi
-
-  return 0
-}
-
 function install_mas_app_if_missing() {
   local app_id="$1"
 
@@ -133,6 +117,7 @@ function install_packages() {
 
   local formulae=(
     "bash"
+    "mas"
     "mise"
     "python@3.12"
     "tree"
@@ -177,10 +162,12 @@ function install_packages() {
     install_cask_if_missing "$cask"
   done
 
-  if ! ensure_mas_available; then
-    return 0
-  fi
   load_installed_packages
+
+  if [ "${DRY_RUN}" != "true" ] && ! is_mas_exists; then
+    echo "Error: mas is not installed"
+    exit 1
+  fi
 
   echo "Installing Mac App Store apps..."
   for app_id in "${mas_apps[@]}"; do
