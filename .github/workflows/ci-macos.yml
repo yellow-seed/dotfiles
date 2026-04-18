@@ -44,25 +44,14 @@ jobs:
 
       - name: Collect script coverage
         run: |
-          export DRY_RUN=true
-
-          # Measure script coverage directly with Homebrew bash to avoid kcov issues on macOS runners.
-          brew_prefix="$(brew --prefix)"
-          BASH_BIN="${brew_prefix}/bin/bash"
-          test -x "${BASH_BIN}"
-
-          mkdir -p coverage/raw
-          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/01-brew "${BASH_BIN}" install/macos/01-brew.sh
-          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/02-brew-packages "${BASH_BIN}" install/macos/02-brew-packages.sh
-          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/03-profile "${BASH_BIN}" install/macos/03-profile.sh
-
-          # setup.sh just orchestrates the step scripts already covered above.
-          # brew-dump-explicit.sh shells out to large brew listings on the runner and dominates kcov runtime.
-          # Merge coverage reports and ensure the upload artifact exists.
-          kcov --merge coverage coverage/raw/01-brew coverage/raw/02-brew-packages coverage/raw/03-profile
-          test -f coverage/cobertura.xml
+          # TODO: Collect script coverage is intentionally skipped for now.
+          # The step remains so the workflow structure stays visible, but the
+          # current kcov-based approach takes too long and should be redesigned
+          # in a separate issue before re-enabling coverage collection here.
+          echo "Skipping script coverage collection for now; revisit in a separate issue."
 
       - name: Upload coverage to Codecov
+        if: ${{ hashFiles('coverage/cobertura.xml') != '' }}
         uses: codecov/codecov-action@v6
         with:
           files: ./coverage/cobertura.xml
