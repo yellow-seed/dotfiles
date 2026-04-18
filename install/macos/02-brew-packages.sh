@@ -8,6 +8,8 @@ fi
 
 # ドライランモード設定
 DRY_RUN="${DRY_RUN:-false}"
+INSTALLED_FORMULAE=""
+INSTALLED_CASKS=""
 
 # Homebrew関連の関数群
 function is_brew_exists() {
@@ -21,6 +23,41 @@ function run_brew() {
   fi
 
   brew "$@"
+}
+
+function load_installed_packages() {
+  INSTALLED_FORMULAE="$(brew list --formula)"
+  INSTALLED_CASKS="$(brew list --cask)"
+}
+
+function is_formula_installed() {
+  local formula="$1"
+  grep -Fxq "$formula" <<<"${INSTALLED_FORMULAE}"
+}
+
+function is_cask_installed() {
+  local cask="$1"
+  grep -Fxq "$cask" <<<"${INSTALLED_CASKS}"
+}
+
+function install_formula_if_missing() {
+  local formula="$1"
+  if is_formula_installed "$formula"; then
+    echo "  [SKIP] ${formula} is already installed"
+    return 0
+  fi
+
+  run_brew install "$formula"
+}
+
+function install_cask_if_missing() {
+  local cask="$1"
+  if is_cask_installed "$cask"; then
+    echo "  [SKIP] ${cask} is already installed"
+    return 0
+  fi
+
+  run_brew install --cask "$cask"
 }
 
 function install_packages() {
@@ -69,14 +106,16 @@ function install_packages() {
     run_brew tap "$tap"
   done
 
+  load_installed_packages
+
   echo "Installing Homebrew formulae..."
   for formula in "${formulae[@]}"; do
-    run_brew install "$formula"
+    install_formula_if_missing "$formula"
   done
 
   echo "Installing Homebrew casks..."
   for cask in "${casks[@]}"; do
-    run_brew install --cask "$cask"
+    install_cask_if_missing "$cask"
   done
 }
 

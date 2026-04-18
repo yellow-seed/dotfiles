@@ -34,26 +34,27 @@ jobs:
       - name: Install kcov
         run: brew install kcov
 
-      - name: Install Bats
-        run: brew install bats-core
+      - name: Install Bats and Bash
+        run: brew install bats-core bash
 
-      - name: Run tests with coverage
+      - name: Run Bats tests
         run: |
-          # Set environment variables for SimpleCov
-          export DRY_RUN=true
+          # Run the full test suite first so pass/fail is decided before coverage collection.
+          bats install/macos/ install/common/ tests/files/
 
-          # Run macOS-specific tests with coverage (kcov for performance)
-          # Only measure coverage for macOS-specific scripts
-          mkdir -p coverage
-          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage bats install/macos/
-
-          # Run common and file tests without coverage for speed
-          bats install/common/ tests/files/
+      - name: Collect script coverage
+        run: |
+          # TODO: Collect script coverage is intentionally skipped for now.
+          # The step remains so the workflow structure stays visible, but the
+          # current kcov-based approach takes too long and should be redesigned
+          # in a separate issue before re-enabling coverage collection here.
+          echo "Skipping script coverage collection for now; revisit in a separate issue."
 
       - name: Upload coverage to Codecov
+        if: ${{ hashFiles('coverage/cobertura.xml') != '' }}
         uses: codecov/codecov-action@v6
         with:
-          files: ./coverage/coverage.json
+          files: ./coverage/cobertura.xml
           flags: macos
           name: coverage-macos
           token: ${{ secrets.CODECOV_TOKEN }}

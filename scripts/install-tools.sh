@@ -291,16 +291,33 @@ install_prettier() {
 install_bats() {
   if command_exists bats; then
     log "bats already installed: $(bats --version)"
+  else
+    log "Installing bats..."
+    if command_exists apt-get; then
+      if install_packages bats bats-support bats-assert; then
+        log "bats, bats-support, bats-assert installed successfully via apt-get"
+      else
+        fail "Failed to install bats via apt-get"
+      fi
+    elif command_exists brew; then
+      if brew install bats-core bats-support bats-assert; then
+        log "bats-core, bats-support, bats-assert installed successfully via Homebrew"
+      else
+        fail "Failed to install bats via Homebrew"
+      fi
+    else
+      fail "Failed to install bats: neither apt-get nor brew is available"
+      return 1
+    fi
+  fi
+
+  if command_exists bats; then
+    log "bats command is available: $(bats --version)"
     return 0
   fi
 
-  log "Installing bats..."
-  if install_packages bats; then
-    log "bats installed successfully via apt-get"
-    return 0
-  fi
-
-  fail "Failed to install bats"
+  fail "bats command is still unavailable after installation attempt"
+  return 1
 }
 
 install_helper_script() {
