@@ -39,8 +39,6 @@ jobs:
 
       - name: Run Bats tests
         run: |
-          export DRY_RUN=true
-
           # Run the full test suite first so pass/fail is decided before coverage collection.
           bats install/macos/ install/common/ tests/files/
 
