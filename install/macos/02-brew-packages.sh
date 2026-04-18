@@ -23,6 +23,26 @@ function run_brew() {
   brew "$@"
 }
 
+function install_formula_if_missing() {
+  local formula="$1"
+  if brew list --formula | grep -q "^${formula}$"; then
+    echo "  [SKIP] ${formula} is already installed"
+    return 0
+  fi
+
+  run_brew install "$formula"
+}
+
+function install_cask_if_missing() {
+  local cask="$1"
+  if brew list --cask | grep -q "^${cask}$"; then
+    echo "  [SKIP] ${cask} is already installed"
+    return 0
+  fi
+
+  run_brew install --cask "$cask"
+}
+
 function install_packages() {
   if ! is_brew_exists; then
     if [ "${DRY_RUN}" = "true" ]; then
@@ -71,12 +91,12 @@ function install_packages() {
 
   echo "Installing Homebrew formulae..."
   for formula in "${formulae[@]}"; do
-    run_brew install "$formula"
+    install_formula_if_missing "$formula"
   done
 
   echo "Installing Homebrew casks..."
   for cask in "${casks[@]}"; do
-    run_brew install --cask "$cask"
+    install_cask_if_missing "$cask"
   done
 }
 
