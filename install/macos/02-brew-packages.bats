@@ -9,6 +9,45 @@ teardown() {
   rm -rf "$TEST_BIN_DIR"
 }
 
+write_brew_stub() {
+  local installed_formulae="$1"
+  local installed_casks="$2"
+
+  cat >"$TEST_BIN_DIR/brew" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "\$1" = "list" ] && [ "\$2" = "--formula" ]; then
+  cat <<'FORMULAE'
+${installed_formulae}
+FORMULAE
+  exit 0
+fi
+
+if [ "\$1" = "list" ] && [ "\$2" = "--cask" ]; then
+  cat <<'CASKS'
+${installed_casks}
+CASKS
+  exit 0
+fi
+
+if [ "\$1" = "install" ]; then
+  echo "INSTALL \$*"
+  exit 0
+fi
+
+if [ "\$1" = "tap" ]; then
+  echo "TAP \$2"
+  exit 0
+fi
+
+echo "UNEXPECTED: \$*" >&2
+exit 2
+EOF
+
+  chmod +x "$TEST_BIN_DIR/brew"
+}
+
 @test "brew packages script exists" {
   [ -f "$SCRIPT_PATH" ]
 }
@@ -94,38 +133,7 @@ teardown() {
 }
 
 @test "brew packages skips installed formula and installs missing formula" {
-  cat >"$TEST_BIN_DIR/brew" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-
-if [ "$1" = "list" ] && [ "$2" = "--formula" ]; then
-  cat <<'FORMULAE'
-bash
-mise
-python@3.12
-FORMULAE
-  exit 0
-fi
-
-if [ "$1" = "list" ] && [ "$2" = "--cask" ]; then
-  cat <<'CASKS'
-1password
-google-chrome
-CASKS
-  exit 0
-fi
-
-if [ "$1" = "install" ]; then
-  echo "INSTALL $*"
-  exit 0
-fi
-
-if [ "$1" = "tap" ]; then
-  echo "TAP $2"
-  exit 0
-fi
-EOF
-  chmod +x "$TEST_BIN_DIR/brew"
+  write_brew_stub $'bash\nmise\npython@3.12' $'1password\ngoogle-chrome'
 
   run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
@@ -134,39 +142,7 @@ EOF
 }
 
 @test "brew packages skips installed cask and installs missing cask" {
-  cat >"$TEST_BIN_DIR/brew" <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-
-if [ "$1" = "list" ] && [ "$2" = "--formula" ]; then
-  cat <<'FORMULAE'
-bash
-mise
-python@3.12
-tree
-FORMULAE
-  exit 0
-fi
-
-if [ "$1" = "list" ] && [ "$2" = "--cask" ]; then
-  cat <<'CASKS'
-1password
-google-chrome
-CASKS
-  exit 0
-fi
-
-if [ "$1" = "install" ]; then
-  echo "INSTALL $*"
-  exit 0
-fi
-
-if [ "$1" = "tap" ]; then
-  echo "TAP $2"
-  exit 0
-fi
-EOF
-  chmod +x "$TEST_BIN_DIR/brew"
+  write_brew_stub $'bash\nmise\npython@3.12\ntree' $'1password\ngoogle-chrome'
 
   run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
