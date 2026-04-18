@@ -51,15 +51,15 @@ jobs:
           BASH_BIN="${brew_prefix}/bin/bash"
           test -x "${BASH_BIN}"
 
-          mkdir -p coverage/raw coverage/tmp
+          mkdir -p coverage/raw
           kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/01-brew "${BASH_BIN}" install/macos/01-brew.sh
           kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/02-brew-packages "${BASH_BIN}" install/macos/02-brew-packages.sh
           kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/03-profile "${BASH_BIN}" install/macos/03-profile.sh
-          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/setup "${BASH_BIN}" install/macos/setup.sh
-          kcov --exclude-pattern=/usr,/opt/homebrew,/System coverage/raw/brew-dump-explicit "${BASH_BIN}" install/macos/brew-dump-explicit.sh coverage/tmp/Brewfile
 
+          # setup.sh just orchestrates the step scripts already covered above.
+          # brew-dump-explicit.sh shells out to large brew listings on the runner and dominates kcov runtime.
           # Merge coverage reports and ensure the upload artifact exists.
-          kcov --merge coverage coverage/raw/01-brew coverage/raw/02-brew-packages coverage/raw/03-profile coverage/raw/setup coverage/raw/brew-dump-explicit
+          kcov --merge coverage coverage/raw/01-brew coverage/raw/02-brew-packages coverage/raw/03-profile
           test -f coverage/cobertura.xml
 
       - name: Upload coverage to Codecov
