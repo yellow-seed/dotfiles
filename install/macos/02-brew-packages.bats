@@ -52,6 +52,11 @@ teardown() {
   [ "$status" -eq 0 ]
 }
 
+@test "brew packages script defines load_installed_packages function" {
+  run grep -E '^function load_installed_packages\(\)' "$SCRIPT_PATH"
+  [ "$status" -eq 0 ]
+}
+
 @test "brew packages script runs without errors in dry-run mode" {
   run env DRY_RUN=true bash "$SCRIPT_PATH"
   [ "$status" -eq 0 ]
@@ -167,6 +172,57 @@ EOF
   [ "$status" -eq 0 ]
   [[ "$output" == *"[SKIP] 1password is already installed"* ]]
   [[ "$output" == *"INSTALL install --cask claude"* ]]
+}
+
+@test "brew packages reads installed lists once per run" {
+  formula_count_file="$TEST_BIN_DIR/formula_count"
+  cask_count_file="$TEST_BIN_DIR/cask_count"
+  : >"$formula_count_file"
+  : >"$cask_count_file"
+
+  cat >"$TEST_BIN_DIR/brew" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "\$1" = "list" ] && [ "\$2" = "--formula" ]; then
+  echo x >>"$formula_count_file"
+  cat <<'FORMULAE'
+bash
+mise
+python@3.12
+FORMULAE
+  exit 0
+fi
+
+if [ "\$1" = "list" ] && [ "\$2" = "--cask" ]; then
+  echo x >>"$cask_count_file"
+  cat <<'CASKS'
+1password
+google-chrome
+CASKS
+  exit 0
+fi
+
+if [ "\$1" = "install" ]; then
+  exit 0
+fi
+
+if [ "\$1" = "tap" ]; then
+  exit 0
+fi
+EOF
+  chmod +x "$TEST_BIN_DIR/brew"
+
+  run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
+  [ "$status" -eq 0 ]
+
+  run wc -l <"$formula_count_file"
+  [ "$status" -eq 0 ]
+  [ "$output" -eq 1 ]
+
+  run wc -l <"$cask_count_file"
+  [ "$status" -eq 0 ]
+  [ "$output" -eq 1 ]
 }
 
 @test "brew packages dry-run skips gracefully without Homebrew" {
