@@ -619,3 +619,41 @@ docker compose run --rm windows-test-shell
 - `chezmoi apply`を実行する前に`chezmoi diff`で変更内容を確認することを推奨
 - 重要な設定変更は必ずブランチを作成して作業する
 - コミットメッセージは[Conventional Commits](https://www.conventionalcommits.org/)の形式に従う
+
+## nix-darwin（Phase 1）
+
+Issue #158 の Phase 1 として、既存の chezmoi / Homebrew / mise を維持したまま、nix-darwin の最小構成を追加しています。
+
+### 追加したファイル
+
+- `macos/nix/flake.nix`: nix-darwin の flake エントリーポイント
+- `macos/nix/darwin/default.nix`: nix-darwin の最小モジュール
+
+### セットアップ手順（macOS）
+
+1. Determinate Systems インストーラーで Nix を導入
+
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+   ```
+
+2. flake を検証
+
+   ```bash
+   cd macos/nix
+   nix flake check
+   ```
+
+3. 適用（Apple Silicon の例）
+
+   ```bash
+   sudo darwin-rebuild switch --flake .#dotfiles
+   ```
+
+4. 適用（Intel Mac の例）
+
+   ```bash
+   sudo darwin-rebuild switch --flake .#dotfiles-intel
+   ```
+
+> ホスト名を独自名で運用する場合は `macos/nix/flake.nix` の `darwinConfigurations` を環境に合わせて変更してください。
