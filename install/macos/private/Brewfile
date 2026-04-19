@@ -1,7 +1,6 @@
 # Taps
 tap "aws/tap"
 tap "dotenvx/brew"
-tap "go-swagger/go-swagger"
 tap "stuartleeks/tap"
 
 # Formulae (explicitly installed)
@@ -29,8 +28,6 @@ brew "librist"
 brew "mas"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.12"
 # Tools for and transforming and inspecting PDF files
 brew "qpdf"
 # Low-level access to audio, keyboard, mouse, joystick, and graphics
