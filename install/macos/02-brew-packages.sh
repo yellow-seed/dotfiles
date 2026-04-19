@@ -112,14 +112,12 @@ function install_packages() {
   local taps=(
     "aws/tap"
     "dotenvx/brew"
-    "go-swagger/go-swagger"
   )
 
   local formulae=(
     "bash"
     "mas"
     "mise"
-    "python@3.12"
     "tree"
   )
 
