@@ -4,7 +4,7 @@ set -euo pipefail
 declare -a markdown_files=()
 declare -a yaml_files=()
 declare -a json_files=()
-prettier_cmd=(npx --no-install prettier)
+prettier_cmd=(prettier)
 
 matches_markdown() {
   local file="$1"

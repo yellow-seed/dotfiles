@@ -29,14 +29,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup mise tools
+        uses: jdx/mise-action@v3
 
       - name: Run Prettier (Markdown)
         run: npm run format:md
@@ -50,14 +44,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup mise tools
+        uses: jdx/mise-action@v3
 
       - name: Run Prettier (YAML)
         run: npm run format:yaml
@@ -71,14 +59,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Setup mise tools
+        uses: jdx/mise-action@v3
 
       - name: Run Prettier (JSON)
         run: npm run format:json
