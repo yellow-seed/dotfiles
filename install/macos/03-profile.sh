@@ -70,35 +70,30 @@ function detect_profile() {
   echo "${profile}"
 }
 
-function install_profile_brewfile() {
+function install_profile_packages() {
   local profile
   profile="$(detect_profile)"
 
   if [ "${profile}" = "common" ]; then
-    echo "Profile is common; skipping profile-specific Brewfile (common packages already installed)"
+    echo "Profile is common; skipping profile-specific packages"
     return 0
   fi
 
   local script_dir
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  local profile_brewfile="${script_dir}/${profile}/Brewfile"
+  local profile_script="${script_dir}/${profile}/brew-packages.sh"
 
-  if [ -f "${profile_brewfile}" ]; then
-    if [ "${DRY_RUN}" = "true" ]; then
-      echo "[DRY RUN] Would install ${profile}-specific packages from ${profile_brewfile}"
-      return 0
-    fi
-
+  if [ -f "${profile_script}" ]; then
     echo "Installing ${profile}-specific packages..."
-    brew bundle --file="${profile_brewfile}"
+    bash "${profile_script}"
   else
-    echo "Warning: ${profile} Brewfile not found at ${profile_brewfile}, skipping profile-specific packages"
+    echo "Warning: ${profile} brew-packages.sh not found at ${profile_script}, skipping profile-specific packages"
   fi
 }
 
 function main() {
   parse_args "$@"
-  install_profile_brewfile
+  install_profile_packages
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
