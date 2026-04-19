@@ -24,3 +24,21 @@
   [ "$status" -eq 0 ]
   [[ "$output" =~ "[DRY RUN] Would install work-specific packages" ]]
 }
+
+@test "profile script accepts --profile option" {
+  run env DRY_RUN=true bash install/macos/03-profile.sh --profile work
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "[DRY RUN] Would install work-specific packages" ]]
+}
+
+@test "profile script prioritizes --profile over DOTFILES_PROFILE env" {
+  run env DOTFILES_PROFILE=common DRY_RUN=true bash install/macos/03-profile.sh --profile work
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "[DRY RUN] Would install work-specific packages" ]]
+}
+
+@test "profile script fails for unknown option" {
+  run bash install/macos/03-profile.sh --unknown
+  [ "$status" -ne 0 ]
+  [[ "$output" =~ "Unknown option" ]]
+}

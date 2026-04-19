@@ -19,6 +19,7 @@ GO_VERSION="1.23.5"
 SHFMT_VERSION="3.12.0"
 ACTIONLINT_VERSION="1.7.5"
 PRETTIER_VERSION="3.4.2"
+BATS_CORE_VERSION="1.12.0"
 
 fail() {
   log "ERROR: $1"
@@ -289,24 +290,65 @@ install_prettier() {
 }
 
 install_bats() {
+  install_bats_from_release() {
+    local version="$1"
+    local temp_dir
+    temp_dir=$(mktemp -d)
+
+    local archive_url="https://github.com/bats-core/bats-core/archive/refs/tags/v${version}.tar.gz"
+    local archive_path="${temp_dir}/bats-core.tar.gz"
+    local extracted_dir="${temp_dir}/bats-core-${version}"
+
+    if ! download_file "$archive_url" "$archive_path"; then
+      rm -rf "$temp_dir"
+      return 1
+    fi
+
+    if ! tar -xzf "$archive_path" -C "$temp_dir"; then
+      rm -rf "$temp_dir"
+      return 1
+    fi
+
+    if [ ! -x "${extracted_dir}/install.sh" ]; then
+      rm -rf "$temp_dir"
+      return 1
+    fi
+
+    if ! "${extracted_dir}/install.sh" "$INSTALL_PREFIX"; then
+      rm -rf "$temp_dir"
+      return 1
+    fi
+
+    rm -rf "$temp_dir"
+    return 0
+  }
+
   if command_exists bats; then
     log "bats already installed: $(bats --version)"
-  else
-    log "Installing bats..."
-    if command_exists apt-get; then
-      if install_packages bats bats-support bats-assert; then
-        log "bats, bats-support, bats-assert installed successfully via apt-get"
-      else
-        fail "Failed to install bats via apt-get"
-      fi
-    elif command_exists brew; then
-      if brew install bats-core bats-support bats-assert; then
-        log "bats-core, bats-support, bats-assert installed successfully via Homebrew"
-      else
-        fail "Failed to install bats via Homebrew"
-      fi
+    return 0
+  fi
+
+  log "Installing bats..."
+  if command_exists apt-get; then
+    if install_packages bats; then
+      log "bats installed successfully via apt-get"
     else
-      fail "Failed to install bats: neither apt-get nor brew is available"
+      log "apt-get bats install failed; trying fallback installation from bats-core release"
+    fi
+  elif command_exists brew; then
+    if brew install bats-core; then
+      log "bats-core installed successfully via Homebrew"
+    else
+      log "Homebrew bats-core install failed; trying fallback installation from bats-core release"
+    fi
+  fi
+
+  if ! command_exists bats; then
+    log "Installing bats v${BATS_CORE_VERSION} from GitHub release..."
+    if install_bats_from_release "${BATS_CORE_VERSION}"; then
+      log "bats installed successfully from release archive"
+    else
+      fail "Failed to install bats from release archive"
       return 1
     fi
   fi

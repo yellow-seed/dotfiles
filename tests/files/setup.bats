@@ -55,6 +55,14 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
+@test "setup.sh supports --profile option and exports DOTFILES_PROFILE" {
+  run grep -q -- "--profile" "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+
+  run grep -q "export DOTFILES_PROFILE" "${SETUP_SCRIPT}"
+  [ "$status" -eq 0 ]
+}
+
 @test "setup.sh bootstrap checks for git availability" {
   run grep -q "command -v git" "${SETUP_SCRIPT}"
   [ "$status" -eq 0 ]
@@ -78,4 +86,3 @@ setup() {
   [ "$status" -ne 0 ]
   [[ "$output" =~ "Required scripts not found locally" ]]
 }
-

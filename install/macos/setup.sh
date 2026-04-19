@@ -8,6 +8,7 @@ fi
 
 # ドライランモード設定（子スクリプトにも伝搬）
 export DRY_RUN="${DRY_RUN:-false}"
+DOTFILES_PROFILE="${DOTFILES_PROFILE:-}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -64,6 +65,7 @@ function configure_homebrew_path() {
 function run_step() {
   local step_name="$1"
   local step_script="$2"
+  shift 2
 
   echo "${step_name}"
 
@@ -72,21 +74,60 @@ function run_step() {
     exit 1
   fi
 
-  bash "${step_script}"
+  bash "${step_script}" "$@"
+}
+
+function usage() {
+  cat <<'EOF'
+Usage: install/macos/setup.sh [--profile <name>]
+
+Options:
+  --profile <name>  Specify dotfiles profile (e.g. work, common)
+EOF
+}
+
+function parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    --profile)
+      if [[ $# -lt 2 ]] || [[ -z "${2:-}" ]]; then
+        echo "Error: --profile requires a non-empty value" >&2
+        usage >&2
+        exit 1
+      fi
+      DOTFILES_PROFILE="$2"
+      shift 2
+      ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Error: Unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+    esac
+  done
 }
 
 function main() {
+  parse_args "$@"
+  if [[ -n "${DOTFILES_PROFILE}" ]]; then
+    export DOTFILES_PROFILE
+  fi
+
   echo "Initializing macOS environment..."
 
   keepalive_sudo
   run_step "Step 1: Installing Homebrew..." "${SCRIPT_DIR}/01-brew.sh"
   configure_homebrew_path
   run_step "Step 2: Installing common packages..." "${SCRIPT_DIR}/02-brew-packages.sh"
-  run_step "Step 3: Installing profile-specific packages..." "${SCRIPT_DIR}/03-profile.sh"
+  run_step "Step 3: Installing profile-specific packages..." "${SCRIPT_DIR}/03-profile.sh" "${@}"
 
   echo "macOS setup completed."
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  main
+  main "$@"
 fi

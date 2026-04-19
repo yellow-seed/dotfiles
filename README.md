@@ -375,6 +375,16 @@ DRY_RUN=true bash install/macos/02-brew-packages.sh
 bash install/macos/02-brew-packages.sh
 ```
 
+### Linuxでのテストツール導入（BATS含む）
+
+Linux環境でBATS/ShellCheck/shfmt/actionlint等を使う場合は、先に以下を実行してください。
+
+```bash
+bash scripts/install-tools.sh
+```
+
+`scripts/install-tools.sh` は `apt-get` による `bats` 導入を最優先し、失敗時は bats-core の GitHub release からの導入へフォールバックします。これにより、APTの一時的な不調やパッケージ取得失敗があっても、`bats` コマンドが利用可能になる確率を高めています。
+
 ## mise設定管理
 
 miseでツールのバージョンを追加・変更・削除した際は、以下の手順で設定ファイルを更新し、chezmoiで管理します。

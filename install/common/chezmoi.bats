@@ -50,3 +50,9 @@ teardown() {
   [[ "$output" =~ "test-user" ]]
   [ ! -d "${TEMP_HOME}/.local/bin" ]
 }
+
+@test "chezmoi installation script reports DOTFILES_PROFILE when provided" {
+  run env DRY_RUN=true DOTFILES_PROFILE=work HOME="${TEMP_HOME}" /bin/bash install/common/chezmoi.sh
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "DOTFILES_PROFILE=work" ]]
+}

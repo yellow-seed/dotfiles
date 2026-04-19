@@ -7,6 +7,7 @@ fi
 
 declare -r GITHUB_USERNAME="${GITHUB_USERNAME:-yellow-seed}"
 DRY_RUN="${DRY_RUN:-false}"
+DOTFILES_PROFILE="${DOTFILES_PROFILE:-}"
 declare -r CHEZMOI_BIN_DIR="${CHEZMOI_BIN_DIR:-${HOME}/.local/bin}"
 
 function setup_chezmoi_bin_dir() {
@@ -21,6 +22,10 @@ function setup_chezmoi_bin_dir() {
 }
 
 function run_chezmoi() {
+  if [ -n "${DOTFILES_PROFILE}" ]; then
+    echo "Using DOTFILES_PROFILE=${DOTFILES_PROFILE} for chezmoi apply"
+  fi
+
   if [ "${DRY_RUN}" = "true" ]; then
     echo "[DRY RUN] Would install chezmoi for ${GITHUB_USERNAME}"
     return 0
@@ -30,10 +35,10 @@ function run_chezmoi() {
 
   if command -v curl &>/dev/null; then
     echo "Using curl to download chezmoi installer..."
-    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "${CHEZMOI_BIN_DIR}" init --apply "${GITHUB_USERNAME}"
+    DOTFILES_PROFILE="${DOTFILES_PROFILE}" sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "${CHEZMOI_BIN_DIR}" init --apply "${GITHUB_USERNAME}"
   elif command -v wget &>/dev/null; then
     echo "Using wget to download chezmoi installer..."
-    sh -c "$(wget -qO- get.chezmoi.io)" -- -b "${CHEZMOI_BIN_DIR}" init --apply "${GITHUB_USERNAME}"
+    DOTFILES_PROFILE="${DOTFILES_PROFILE}" sh -c "$(wget -qO- get.chezmoi.io)" -- -b "${CHEZMOI_BIN_DIR}" init --apply "${GITHUB_USERNAME}"
   else
     echo "Error: Neither curl nor wget is available. Please install curl or wget to proceed." >&2
     echo "On Debian/Ubuntu: sudo apt-get install curl" >&2

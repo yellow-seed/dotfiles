@@ -29,3 +29,13 @@
   run grep "export DRY_RUN" install/macos/setup.sh
   [ "$status" -eq 0 ]
 }
+
+@test "macOS setup script supports --profile option" {
+  run grep -- "--profile" install/macos/setup.sh
+  [ "$status" -eq 0 ]
+}
+
+@test "macOS setup script forwards parsed args to profile step" {
+  run grep '03-profile.sh" "\${@}"' install/macos/setup.sh
+  [ "$status" -eq 0 ]
+}
