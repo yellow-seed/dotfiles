@@ -270,22 +270,51 @@ install_node() {
   fail "Failed to install Node.js and npm"
 }
 
+install_mise() {
+  if command_exists mise; then
+    log "mise already installed: $(mise --version)"
+    return 0
+  fi
+
+  log "Installing mise..."
+  local temp_dir
+  temp_dir=$(mktemp -d)
+  trap 'rm -rf "$temp_dir"' EXIT
+
+  if ! download_file "https://mise.run" "$temp_dir/mise-install.sh"; then
+    fail "failed to download mise installer"
+    return 1
+  fi
+
+  if sh "$temp_dir/mise-install.sh"; then
+    if [ -x "$HOME/.local/bin/mise" ]; then
+      export PATH="$HOME/.local/bin:$PATH"
+    elif [ -x "$HOME/.local/share/mise/bin/mise" ]; then
+      export PATH="$HOME/.local/share/mise/bin:$PATH"
+    fi
+    log "mise installed successfully: $(mise --version)"
+  else
+    fail "failed to install mise"
+  fi
+}
+
 install_prettier() {
   if command_exists prettier; then
     log "Prettier already installed: $(prettier --version)"
     return 0
   fi
 
-  if ! command_exists npm; then
-    fail "npm is required to install Prettier"
+  if ! command_exists mise; then
+    fail "mise is required to install Prettier"
     return 1
   fi
 
-  log "Installing Prettier v${PRETTIER_VERSION}..."
-  if npm install -g "prettier@${PRETTIER_VERSION}"; then
-    log "Prettier v${PRETTIER_VERSION} installed successfully"
+  log "Installing Prettier v${PRETTIER_VERSION} via mise..."
+  if MISE_OVERRIDE_CONFIG_FILENAMES=".mise.toml" mise install -C "$REPO_ROOT" "npm:prettier"; then
+    eval "$(MISE_OVERRIDE_CONFIG_FILENAMES=".mise.toml" mise activate -C "$REPO_ROOT" bash)"
+    log "Prettier v${PRETTIER_VERSION} installed successfully via mise"
   else
-    fail "Failed to install Prettier"
+    fail "Failed to install Prettier via mise"
   fi
 }
 
@@ -396,6 +425,7 @@ main() {
   install_shfmt
   install_actionlint
   install_node
+  install_mise
   install_prettier
   install_bats
 

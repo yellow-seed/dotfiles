@@ -19,4 +19,4 @@ jobs:
           shfmt --version
           actionlint --version
           node --version
-          npx prettier --version
+          prettier --version

@@ -1,756 +1,168 @@
-# AGENTS.md - GitHub Copilot Agent Guide
+# AGENTS.md - Agent Guide
 
-## プロジェクト概要
+## このリポジトリの本質
 
-このリポジトリは**dotfiles**管理システムで、[chezmoi](https://www.chezmoi.io/)を使用して個人の開発環境設定を管理しています。主な目的は、複数のマシン間で一貫した開発環境を維持し、新しいマシンでの環境構築を自動化することです。
+このリポジトリは、単なる dotfiles 集ではなく、`chezmoi` を中心にした **3OS対応の開発環境セットアップシステム** です。
 
-### 主要な管理ツール
+AI エージェントは、個別の手順をその場で組み立てるよりも、次の設計思想に従って既存の入口・テスト・Skill を使って作業してください。
 
-1. **chezmoi**: dotfiles全体の運用管理
-   - 設定ファイルのバージョン管理と同期
-   - テンプレート機能による環境別の設定
-2. **Homebrew**: macOSアプリケーション管理
+1. **OS差分は setup に寄せる**
 
-   - GUIアプリケーションとシステムツールのインストール
-   - スクリプト内でパッケージリストを直接管理
+   - macOS / Ubuntu / Windows を主要対象とする
+   - OSごとの分岐は setup スクリプト側の責務とする
+   - ユーザーや AI は、原則として上位の setup 入口を呼び出す
 
-3. **mise**: プログラミング言語とCLIツールの管理
-   - 複数言語のバージョン管理（Node.js, Python, Go, Rubyなど）
-   - プロジェクト固有のツール管理
+2. **検証環境は OS 別 compose から選ぶ**
 
-## リポジトリ構造
+   - macOS / Ubuntu / Windows 相当のテスト環境を `docker/*-test/docker-compose.yml` で管理する
+   - 変更内容に応じて、必要な compose だけを起動する
+   - 複数OSに影響する変更では、該当する compose を組み合わせて検証する
 
-```bash
-.
-├── .chezmoiroot              # chezmoiのルートディレクトリ指定
-├── .github/                  # GitHub Actions ワークフロー
-│   └── workflows/
-│       ├── ci-macos.yml             # macOS CI/CD
-│       ├── ci-ubuntu.yml            # Ubuntu CI/CD
-│       ├── ci-windows.yml           # Windows CI/CD
-│       ├── copilot-setup-steps.yml  # Copilot検証環境構築
-│       └── e2e-setup-test.yml       # E2Eセットアップテスト
-├── home/                     # chezmoi管理下のdotfiles
-│   ├── .chezmoi.toml.tmpl   # chezmoiメイン設定
-│   ├── .chezmoiignore       # chezmoi無視ファイル
-│   ├── dot_config/          # アプリケーション設定
-│   │   ├── gh/             # GitHub CLI設定
-│   │   └── mise/           # mise設定
-│   │       └── config.toml  # miseツール定義
-│   ├── dot_gitconfig        # Git設定
-│   ├── dot_gitignore_global # Gitグローバル無視設定
-│   └── dot_zshrc            # Zsh設定
-├── install/                 # インストールスクリプト（テストと実装が同じ階層）
-│   ├── common/              # OS共通
-│   │   └── chezmoi.bats    # chezmoiテスト
-│   ├── macos/              # macOS専用
-│   │   ├── 01-brew.sh      # Homebrew自動インストール
-│   │   ├── 01-brew.bats    # Homebrewテスト
-│   │   ├── 02-brew-packages.sh  # パッケージ自動インストール
-│   │   ├── 02-brew-packages.bats # パッケージインストールテスト
-│   │   ├── 03-profile.sh  # プロファイル固有パッケージインストール
-│   │   ├── 03-profile.bats # プロファイル固有パッケージテスト
-│   │   ├── setup.sh       # macOS用オーケストレーター
-│   │   ├── setup.bats     # macOS用オーケストレーターテスト
-│   │   ├── Brewfile        # Homebrewパッケージ定義
-│   │   ├── brew-dump-explicit.sh    # Brewfileダンプスクリプト
-│   │   ├── brew-dump-explicit.bats  # Brewfileダンプテスト
-│   │   ├── work/           # 仕事環境用Brewfile
-│   │   │   └── Brewfile
-│   │   └── private/        # プライベート環境用Brewfile
-│   │       └── Brewfile
-│   ├── ubuntu/             # Ubuntu専用（仮実装/Stub）
-│   │   └── README.md       # 仮実装の説明
-│   └── windows/            # Windows専用
-│       ├── 01-winget.ps1           # Wingetインストール
-│       ├── 01-winget.Tests.ps1     # Wingetテスト
-│       ├── 02-dev-tools.ps1        # 開発ツールインストール
-│       ├── 02-dev-tools.Tests.ps1  # 開発ツールテスト
-│       ├── 03-packages.ps1         # パッケージインストール
-│       ├── 03-packages.Tests.ps1   # パッケージテスト
-│       ├── packages.json           # パッケージ定義
-│       ├── run_unit_test.ps1       # Windows用テスト実行
-│       ├── setup.ps1               # Windows用オーケストレーター
-│       └── setup.Tests.ps1         # Windows用オーケストレーターテスト
-├── tests/                   # ファイル系のテストのみ
-│   └── files/
-│       ├── common.bats      # 共通ファイルテスト
-│       ├── shellcheck.bats  # ShellCheckテスト
-│       ├── templates.bats   # テンプレートテスト
-│       └── setup.bats       # セットアップテスト
-├── setup.sh                 # クイックセットアップスクリプト
-└── README.md                # ユーザー向けドキュメント
-```
+3. **手続き的な運用は Skill に委譲する**
+   - パッケージの追加・削除、chezmoi 同期、コミット、PR 作成などは Skill 化された手順を優先する
+   - AGENTS.md には詳細手順を詰め込まず、「何をしたいときに何を使うか」を書く
 
-## 主要ファイルとディレクトリの詳細
+## 基本原則
 
-### 設定ファイル (home/)
+- `home/` 配下は chezmoi のソースです。実ホームディレクトリを直接編集するのではなく、chezmoi 管理下のファイルを更新します。
+- OS別インストール処理は `install/<os>/` に閉じ込めます。共通処理は `install/common/` に置きます。
+- スクリプト変更では、実装と同じ階層にテストを置きます。
+- macOS が主運用環境です。迷った場合、macOS の実用性とテスト品質を優先します。
+- Ubuntu はサブ環境、Windows は PowerShell / winget ベースの別系統として扱います。
+- 手順の詳細を AGENTS.md に増やしすぎず、README または Skill に逃がします。
 
-- **dot_Brewfile**: Homebrewでインストールするパッケージのリスト
+## OS別セットアップ方針
 
-  - brew: CLIツール
-  - cask: GUIアプリケーション
-  - mas: Mac App Storeアプリ
-  - vscode: VS Code拡張機能
+### 共通入口
 
-- **dot_config/mise/config.toml**: miseで管理する開発ツール
-
-  - 言語ランタイム: Node.js, Python, Go, Ruby
-  - CLIツール: act, aws-sam-cli, awscli, chezmoi, docker-compose, gh, pnpm, uv
-
-- **dot_zshrc**: Zshシェル設定
-
-  - miseの初期化設定を含む
-  - 環境変数とエイリアスの定義
-
-- **dot_gitconfig**: Git設定
-  - ユーザー情報、エイリアス、デフォルト動作
-
-### インストールスクリプト (install/)
-
-**新しい構造の特徴**：テストコードと実装コードが同じディレクトリに配置され、OS別に明確に分離されています。
-
-#### OS共通 (common/)
-
-- **chezmoi.bats**: chezmoiインストールスクリプトのテスト（実装はペンディング）
-  - chezmoiはOS非依存のツールのため、common/に配置
-
-#### macOS専用 (macos/)
-
-- **01-brew.sh**: Homebrewの自動インストール
-- **02-brew-packages.sh**: スクリプト内のパッケージリストからtap/formulae/caskを一括インストール
-- **03-profile.sh**: プロファイル固有パッケージのインストール
-- **setup.sh**: macOS用オーケストレーター
-- **brew-dump-explicit.sh**: 明示的にインストールされたパッケージをBrewfileにダンプ
-- 各スクリプトに対応する .bats テストファイル
-
-#### Windows専用 (windows/)
-
-- **01-winget.ps1**: Windows用パッケージマネージャー設定
-- **02-dev-tools.ps1**: Windows用開発ツールインストール
-- **03-packages.ps1**: Windows用パッケージ一括インストール
-- **setup.ps1**: Windows用オーケストレーター
-- 各スクリプトに対応する .Tests.ps1 テストファイル
-
-#### Ubuntu専用 (ubuntu/)
-
-- **現在は仮実装（Stub）**: 実用優先度が低いため、スクリプトは未実装
-- 今後、必要に応じて実装予定
-
-#### その他
-
-- **template.sh**: 新しいインストールスクリプトのテンプレート
-
-### テストスイート
-
-**責務別の配置**：
-
-- **install/\*/\*.bats, \*.Tests.ps1**: インストールスクリプトのテスト（実装と同じディレクトリ）
-- **tests/files/**: ファイル系の共通テスト（ShellCheck、テンプレート検証など）
-
-**テストフレームワーク**：
-
-- **BATS (Bash Automated Testing System)**: macOS/Ubuntuのシェルスクリプトテスト
-- **Pester**: Windows PowerShellスクリプトテスト
-- macOS、Ubuntu、Windowsの3つのOS環境でCIが実行される
-
-## セットアップ手順
-
-### 新しいマシンでの初期セットアップ
-
-1. **chezmoiのインストールとdotfilesの適用**:
-
-   ```bash
-   sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply yellow-seed
-   ```
-
-2. **Homebrewのインストール** (macOSのみ):
-
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-3. **Brewfileからパッケージをインストール** (macOSのみ):
-
-   ```bash
-   cd ~/.local/share/chezmoi
-   brew bundle install --file=home/dot_Brewfile
-   ```
-
-4. **miseでツールをインストール**:
-
-   ```bash
-   mise install
-   ```
-
-### クイックセットアップ
-
-リポジトリの`setup.sh`を使用:
+Unix 系環境では、ルートの `setup.sh` を入口にします。
 
 ```bash
-sh setup.sh
+bash setup.sh
 ```
 
-## Claude Code での開発環境
+`setup.sh` は `uname` によって OS を判定し、現状では次を呼び出します。
 
-### GitHub CLI (gh) のセットアップ
+| OS    | 呼び出し先                |
+| ----- | ------------------------- |
+| macOS | `install/macos/setup.sh`  |
+| Linux | `install/ubuntu/setup.sh` |
 
-Claude Code on the Web などのリモート環境で GitHub CLI (`gh`) コマンドを使用する場合は、以下のhookスクリプトを実行してください：
-
-```bash
-bash .claude/hooks/gh-setup.sh
-```
-
-### リモート環境での gh コマンド使用方法
-
-gitのremoteがローカルプロキシを経由している環境では、`gh` コマンドがリポジトリを自動認識できない場合があります。その場合は以下の方法を使用してください：
-
-**方法: `-R` フラグでリポジトリを明示的に指定**
-
-```bash
-# Issue一覧を表示
-gh issue list -R yellow-seed/dotfiles
-
-# PR詳細を表示
-gh pr view 123 -R yellow-seed/dotfiles
-```
-
-## 開発とテスト方法
-
-### ローカルテスト実行
-
-#### macOSでテスト実行
-
-```bash
-# すべてのテストを実行
-bats install/macos/ install/common/ tests/files/
-
-# 特定のテストのみ実行
-bats install/macos/brew.bats
-```
-
-#### Ubuntuでテスト実行
-
-```bash
-# すべてのテストを実行
-bats install/ubuntu/ install/common/ tests/files/
-
-# 特定のテストのみ実行
-bats install/common/chezmoi.bats
-```
-
-#### Windowsでテスト実行
+Windows は PowerShell 系の入口を使います。
 
 ```powershell
-# すべてのテストを実行
-.\install\windows\run_unit_test.ps1
-
-# 特定のテストのみ実行
-Invoke-Pester -Path install/windows/01-winget.Tests.ps1
+.\install\windows\setup.ps1
 ```
 
-### BATSテストの書き方
+### エージェントの判断
 
-テストファイルは実装と同じディレクトリに配置（`install/*/`）、またはファイル系テストは `tests/files/` に配置:
+- OSごとの個別手順を勝手に増やす前に、既存の setup 入口に組み込めるかを確認します。
+- OS判定ロジックを変更する場合は、`setup.sh` と該当 OS の setup テストを確認します。
+- Windows 対応を触る場合は、Bash 側と混同せず PowerShell / Pester の流儀に合わせます。
+
+## Compose 環境の使い分け
+
+このリポジトリの compose は、OS別のテスト・検証環境として扱います。変更対象に応じて必要なものだけ使います。
+
+| 目的                                      | compose                                  |
+| ----------------------------------------- | ---------------------------------------- |
+| macOS 系 Bash / Homebrew スクリプトの検証 | `docker/macos-test/docker-compose.yml`   |
+| Ubuntu / Linux 系 Bash スクリプトの検証   | `docker/ubuntu-test/docker-compose.yml`  |
+| Windows PowerShell / Pester の検証        | `docker/windows-test/docker-compose.yml` |
+
+例:
 
 ```bash
-#!/usr/bin/env bats
-
-@test "テストケース名" {
-  run コマンド
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ "期待される出力" ]]
-}
+docker compose -f docker/macos-test/docker-compose.yml run --rm macos-test bats install/macos/ install/common/ tests/files/
+docker compose -f docker/ubuntu-test/docker-compose.yml run --rm ubuntu-test bats install/ubuntu/ install/common/ tests/files/
+docker compose -f docker/windows-test/docker-compose.yml run --rm windows-test
 ```
 
-## テストファーストなシェルスクリプト実装
-
-このリポジトリでは、**BATS (Bash Automated Testing System)** を使用したテストファースト開発を推奨しています。新しいインストールスクリプトやユーティリティを追加する際は、必ず先にテストを書いてから実装を行います。
-
-### テストファースト開発の流れ
-
-#### 1. テストファイルの作成（Red フェーズ）
-
-まず、期待する動作を定義するテストを書きます。この時点でテストは失敗します。
-
-**例**: 新しいインストールスクリプト `install/macos/git.sh` のテスト作成
+macOS / Ubuntu の compose には `lint-shell` もあります。シェルスクリプトや GitHub Actions を触った場合は、必要に応じて lint も実行します。
 
 ```bash
-# install/macos/git.bats
-#!/usr/bin/env bats
-
-@test "git installation script exists" {
-    [ -f "install/macos/git.sh" ]
-}
-
-@test "git installation script is executable" {
-    [ -x "install/macos/git.sh" ]
-}
-
-@test "git installation script has proper error handling" {
-    run head -1 install/macos/git.sh
-    [[ "$output" =~ "#!/usr/bin/env bash" ]] || [[ "$output" =~ "#!/bin/bash" ]]
-}
-
-@test "git installation script uses set -Eeuo pipefail" {
-    run grep "set -Eeuo pipefail" install/macos/git.sh
-    [ "$status" -eq 0 ]
-}
-
-@test "git installation script runs without errors in dry-run mode" {
-    # 環境変数でドライランモードを有効化
-    DRY_RUN=true run bash install/macos/git.sh
-    [ "$status" -eq 0 ]
-}
-
-@test "git command is available after installation" {
-    skip "Requires actual installation, test in CI only"
-    run command -v git
-    [ "$status" -eq 0 ]
-}
+docker compose -f docker/macos-test/docker-compose.yml run --rm macos-test bash docker/macos-test/lint-shell
+docker compose -f docker/ubuntu-test/docker-compose.yml run --rm ubuntu-test bash docker/ubuntu-test/lint-shell
 ```
 
-#### 2. テストの実行と確認（Red フェーズ）
+## Skill への委譲方針
+
+インストール、アンインストール、chezmoi 同期、コミット、PR 作成などの手続き的な作業は、AGENTS.md に手順を再掲しません。
+
+該当する Skill がある作業では、まずその Skill を読み、そこに書かれた手順を優先します。Skill がない場合だけ、既存の README、スクリプト、テストから最小限の手順を判断します。
+
+コード変更では、`test-driven-development` Skill を入口にします。対象 OS ごとの技術スタックや検証手順は、その Skill の OS 別 reference を必要なものだけ読みます。
+
+## 変更時の判断ルール
+
+### chezmoi 管理ファイル
+
+- `home/` 配下を更新します。
+- `.tmpl` を触る場合は、テンプレート展開結果を確認します。
+- PR では `chezmoi apply --dry-run --verbose`、`chezmoi diff`、または `chezmoi execute-template` の結果を示します。
+
+### パッケージ管理
+
+- macOS のパッケージ追加・削除は `brew-add` / `brew-remove` Skill を優先します。
+- macOS の基本パッケージは `install/macos/02-brew-packages.sh` と関連テストを確認します。
+- プロファイル別パッケージは `install/macos/03-profile.sh` と `install/macos/{work,private}/Brewfile` の責務を確認します。
+- Windows パッケージは `install/windows/packages.json` と `03-packages.ps1` 系を確認します。
+
+### setup スクリプト
+
+- `set -Eeuo pipefail` を基本とします。
+- 失敗時のメッセージは、ユーザーが次に取る行動を判断できる内容にします。
+- 実システムを変更する処理には、可能な範囲で dry-run やテストしやすい分岐を用意します。
+
+### テスト
+
+- macOS / Ubuntu のシェルテストは BATS を使います。
+- Windows の PowerShell テストは Pester を使います。
+- スクリプト変更では、実装ファイルと同じ OS ディレクトリに対応テストを置きます。
+- ファイル構造やテンプレートの検証は `tests/files/` に置きます。
+
+## よく使う検証コマンド
+
+macOS 系:
 
 ```bash
-# macOSの場合
-bats install/macos/git.bats
-
-# Ubuntuの場合
-bats install/ubuntu/git.bats
-```
-
-この段階では、スクリプトがまだ存在しないため、テストは失敗します。
-
-#### 3. 実装（Green フェーズ）
-
-テストをパスする最小限の実装を行います。
-
-```bash
-# install/macos/git.sh
-#!/usr/bin/env bash
-
-# エラーハンドリング設定
-set -Eeuo pipefail
-
-# 環境変数の設定
-DRY_RUN="${DRY_RUN:-false}"
-
-# Gitがインストール済みかチェック
-if command -v git >/dev/null 2>&1; then
-    echo "Git is already installed"
-    git --version
-    exit 0
-fi
-
-# ドライランモードの場合は実際のインストールをスキップ
-if [ "$DRY_RUN" = "true" ]; then
-    echo "[DRY RUN] Would install git"
-    exit 0
-fi
-
-# Gitをインストール
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "Installing git via Homebrew..."
-    brew install git
-else
-    echo "Unsupported OS: $OSTYPE"
-    exit 1
-fi
-
-echo "Git installation completed"
-git --version
-```
-
-#### 4. テストの再実行（Green フェーズ）
-
-実装後、テストを再実行してすべてパスすることを確認します。
-
-```bash
-bats install/macos/git.bats
-```
-
-#### 5. リファクタリング（Refactor フェーズ）
-
-テストがパスしたら、コードの品質を向上させます：
-
-- 重複コードの削除
-- 関数への分割
-- コメントの追加
-- エラーメッセージの改善
-
-各リファクタリング後は必ずテストを再実行し、動作が壊れていないことを確認します。
-
-### BATSテストのベストプラクティス
-
-#### テストの構造
-
-```bash
-#!/usr/bin/env bats
-
-# セットアップ処理（各テスト実行前）
-setup() {
-    # テスト用の一時ディレクトリを作成
-    export TEST_TEMP_DIR="$(mktemp -d)"
-}
-
-# クリーンアップ処理（各テスト実行後）
-teardown() {
-    # 一時ディレクトリを削除
-    [ -d "$TEST_TEMP_DIR" ] && rm -rf "$TEST_TEMP_DIR"
-}
-
-@test "スクリプトが存在する" {
-    [ -f "install/macos/common/script.sh" ]
-}
-
-@test "スクリプトが実行可能" {
-    [ -x "install/macos/common/script.sh" ]
-}
-
-@test "エラーハンドリングが設定されている" {
-    run grep "set -Eeuo pipefail" install/macos/common/script.sh
-    [ "$status" -eq 0 ]
-}
-
-@test "環境変数のデフォルト値が設定されている" {
-    run grep 'VARIABLE="${ENVIRONMENT_VAR:-default_value}"' install/macos/common/script.sh
-    [ "$status" -eq 0 ]
-}
-```
-
-#### テストケースの分類
-
-1. **存在確認テスト**: ファイルやディレクトリの存在を確認
-2. **権限テスト**: 実行可能権限などを確認
-3. **構文テスト**: エラーハンドリングや変数定義の確認
-4. **機能テスト**: 実際の動作を確認（ドライランモードを活用）
-5. **統合テスト**: 複数のスクリプトの連携を確認
-
-#### ドライランモードの実装
-
-実際にシステムを変更せずにテストするために、ドライランモードを実装します：
-
-```bash
-# スクリプト内
-DRY_RUN="${DRY_RUN:-false}"
-
-if [ "$DRY_RUN" = "true" ]; then
-    echo "[DRY RUN] Would execute: brew install package"
-    exit 0
-fi
-
-# 実際のコマンド
-brew install package
-```
-
-```bash
-# テスト内
-@test "ドライランモードで正常に動作する" {
-    DRY_RUN=true run bash install/macos/common/script.sh
-    [ "$status" -eq 0 ]
-    [[ "$output" =~ "\[DRY RUN\]" ]]
-}
-```
-
-### 実装時の重点ポイント
-
-1. **テストを先に書く**: コードを書く前に、期待する動作を定義する
-2. **小さく始める**: 最小限の機能から始めて、段階的に拡張する
-3. **頻繁にテストする**: コード変更のたびにテストを実行する
-4. **エッジケースを考える**: 正常系だけでなく、異常系もテストする
-5. **CI/CDで自動化**: GitHub Actionsで自動的にテストを実行する
-
-### テスト実行コマンド
-
-```bash
-# macOS: すべてのテストを実行
 bats install/macos/ install/common/ tests/files/
+docker compose -f docker/macos-test/docker-compose.yml run --rm macos-test bats install/macos/ install/common/ tests/files/
+```
 
-# Ubuntu: すべてのテストを実行
+Ubuntu 系:
+
+```bash
 bats install/ubuntu/ install/common/ tests/files/
-
-# 特定のテストファイルのみ実行
-bats install/macos/brew.bats
+docker compose -f docker/ubuntu-test/docker-compose.yml run --rm ubuntu-test bats install/ubuntu/ install/common/ tests/files/
 ```
 
-### テストカバレッジの確認
+Windows 系:
 
-このリポジトリでは、**kcov**（C実装のカバレッジツール）を使用してBashスクリプトのテストカバレッジを計測し、**Codecov**で可視化しています。
-
-カバレッジツールの特徴
-
-- **kcov**: 低オーバーヘッドでBashを計測できるカバレッジツール
-  - C実装で高速
-  - Cobertura形式のレポート出力に対応（Codecov連携）
-  - CI/CD環境のみでインストール（dotfiles本体には依存なし）
-
-### テスト環境の優先順位
-
-**重要**: このリポジトリでは、macOSを主要な開発・運用環境としているため、テスト検証とカバレッジ拡充は**macOSを優先**します。
-
-- **macOS**: 主要環境であり、テストパターンの拡充と検証を優先的に実施
-
-  - 新しいインストールスクリプトやツールの追加時は、まずmacOS環境でのテストを充実させる
-  - カバレッジの向上もmacOS環境を優先して取り組む
-  - ローカル開発環境として実際に使用されるため、実践的なテストが重要
-
-- **Ubuntu**: サブ環境であり、CI/CD環境での動作確認が主目的
-  - 現状、実運用では使用していない
-  - 基本的な動作確認レベルのテストで十分
-  - macOS環境のテストが充実した後に、必要に応じて拡充
-
-この優先順位により、実際の利用シーンに即した高品質なテストカバレッジを維持します。
-
-### CI/CDワークフロー
-
-1. **test_bats.yml**: macOSとUbuntuでBATSテストを実行（カバレッジなし、高速実行）
-2. **coverage.yml**: kcovによるカバレッジ計測とCodecovへのレポート送信
-3. **test_chezmoi_apply.yml**: chezmoiの適用が正常に動作するか検証
-4. **shellcheck.yml**: ShellCheckによるシェルスクリプトの静的解析
-5. **copilot-setup-steps.yml**: GitHub Copilot用の検証環境構築
-
-## コード品質管理
-
-### Lintツール
-
-#### ShellCheck
-
-- **目的**: シェルスクリプトの静的解析
-- **検出内容**: 文法エラー、潜在的なバグ、非推奨な書き方
-- **設定ファイル**: `.shellcheckrc`
-- **インストール**:
-
-  ```bash
-  # macOS
-  brew install shellcheck
-
-  # Ubuntu
-  sudo apt-get install shellcheck
-  ```
-
-- **実行方法**:
-
-  ```bash
-  # ローカルでの実行
-  shellcheck script.sh
-
-  # すべてのスクリプトを一括チェック
-  shellcheck install/**/*.sh scripts/**/*.sh setup.sh
-  ```
-
-- **CI統合**: `.github/workflows/ci-macos.yml`、`.github/workflows/ci-ubuntu.yml`で自動実行
-
-#### shfmt
-
-- **目的**: シェルスクリプトの自動フォーマット
-- **インストール**:
-
-  ```bash
-  # mise経由（推奨）
-  mise use shfmt@latest
-
-  # または Homebrew
-  brew install shfmt
-  ```
-
-- **実行方法**:
-
-  ```bash
-  # チェックのみ
-  shfmt -d -i 2 .
-
-  # 自動フォーマット
-  shfmt -w -d -i 2 .
-  ```
-
-- **CI統合**: `.github/workflows/ci-macos.yml`、`.github/workflows/ci-ubuntu.yml`で自動実行
-
-## コーディング規約とベストプラクティス
-
-### Bashスクリプト
-
-1. **エラーハンドリング**:
-
-   ```bash
-   set -Eeuo pipefail
-   ```
-
-   - `-E`: ERRトラップを関数に継承
-   - `-e`: エラー時に即座に終了
-   - `-u`: 未定義変数をエラーとする
-   - `-o pipefail`: パイプライン内のエラーを検出
-
-2. **変数の命名**:
-
-   - 環境変数: `UPPER_CASE`
-   - ローカル変数: `lower_case`
-
-3. **デフォルト値の設定**:
-
-   ```bash
-   VARIABLE="${ENVIRONMENT_VAR:-default_value}"
-   ```
-
-4. **ShellCheckによる静的解析**:
-
-   - すべてのシェルスクリプトは[ShellCheck](https://www.shellcheck.net/)で検証されます
-   - CI/CDパイプラインで自動チェックが実行されます
-   - ローカルでの検証方法:
-
-     ```bash
-     # 単一ファイルをチェック
-     shellcheck install/macos/01-brew.sh
-
-     # すべてのシェルスクリプトをチェック
-     shellcheck **/*.sh
-
-     # shfmtでフォーマット
-     shfmt -w .
-     ```
-
-   - VS Code拡張機能を使用すると、エディタ内でリアルタイム検証が可能
-   - `.shellcheckrc`でプロジェクト固有のルールを設定可能
-
-### Git コミットメッセージ
-
-[Conventional Commits](https://www.conventionalcommits.org/)形式を使用:
-
-- `feat:` - 新機能追加
-- `fix:` - バグ修正
-- `chore:` - 雑務（既存設定の反映など）
-- `docs:` - ドキュメント更新
-- `test:` - テスト追加・修正
-
-### ブランチ戦略
-
-- `main`: 安定版
-- `feature/*`: 新機能開発
-- `fix/*`: バグ修正
-- `chore/*`: メンテナンス作業
-- `docs/*`: ドキュメント更新
-
-## ツール管理のワークフロー
-
-### Homebrewパッケージの追加
-
-```bash
-# パッケージをインストール
-brew install <package-name>
-
-# install/macos/02-brew-packages.sh 内の該当配列（taps/formulae/casks）にパッケージを追加
-# ※ 新しいマシンでのセットアップ時に自動インストールされるようにするため
-
-# （任意）Brewfileをダンプして現在の状態を記録
-bash install/macos/brew-dump-explicit.sh install/macos/Brewfile
-
-# コミットしてプッシュ
-git add install/macos/02-brew-packages.sh install/macos/Brewfile
-git commit -m "chore: <package-name>を追加"
-git push
+```powershell
+.\install\windows\run_unit_test.ps1
 ```
 
-### miseツールの追加
-
 ```bash
-# ツールをインストール
-mise use node@20.0.0
-
-# chezmoiに反映
-chezmoi re-add ~/.config/mise/config.toml
-
-# コミットしてプッシュ
-git add .
-git commit -m "chore: Node.js 20.0.0をmiseに追加"
-git push
+docker compose -f docker/windows-test/docker-compose.yml run --rm windows-test
 ```
 
-### dotfilesの追加・更新
+chezmoi:
 
 ```bash
-# 新しい設定ファイルを追加
-chezmoi add ~/.newconfig
-
-# 既存の設定ファイルを更新
-chezmoi re-add ~/.existingconfig
-
-# 変更を確認
 chezmoi diff
-
-# 変更を適用
-chezmoi apply
-
-# コミットしてプッシュ
-git add .
-git commit -m "feat: 新しい設定ファイルを追加"
-git push
+chezmoi apply --dry-run --verbose
+chezmoi execute-template < path/to/template.tmpl
 ```
 
-## GitHub Copilotエージェント向けの重要情報
+## PR・レビュー時の注意
 
-### コンテキスト理解のポイント
+- 変更の影響範囲を OS 別に書きます。
+- 実行したテストと、未実行の理由を明記します。
+- chezmoi 設定変更を含む場合は、実際に適用される差分が分かるコマンド結果を示します。
+- 手続き的な変更は、対応する Skill を使ったことが分かるようにします。
 
-1. **ツールの優先順位**:
+## 参照先
 
-   - chezmoi: 設定ファイル管理（最優先）
-   - Homebrew: macOSアプリケーション管理
-   - mise: 開発言語・ツール管理
-
-2. **ディレクトリ構造の重要性**:
-
-   - `home/`: chezmoiのソースディレクトリ（設定ファイルの実体）
-   - ファイル名の`dot_`プレフィックスは`.`に変換される
-   - テンプレートファイル（`.tmpl`拡張子）は環境変数を展開
-
-3. **変更時の注意点**:
-
-   - 設定ファイルは必ず`chezmoi add`または`chezmoi re-add`で管理
-   - 直接ホームディレクトリを編集せず、`chezmoi edit`を使用
-   - パッケージ追加・削除時は`install/macos/02-brew-packages.sh`の配列を更新
-
-4. **PR作成時の必須事項（Chezmoi設定変更の場合）**:
-
-   - Chezmoiの設定変更（テンプレートファイルや設定ファイルの追加・変更）を含むPRでは、必ず以下を実施しPRに記載すること：
-     - `chezmoi apply --dry-run --verbose` の実行結果を提示
-     - または `chezmoi diff` の出力を提示
-     - テンプレートファイル（`.tmpl`）の場合は、`chezmoi execute-template` で展開結果を提示
-     - 複数OS対応の場合は、各OS（macOS/Linux）での展開結果を明示
-   - これにより、変更内容が実際の環境でどのように適用されるかをレビュアーが確認できる
-
-5. **テスト必須事項**:
-   - スクリプト変更時は必ずBATSテストを実行
-   - CI/CDワークフローで自動テストが実行される
-   - macOSとUbuntuの両環境をサポート
-
-### よくある作業パターン
-
-1. **新しい設定ファイルの追加**:
-
-   - ホームディレクトリに設定ファイルを作成
-   - `chezmoi add ~/.config/newapp/config.yml`
-   - `git commit` & `git push`
-
-2. **Homebrewパッケージの管理**:
-
-   - `brew install`/`brew uninstall`でパッケージを操作
-   - `install/macos/02-brew-packages.sh` 内の配列を更新
-   - （任意）`brew-dump-explicit.sh`でBrewfileをダンプ
-
-3. **開発ツールのバージョン管理**:
-   - `mise use <tool>@<version>`でツールを追加
-   - `chezmoi re-add ~/.config/mise/config.toml`で反映
-
-### トラブルシューティング
-
-- **chezmoi適用エラー**: `chezmoi diff`で差分を確認
-- **Homebrew依存関係エラー**: `brew doctor`で診断
-- **miseインストールエラー**: `mise doctor`で環境チェック
-- **テスト失敗**: ログを確認し、該当スクリプトを修正
-
-## 参考リンク
-
-- [chezmoi公式ドキュメント](https://www.chezmoi.io/)
-- [Homebrew公式サイト](https://brew.sh/)
-- [mise公式ドキュメント](https://mise.jdx.dev/)
-- [BATS公式リポジトリ](https://github.com/bats-core/bats-core)
-- [Conventional Commits仕様](https://www.conventionalcommits.org/)
+- ユーザー向けの詳細説明: `README.md`
+- AI向け定型手順: `.github/skills/`
