@@ -8,6 +8,41 @@ fi
 
 # ドライランモード設定
 DRY_RUN="${DRY_RUN:-false}"
+DOTFILES_PROFILE="${DOTFILES_PROFILE:-}"
+
+function usage() {
+  cat <<'EOF'
+Usage: install/macos/03-profile.sh [--profile <name>]
+
+Options:
+  --profile <name>  Specify dotfiles profile (e.g. work, common)
+EOF
+}
+
+function parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    --profile)
+      if [[ $# -lt 2 ]] || [[ -z "${2:-}" ]]; then
+        echo "Error: --profile requires a non-empty value" >&2
+        usage >&2
+        exit 1
+      fi
+      DOTFILES_PROFILE="$2"
+      shift 2
+      ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Error: Unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+    esac
+  done
+}
 
 # プロファイルの検出（共通をデフォルト、ホスト名による自動判定、環境変数で上書き）
 function detect_profile() {
@@ -28,7 +63,7 @@ function detect_profile() {
     done
   fi
 
-  if [ -n "${DOTFILES_PROFILE:-}" ]; then
+  if [ -n "${DOTFILES_PROFILE}" ]; then
     profile="${DOTFILES_PROFILE}"
   fi
 
@@ -62,9 +97,10 @@ function install_profile_brewfile() {
 }
 
 function main() {
+  parse_args "$@"
   install_profile_brewfile
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  main
+  main "$@"
 fi
