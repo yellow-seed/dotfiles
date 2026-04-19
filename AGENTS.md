@@ -632,23 +632,9 @@ bats install/macos/brew.bats
 
 ## ツール管理のワークフロー
 
-### Homebrewパッケージの追加
+### Homebrewパッケージの追加・削除
 
-```bash
-# パッケージをインストール
-brew install <package-name>
-
-# install/macos/02-brew-packages.sh 内の該当配列（taps/formulae/casks）にパッケージを追加
-# ※ 新しいマシンでのセットアップ時に自動インストールされるようにするため
-
-# （任意）Brewfileをダンプして現在の状態を記録
-bash install/macos/brew-dump-explicit.sh install/macos/Brewfile
-
-# コミットしてプッシュ
-git add install/macos/02-brew-packages.sh install/macos/Brewfile
-git commit -m "chore: <package-name>を追加"
-git push
-```
+`/brew-add` スキル（追加）または `/brew-remove` スキル（削除）を使用してください。
 
 ### miseツールの追加
 
@@ -667,24 +653,7 @@ git push
 
 ### dotfilesの追加・更新
 
-```bash
-# 新しい設定ファイルを追加
-chezmoi add ~/.newconfig
-
-# 既存の設定ファイルを更新
-chezmoi re-add ~/.existingconfig
-
-# 変更を確認
-chezmoi diff
-
-# 変更を適用
-chezmoi apply
-
-# コミットしてプッシュ
-git add .
-git commit -m "feat: 新しい設定ファイルを追加"
-git push
-```
+`/chezmoi-sync` スキルを使用してください。
 
 ## GitHub Copilotエージェント向けの重要情報
 
@@ -724,17 +693,9 @@ git push
 
 ### よくある作業パターン
 
-1. **新しい設定ファイルの追加**:
+1. **新しい設定ファイルの追加・更新**: `/chezmoi-sync` スキルを使用
 
-   - ホームディレクトリに設定ファイルを作成
-   - `chezmoi add ~/.config/newapp/config.yml`
-   - `git commit` & `git push`
-
-2. **Homebrewパッケージの管理**:
-
-   - `brew install`/`brew uninstall`でパッケージを操作
-   - `install/macos/02-brew-packages.sh` 内の配列を更新
-   - （任意）`brew-dump-explicit.sh`でBrewfileをダンプ
+2. **Homebrewパッケージの管理**: `/brew-add`（追加）または `/brew-remove`（削除）スキルを使用
 
 3. **開発ツールのバージョン管理**:
    - `mise use <tool>@<version>`でツールを追加
