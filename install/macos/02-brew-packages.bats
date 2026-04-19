@@ -189,7 +189,7 @@ EOF
 }
 
 @test "brew packages skips installed formula and installs missing formula" {
-  write_brew_stub $'bash\nmise\npython@3.12' $'1password\ngoogle-chrome'
+  write_brew_stub $'bash\nmise' $'1password\ngoogle-chrome'
   write_mas_stub ""
 
   run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
@@ -199,7 +199,7 @@ EOF
 }
 
 @test "brew packages skips installed cask and installs missing cask" {
-  write_brew_stub $'bash\nmise\npython@3.12\ntree' $'1password\ngoogle-chrome'
+  write_brew_stub $'bash\nmise\ntree' $'1password\ngoogle-chrome'
   write_mas_stub ""
 
   run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
@@ -209,7 +209,7 @@ EOF
 }
 
 @test "brew packages installs mas formula when mas is missing from installed formulae" {
-  write_brew_stub $'bash\nmise\npython@3.12\ntree' $'1password\ngoogle-chrome'
+  write_brew_stub $'bash\nmise\ntree' $'1password\ngoogle-chrome'
   write_mas_stub ""
 
   run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
@@ -218,7 +218,7 @@ EOF
 }
 
 @test "brew packages skips installed mas app and installs missing mas app" {
-  write_brew_stub $'bash\nmise\npython@3.12\ntree\nmas' $'1password\ngoogle-chrome'
+  write_brew_stub $'bash\nmise\ntree\nmas' $'1password\ngoogle-chrome'
   write_mas_stub $'1429033973 RunCat (3.9)'
 
   run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
@@ -227,7 +227,7 @@ EOF
 }
 
 @test "brew packages falls back to mas install when mas get fails" {
-  write_brew_stub $'bash\nmise\npython@3.12\ntree\nmas' $'1password\ngoogle-chrome'
+  write_brew_stub $'bash\nmise\ntree\nmas' $'1password\ngoogle-chrome'
   write_mas_stub "" "get_fail"
 
   run env PATH="$TEST_BIN_DIR:$PATH" bash "$SCRIPT_PATH"
@@ -251,7 +251,6 @@ if [ "\$1" = "list" ] && [ "\$2" = "--formula" ]; then
   cat <<'FORMULAE'
 bash
 mise
-python@3.12
 FORMULAE
   exit 0
 fi

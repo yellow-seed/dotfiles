@@ -1,15 +1,12 @@
 # Taps
 tap "aws/tap"
 tap "dotenvx/brew"
-tap "go-swagger/go-swagger"
 
 # Formulae (explicitly installed)
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.12"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
 
