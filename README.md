@@ -616,7 +616,7 @@ Issue #158 の Phase 1 として、既存の chezmoi / Homebrew / mise を維持
 
 ### 追加したファイル
 
-- `macos/nix/flake.nix`: nix-darwin の flake エントリポイント
+- `macos/nix/flake.nix`: nix-darwin の flake エントリーポイント
 - `macos/nix/darwin/default.nix`: nix-darwin の最小モジュール
 
 ### セットアップ手順（macOS）
