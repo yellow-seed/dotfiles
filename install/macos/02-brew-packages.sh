@@ -137,6 +137,7 @@ function install_packages() {
     "shottr"
     "visual-studio-code"
     "warp"
+    "ente-auth"
   )
 
   local mas_apps=(
