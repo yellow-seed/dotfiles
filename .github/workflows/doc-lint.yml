@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup mise tools
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
 
       - name: Run Prettier (Markdown)
         run: npm run format:md
@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup mise tools
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
 
       - name: Run Prettier (YAML)
         run: npm run format:yaml
@@ -60,7 +60,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup mise tools
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
 
       - name: Run Prettier (JSON)
         run: npm run format:json
