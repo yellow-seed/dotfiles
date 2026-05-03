@@ -11,7 +11,18 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     kcov \
     wget \
+    xz-utils \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Nix for nix-darwin flake checks in the macOS test image
+ENV USER=root
+ENV PATH=/root/.nix-profile/bin:/nix/var/nix/profiles/default/bin:${PATH}
+RUN groupadd -r nixbld && \
+    for n in $(seq 1 10); do \
+    useradd -c "Nix build user ${n}" -d /var/empty -g nixbld -G nixbld -M -N -r -s /usr/sbin/nologin "nixbld${n}"; \
+    done && \
+    mkdir -m 0755 /nix && \
+    curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
 
 # Install BATS (Bash Automated Testing System)
 RUN git clone --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core && \
