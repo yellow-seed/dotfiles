@@ -546,8 +546,8 @@ Issue #158 の Phase 1 として、既存の chezmoi / Homebrew / mise を維持
 
 ### 追加したファイル
 
-- `macos/nix/flake.nix`: nix-darwin の flake エントリーポイント
-- `macos/nix/darwin/default.nix`: nix-darwin の最小モジュール
+- `install/macos/nix/flake.nix`: nix-darwin の flake エントリーポイント
+- `install/macos/nix/darwin/default.nix`: nix-darwin の最小モジュール
 
 ### セットアップ手順（macOS）
 
@@ -560,7 +560,7 @@ Issue #158 の Phase 1 として、既存の chezmoi / Homebrew / mise を維持
 2. flake を検証
 
    ```bash
-   cd macos/nix
+   cd install/macos/nix
    nix flake check
    ```
 
@@ -576,4 +576,4 @@ Issue #158 の Phase 1 として、既存の chezmoi / Homebrew / mise を維持
    sudo darwin-rebuild switch --flake .#dotfiles-intel
    ```
 
-> ホスト名を独自名で運用する場合は `macos/nix/flake.nix` の `darwinConfigurations` を環境に合わせて変更してください。
+> ホスト名を独自名で運用する場合は `install/macos/nix/flake.nix` の `darwinConfigurations` を環境に合わせて変更してください。
