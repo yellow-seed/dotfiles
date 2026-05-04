@@ -79,6 +79,19 @@ setup() {
   grep -q 'if eq .chezmoi.os' home/dot_zshrc.tmpl
 }
 
+@test "zshrc template initializes Homebrew PATH before mise activation" {
+  homebrew_line="$(grep -n '/opt/homebrew/bin/brew shellenv' home/dot_zshrc.tmpl | cut -d: -f1 | head -n 1)"
+  mise_line="$(grep -n 'mise activate zsh' home/dot_zshrc.tmpl | cut -d: -f1 | head -n 1)"
+
+  [ -n "$homebrew_line" ]
+  [ -n "$mise_line" ]
+  [ "$homebrew_line" -lt "$mise_line" ]
+}
+
+@test "zshrc template guards mise activation" {
+  grep -q "command -v mise" home/dot_zshrc.tmpl
+}
+
 # 実際の適用後のファイルをテストする場合（CIでchezmoiが適用された後）
 @test "gitconfig contains user name if applied" {
   skip "Requires chezmoi apply to be run first"

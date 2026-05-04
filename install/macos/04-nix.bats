@@ -48,6 +48,16 @@
   [ "$status" -eq 0 ]
 }
 
+@test "nix flake does not force macOS hostname from flake target name" {
+  run grep -R "networking.hostName" install/macos/nix
+  [ "$status" -ne 0 ]
+}
+
+@test "nix-darwin systemPackages does not install git over Homebrew or system git" {
+  run grep -Eq '^[[:space:]]+git[[:space:]]*$' install/macos/nix/darwin/default.nix
+  [ "$status" -ne 0 ]
+}
+
 @test "04-nix.sh supports DRY_RUN=true without errors" {
   DRY_RUN=true run bash install/macos/04-nix.sh
   [ "$status" -eq 0 ]

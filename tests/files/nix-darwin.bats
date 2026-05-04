@@ -23,12 +23,12 @@
 }
 
 @test "flake defines Apple Silicon darwin configuration" {
-  run grep -Eq '^[[:space:]]*"\$\{defaultHost\}" = mkDarwinSystem defaultHost "aarch64-darwin";$' install/macos/nix/flake.nix
+  run grep -Eq '^[[:space:]]*"\$\{defaultHost\}" = mkDarwinSystem "aarch64-darwin";$' install/macos/nix/flake.nix
   [ "$status" -eq 0 ]
 }
 
 @test "flake defines Intel darwin configuration" {
-  run grep -Eq '^[[:space:]]*"\$\{intelHost\}" = mkDarwinSystem intelHost "x86_64-darwin";$' install/macos/nix/flake.nix
+  run grep -Eq '^[[:space:]]*"\$\{intelHost\}" = mkDarwinSystem "x86_64-darwin";$' install/macos/nix/flake.nix
   [ "$status" -eq 0 ]
 }
 
