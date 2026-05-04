@@ -22,6 +22,12 @@
 
 chezmoiを使用したdotfiles管理のガイドです。
 
+## 対象環境
+
+- macOS: macOS 26 Tahoe 以降を想定
+- Ubuntu: 現行の開発用サブ環境を想定
+- Windows: PowerShell / winget ベースのセットアップを想定
+
 ## クイックスタート
 
 新しいマシンで環境をセットアップするには、以下の1コマンドを実行してください：

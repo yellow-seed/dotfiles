@@ -31,7 +31,7 @@
 
   # Finder は Dock の固定要素のため、明示管理するアプリだけ残す
   system.defaults.dock.persistent-apps = [
-    { app = "/System/Applications/Launchpad.app"; }
+    { app = "/System/Applications/Apps.app"; }
     { app = "/System/Applications/App Store.app"; }
     { app = "/System/Applications/System Settings.app"; }
   ];
