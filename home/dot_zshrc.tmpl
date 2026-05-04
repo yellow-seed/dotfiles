@@ -1,5 +1,16 @@
 export PATH="$HOME/.local/bin:$PATH"
-eval "$(mise activate zsh)"
+
+{{- if eq .chezmoi.os "darwin" }}
+if [ -x "/opt/homebrew/bin/brew" ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x "/usr/local/bin/brew" ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+{{- end }}
+
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
 
 # pnpm
 {{- if eq .chezmoi.os "darwin" }}

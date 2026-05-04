@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 {
   # nix-darwin が要求する必須設定
   system.stateVersion = 5;
@@ -18,9 +18,7 @@
   };
 
   # 既存の chezmoi / Homebrew / mise を維持しながら段階導入
-  environment.systemPackages = with pkgs; [
-    git
-  ];
+  environment.systemPackages = [ ];
 
   # touch ID for sudo はローカルユーザー体験改善のため有効化
   security.pam.services.sudo_local.touchIdAuth = true;

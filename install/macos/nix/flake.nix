@@ -20,12 +20,11 @@
       baseHost = "dotfiles";
       defaultHost = baseHost;
       intelHost = "${baseHost}-intel";
-      mkDarwinSystem = hostName: system:
+      mkDarwinSystem = system:
         nix-darwin.lib.darwinSystem {
           modules = [
             ./darwin/default.nix
             {
-              networking.hostName = hostName;
               nixpkgs.hostPlatform = system;
             }
           ];
@@ -33,8 +32,8 @@
     in
     {
       darwinConfigurations = {
-        "${defaultHost}" = mkDarwinSystem defaultHost "aarch64-darwin";
-        "${intelHost}" = mkDarwinSystem intelHost "x86_64-darwin";
+        "${defaultHost}" = mkDarwinSystem "aarch64-darwin";
+        "${intelHost}" = mkDarwinSystem "x86_64-darwin";
       };
 
       checks = {
