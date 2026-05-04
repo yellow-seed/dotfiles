@@ -4,6 +4,10 @@
   [ -f "install/macos/nix/flake.nix" ]
 }
 
+@test "nix flake lock file exists" {
+  [ -f "install/macos/nix/flake.lock" ]
+}
+
 @test "nix-darwin default module exists" {
   [ -f "install/macos/nix/darwin/default.nix" ]
 }
@@ -54,6 +58,15 @@
   run grep -Eq 'mkdir -m 0755 /nix' docker/macos-test/Dockerfile
   [ "$status" -eq 0 ]
   run grep -Eq 'https://nixos\.org/nix/install' docker/macos-test/Dockerfile
+  [ "$status" -eq 0 ]
+}
+
+@test "macOS CI runs nix flake check" {
+  run grep -Eq 'DeterminateSystems/nix-installer-action@main' .github/workflows/ci-macos.yml
+  [ "$status" -eq 0 ]
+  run grep -Eq '^[[:space:]]*run: nix --extra-experimental-features "nix-command flakes" flake check$' .github/workflows/ci-macos.yml
+  [ "$status" -eq 0 ]
+  run grep -Eq '^[[:space:]]*working-directory: install/macos/nix$' .github/workflows/ci-macos.yml
   [ "$status" -eq 0 ]
 }
 

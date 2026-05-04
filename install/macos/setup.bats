@@ -23,6 +23,8 @@
   [ "$status" -eq 0 ]
   run grep "03-profile.sh" install/macos/setup.sh
   [ "$status" -eq 0 ]
+  run grep "04-nix.sh" install/macos/setup.sh
+  [ "$status" -eq 0 ]
 }
 
 @test "macOS setup script exports DRY_RUN for child processes" {

@@ -124,6 +124,7 @@ function main() {
   configure_homebrew_path
   run_step "Step 2: Installing common packages..." "${SCRIPT_DIR}/02-brew-packages.sh"
   run_step "Step 3: Installing profile-specific packages..." "${SCRIPT_DIR}/03-profile.sh" "${@}"
+  run_step "Step 4: Setting up nix-darwin..." "${SCRIPT_DIR}/04-nix.sh"
 
   echo "macOS setup completed."
 }

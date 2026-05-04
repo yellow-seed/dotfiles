@@ -549,31 +549,6 @@ Issue #158 の Phase 1 として、既存の chezmoi / Homebrew / mise を維持
 - `install/macos/nix/flake.nix`: nix-darwin の flake エントリーポイント
 - `install/macos/nix/darwin/default.nix`: nix-darwin の最小モジュール
 
-### セットアップ手順（macOS）
-
-1. Determinate Systems インストーラーで Nix を導入
-
-   ```bash
-   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-   ```
-
-2. flake を検証
-
-   ```bash
-   cd install/macos/nix
-   nix flake check
-   ```
-
-3. 適用（Apple Silicon の例）
-
-   ```bash
-   sudo darwin-rebuild switch --flake .#dotfiles
-   ```
-
-4. 適用（Intel Mac の例）
-
-   ```bash
-   sudo darwin-rebuild switch --flake .#dotfiles-intel
-   ```
+nix-darwin は `bash setup.sh` の Step 4 として自動的に導入・適用されます。Dock の自動非表示や起動音の無効化など、一部の macOS システム設定はこのステップで管理されています。
 
 > ホスト名を独自名で運用する場合は `install/macos/nix/flake.nix` の `darwinConfigurations` を環境に合わせて変更してください。
