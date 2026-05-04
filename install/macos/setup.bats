@@ -38,6 +38,6 @@
 }
 
 @test "macOS setup script forwards parsed args to profile step" {
-  run grep '03-profile.sh" "\${@}"' install/macos/setup.sh
+  run grep '03-profile.sh" ${@+"$@"}' install/macos/setup.sh
   [ "$status" -eq 0 ]
 }
