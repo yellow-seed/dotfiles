@@ -28,6 +28,16 @@
   [ "$status" -eq 0 ]
 }
 
+@test "04-nix.sh references first-time sudo nix-darwin activation" {
+  run grep "sudo nix run nix-darwin#darwin-rebuild -- switch" install/macos/04-nix.sh
+  [ "$status" -eq 0 ]
+}
+
+@test "04-nix.sh sources nix daemon profile after install" {
+  run grep "nix-daemon.sh" install/macos/04-nix.sh
+  [ "$status" -eq 0 ]
+}
+
 @test "04-nix.sh references Apple Silicon flake target" {
   run grep '\.#dotfiles"' install/macos/04-nix.sh
   [ "$status" -eq 0 ]
@@ -49,8 +59,24 @@
   [[ "$output" == *"[DRY RUN]"* ]]
 }
 
-@test "04-nix.sh DRY_RUN shows darwin-rebuild switch command" {
+@test "04-nix.sh DRY_RUN shows nix-darwin switch command" {
   DRY_RUN=true run bash install/macos/04-nix.sh
   [ "$status" -eq 0 ]
-  [[ "$output" == *"darwin-rebuild switch"* ]]
+  [[ "$output" == *"switch --flake"* ]]
+}
+
+@test "04-nix.sh fails with a clear error when nix flake directory is missing" {
+  cp install/macos/04-nix.sh "${BATS_TEST_TMPDIR}/04-nix.sh"
+
+  DRY_RUN=true run bash "${BATS_TEST_TMPDIR}/04-nix.sh"
+
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"expected Nix configuration directory"* ]]
+}
+
+@test "04-nix.sh non-interactive skip output is not labeled as DRY_RUN" {
+  run bash install/macos/04-nix.sh
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"[SKIP]"* ]]
+  [[ "$output" != *"[DRY RUN]"* ]]
 }

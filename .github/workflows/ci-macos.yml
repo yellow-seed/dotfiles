@@ -20,6 +20,24 @@ on:
       ]
 
 jobs:
+  nix-flake-check:
+    name: Nix Flake Check
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Run nix flake check
+        working-directory: install/macos/nix
+        run: nix --extra-experimental-features "nix-command flakes" flake check
+
   test-and-coverage:
     name: macOS Tests with Coverage
     runs-on: macos-latest
