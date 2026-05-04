@@ -68,6 +68,7 @@ jobs:
           bash setup.sh
         env:
           DOTFILES_DEBUG: "1"
+          DRY_RUN: "true"
 
       - name: Record environment (after setup)
         if: always()
