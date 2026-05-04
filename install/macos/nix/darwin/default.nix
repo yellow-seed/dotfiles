@@ -3,6 +3,9 @@
   # nix-darwin が要求する必須設定
   system.stateVersion = 5;
 
+  # ユーザー設定オプション（dock, CustomUserPreferences 等）を使うために必要
+  system.primaryUser = "kazuya";
+
   # Determinate Systems の Nix を利用する場合は false を維持
   nix.enable = false;
 
