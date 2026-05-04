@@ -118,8 +118,13 @@ jobs:
           } | tee /tmp/dotfiles-debug/verify-installation.log
 
           # 基本的な動作確認（失敗判定）
-          command -v chezmoi
-          chezmoi --version
+          # DRY_RUN時はchezmoiインストールがスキップされるため、バージョンチェックのみ実施
+          if [ "${DRY_RUN}" = "true" ]; then
+            echo "DRY_RUN mode: skipping chezmoi installation verification"
+          else
+            command -v chezmoi
+            chezmoi --version
+          fi
 
       - name: Collect debug info on failure
         if: failure()

@@ -123,6 +123,8 @@ function main() {
   run_step "Step 1: Installing Homebrew..." "${SCRIPT_DIR}/01-brew.sh"
   configure_homebrew_path
   run_step "Step 2: Installing common packages..." "${SCRIPT_DIR}/02-brew-packages.sh"
+  # shellcheck disable=SC2068
+  # ${@+"$@"} works around bash 3.x 'set -u' unbound variable error when no args
   run_step "Step 3: Installing profile-specific packages..." "${SCRIPT_DIR}/03-profile.sh" ${@+"$@"}
   run_step "Step 4: Setting up nix-darwin..." "${SCRIPT_DIR}/04-nix.sh"
 
