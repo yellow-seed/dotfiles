@@ -1,5 +1,43 @@
 #!/usr/bin/env bats
 
+setup() {
+  TEST_BIN_DIR="$(mktemp -d)"
+}
+
+teardown() {
+  rm -rf "$TEST_BIN_DIR"
+}
+
+write_brew_stub() {
+  cat >"$TEST_BIN_DIR/brew" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$1" = "list" ] && [ "$2" = "--formula" ]; then
+  exit 0
+fi
+
+if [ "$1" = "list" ] && [ "$2" = "--cask" ]; then
+  exit 0
+fi
+
+if [ "$1" = "tap" ]; then
+  echo "TAP $2"
+  exit 0
+fi
+
+if [ "$1" = "install" ]; then
+  echo "INSTALL $*"
+  exit 0
+fi
+
+echo "UNEXPECTED: $*" >&2
+exit 2
+EOF
+
+  chmod +x "$TEST_BIN_DIR/brew"
+}
+
 @test "profile installation script exists" {
   [ -f "install/macos/03-profile.sh" ]
 }
@@ -60,9 +98,20 @@
 }
 
 @test "private profile script runs in dry-run mode" {
-  run env DRY_RUN=true bash install/macos/private/brew-packages.sh
+  write_brew_stub
+
+  run env PATH="$TEST_BIN_DIR:$PATH" DRY_RUN=true bash install/macos/private/brew-packages.sh
   [ "$status" -eq 0 ]
   [[ "$output" == *"[DRY RUN]"* ]]
+}
+
+@test "private profile installs opencode from anomalyco tap" {
+  write_brew_stub
+
+  run env PATH="$TEST_BIN_DIR:$PATH" DRY_RUN=true bash install/macos/private/brew-packages.sh
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"[DRY RUN] brew tap anomalyco/tap"* ]]
+  [[ "$output" == *"[DRY RUN] brew install anomalyco/tap/opencode"* ]]
 }
 
 @test "work profile script runs in dry-run mode" {
