@@ -114,6 +114,14 @@ EOF
   [[ "$output" == *"[DRY RUN] brew install anomalyco/tap/opencode"* ]]
 }
 
+@test "private profile installs codex-app cask" {
+  write_brew_stub
+
+  run env PATH="$TEST_BIN_DIR:$PATH" DRY_RUN=true bash install/macos/private/brew-packages.sh
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"[DRY RUN] brew install --cask codex-app"* ]]
+}
+
 @test "work profile script runs in dry-run mode" {
   run env DRY_RUN=true bash install/macos/work/brew-packages.sh
   [ "$status" -eq 0 ]

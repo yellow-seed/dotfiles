@@ -58,6 +58,7 @@ function install_packages() {
     "brave-browser"
     "chatgpt"
     "codex"
+    "codex-app"
     "discord"
     "firefox"
     "gcloud-cli"
