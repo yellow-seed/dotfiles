@@ -83,7 +83,7 @@
 @test "darwin module keeps only selected persistent dock apps" {
   run grep -Eq '^[[:space:]]*system\.defaults\.dock\.persistent-apps = \[$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
-  run grep -Eq '^[[:space:]]*\{ app = "/System/Applications/Launchpad\.app"; \}$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*\{ app = "/System/Applications/Apps\.app"; \}$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
   run grep -Eq '^[[:space:]]*\{ app = "/System/Applications/App Store\.app"; \}$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
