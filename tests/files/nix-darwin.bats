@@ -96,6 +96,11 @@
   [ "$status" -eq 0 ]
 }
 
+@test "darwin module disables nix-darwin default prompt suse" {
+  run grep -Eq '^[[:space:]]*programs\.zsh\.promptInit = "";$' install/macos/nix/darwin/default.nix
+  [ "$status" -eq 0 ]
+}
+
 @test "darwin module disables automatic Japanese conversion" {
   run grep -Eq '^[[:space:]]*"com\.apple\.inputmethod\.Kotoeri" = \{$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
