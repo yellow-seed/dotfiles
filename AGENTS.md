@@ -7,13 +7,11 @@
 AI エージェントは、個別の手順をその場で組み立てるよりも、次の設計思想に従って既存の入口・テスト・Skill を使って作業してください。
 
 1. **OS差分は setup に寄せる**
-
    - macOS / Ubuntu / Windows を主要対象とする
    - OSごとの分岐は setup スクリプト側の責務とする
    - ユーザーや AI は、原則として上位の setup 入口を呼び出す
 
 2. **検証環境は OS 別 compose から選ぶ**
-
    - macOS / Ubuntu / Windows 相当のテスト環境を `docker/*-test/docker-compose.yml` で管理する
    - 変更内容に応じて、必要な compose だけを起動する
    - 複数OSに影響する変更では、該当する compose を組み合わせて検証する

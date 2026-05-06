@@ -5,6 +5,20 @@
 
 config_version = "0"
 
+# qlty is introduced by template sync, but this dotfiles repo still has
+# legacy OS-specific setup assets whose formatting is validated by the
+# existing BATS/compose lint paths. Keep qlty focused on the template-managed
+# toolchain until those areas are migrated deliberately.
+exclude_patterns = [
+  ".githooks/**",
+  ".github/copilot-instructions.md",
+  ".github/scripts/setup-*.sh",
+  "docs/GITHUB_RULESET_SETUP.md",
+  "home/**",
+  "install/**",
+  "setup.sh",
+]
+
 [[source]]
 name = "default"
 default = true
