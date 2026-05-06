@@ -96,8 +96,8 @@
   [ "$status" -eq 0 ]
 }
 
-@test "darwin module disables nix-darwin default prompt suse" {
-  run grep -Eq '^[[:space:]]*programs\.zsh\.promptInit = "";$' install/macos/nix/darwin/default.nix
+@test "darwin module sets macOS standard prompt format" {
+  run grep -Eq "^[[:space:]]*programs\\.zsh\\.promptInit = \"PROMPT='%n@%m %1~ %# '\";$" install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 

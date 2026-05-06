@@ -17,8 +17,8 @@
     ];
   };
 
-  # nix-darwin の default prompt suse を無効化し、既存のプロンプト設定を尊重する
-  programs.zsh.promptInit = "";
+  # macOS 標準プロンプト形式（nix-darwin が置き換える /etc/zshrc の Apple デフォルト相当）
+  programs.zsh.promptInit = "PROMPT='%n@%m %1~ %# '";
 
   # 既存の chezmoi / Homebrew / mise を維持しながら段階導入
   environment.systemPackages = [ ];
