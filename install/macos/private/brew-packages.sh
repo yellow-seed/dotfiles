@@ -58,6 +58,7 @@ function install_packages() {
     "applite"
     "brave-browser"
     "chatgpt"
+    "cmux"
     "codex"
     "codex-app"
     "discord"
