@@ -50,6 +50,7 @@ function install_packages() {
   local formulae=(
     "anomalyco/tap/opencode"
     "qpdf"
+    "worktrunk"
   )
 
   local casks=(
