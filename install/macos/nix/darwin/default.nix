@@ -17,6 +17,9 @@
     ];
   };
 
+  # nix-darwin の default prompt suse を無効化し、既存のプロンプト設定を尊重する
+  programs.zsh.promptInit = "";
+
   # 既存の chezmoi / Homebrew / mise を維持しながら段階導入
   environment.systemPackages = [ ];
 
