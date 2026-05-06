@@ -18,11 +18,9 @@ jobs:
       - name: Verify environment setup
         run: |
           echo "Verifying shell linting tools..."
-          shellcheck --version
-          shfmt --version
-          actionlint --version
+          qlty --version
 
       - name: Run shell script linting
         run: |
           echo "Running shell linting checks..."
-          bash scripts/lint-shell.sh
+          qlty check --all

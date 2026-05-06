@@ -82,7 +82,7 @@ macOS / Ubuntu の compose には `lint-shell` もあります。シェルスク
 
 ```bash
 docker compose -f docker/macos-test/docker-compose.yml run --rm macos-test bash docker/macos-test/lint-shell
-docker compose -f docker/ubuntu-test/docker-compose.yml run --rm ubuntu-test bash docker/ubuntu-test/lint-shell
+docker compose -f docker/ubuntu-test/docker-compose.yml run --rm ubuntu-test bash scripts/lint-shell.sh
 ```
 
 ## Skill への委譲方針
@@ -165,4 +165,4 @@ chezmoi execute-template < path/to/template.tmpl
 ## 参照先
 
 - ユーザー向けの詳細説明: `README.md`
-- AI向け定型手順: `.github/skills/`
+- AI向け定型手順: `.agents/skills/`
