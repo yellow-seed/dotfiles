@@ -1,438 +1,91 @@
-#!/bin/bash
-set -u
-set -o pipefail
+#!/usr/bin/env bash
+set -euo pipefail
 
-LOG_PREFIX="[install-tools]"
+ORCHESTRATOR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$ORCHESTRATOR_DIR/installers/_common.sh"
 
-log() {
-  echo "$LOG_PREFIX $*" >&2
+append_path() {
+	local path_entry="$1"
+	local bashrc_path_entry="$path_entry"
+
+	if [[ $path_entry == "$HOME" ]]; then
+		# shellcheck disable=SC2016
+		bashrc_path_entry='$HOME'
+	elif [[ $path_entry == "$HOME/"* ]]; then
+		bashrc_path_entry="\$HOME/${path_entry#"$HOME/"}"
+	fi
+
+	if [[ ":$PATH:" != *":$path_entry:"* ]]; then
+		export PATH="$path_entry:$PATH"
+	fi
+	if [[ -n ${ENV_FILE:-} ]]; then
+		echo "export PATH=\"$path_entry:\$PATH\"" >>"$ENV_FILE"
+	fi
+	if [[ -n ${GITHUB_PATH:-} ]]; then
+		echo "$path_entry" >>"$GITHUB_PATH"
+	fi
+	if [[ ${PERSIST_TO_BASHRC:-false} == "true" ]]; then
+		mkdir -p "$HOME"
+		touch "$HOME/.bashrc"
+		if ! grep -F "export PATH=\"${bashrc_path_entry}:\$PATH\"" "$HOME/.bashrc" >/dev/null 2>&1; then
+			echo "export PATH=\"${bashrc_path_entry}:\$PATH\"" >>"$HOME/.bashrc"
+		fi
+	fi
 }
 
-STRICT_MODE="${STRICT_MODE:-false}"
-INSTALL_PREFIX="${INSTALL_PREFIX:-/usr/local/bin}"
-ENV_FILE="${ENV_FILE:-}"
+run_step() {
+	local description="$1"
+	shift
 
-REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+	log "$description"
+	if "$@"; then
+		return 0
+	fi
 
-SHELLCHECK_VERSION="0.10.0"
-GO_VERSION="1.23.5"
-SHFMT_VERSION="3.12.0"
-ACTIONLINT_VERSION="1.7.5"
-PRETTIER_VERSION="3.4.2"
-BATS_CORE_VERSION="1.12.0"
-
-fail() {
-  log "ERROR: $1"
-  if [ "$STRICT_MODE" = "true" ]; then
-    exit 1
-  fi
+	fail "$description failed"
+	if [[ $STRICT_MODE == "true" ]]; then
+		return 1
+	fi
+	return 0
 }
 
-command_exists() {
-  command -v "$1" >/dev/null 2>&1
+install_mise_tools() {
+	(
+		cd "$REPO_ROOT"
+		mise install
+	)
 }
 
-ensure_path() {
-  mkdir -p "$INSTALL_PREFIX"
-  if [[ ":$PATH:" != *":$INSTALL_PREFIX:"* ]]; then
-    export PATH="$INSTALL_PREFIX:$PATH"
-    if [ -n "$ENV_FILE" ]; then
-      echo "export PATH=\"$INSTALL_PREFIX:\$PATH\"" >>"$ENV_FILE"
-    fi
-  fi
-}
+trust_mise_config() {
+	if [[ ! -f "$REPO_ROOT/.mise.toml" ]]; then
+		return 0
+	fi
 
-use_sudo() {
-  if [ "$(id -u)" -eq 0 ]; then
-    echo ""
-  elif command_exists sudo; then
-    echo "sudo"
-  else
-    echo ""
-  fi
-}
-
-download_file() {
-  local url="$1"
-  local destination="$2"
-
-  if command_exists curl; then
-    curl -fsSL "$url" -o "$destination"
-  elif command_exists wget; then
-    wget -qO "$destination" "$url"
-  else
-    fail "curl or wget is required to download $url"
-    return 1
-  fi
-}
-
-install_packages() {
-  local packages=("$@")
-  local sudo_cmd
-
-  if ! command_exists apt-get; then
-    fail "apt-get is not available to install ${packages[*]}"
-    return 1
-  fi
-
-  sudo_cmd=$(use_sudo)
-  if ! $sudo_cmd apt-get update -qq; then
-    fail "apt-get update failed"
-    return 1
-  fi
-
-  if ! $sudo_cmd apt-get install -y "${packages[@]}"; then
-    fail "apt-get install failed for ${packages[*]}"
-    return 1
-  fi
-}
-
-detect_arch() {
-  local arch
-  arch=$(uname -m)
-  case "$arch" in
-  x86_64)
-    GO_ARCH="amd64"
-    SHELLCHECK_ARCH="x86_64"
-    ;;
-  aarch64 | arm64)
-    GO_ARCH="arm64"
-    SHELLCHECK_ARCH="aarch64"
-    ;;
-  *)
-    fail "Unsupported architecture: $arch"
-    return 1
-    ;;
-  esac
-}
-
-install_shellcheck() {
-  if command_exists shellcheck; then
-    log "shellcheck already installed: $(shellcheck --version | head -2 | tail -1)"
-    return 0
-  fi
-
-  log "Installing shellcheck..."
-  if install_packages shellcheck; then
-    log "shellcheck installed successfully via apt-get"
-    return 0
-  fi
-
-  if [ -z "${SHELLCHECK_ARCH:-}" ]; then
-    fail "shellcheck architecture not available"
-    return 1
-  fi
-
-  local temp_dir
-  temp_dir=$(mktemp -d)
-  trap 'rm -rf "$temp_dir"' EXIT
-
-  local archive="shellcheck-v${SHELLCHECK_VERSION}.linux.${SHELLCHECK_ARCH}.tar.xz"
-  local url="https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/${archive}"
-
-  if download_file "$url" "$temp_dir/shellcheck.tar.xz"; then
-    if tar -xJf "$temp_dir/shellcheck.tar.xz" -C "$temp_dir"; then
-      if [ -f "$temp_dir/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" ]; then
-        cp "$temp_dir/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" "$INSTALL_PREFIX/shellcheck"
-        chmod +x "$INSTALL_PREFIX/shellcheck"
-        log "shellcheck installed successfully from release archive"
-      else
-        fail "shellcheck binary not found after extraction"
-      fi
-    else
-      fail "failed to extract shellcheck archive"
-    fi
-  else
-    fail "failed to download shellcheck archive"
-  fi
-}
-
-install_go() {
-  if command_exists go; then
-    log "Go already installed: $(go version | awk '{print $3}')"
-    return 0
-  fi
-
-  if [ -z "${GO_ARCH:-}" ]; then
-    fail "Go architecture not available"
-    return 1
-  fi
-
-  log "Installing Go ${GO_VERSION}..."
-  local temp_dir
-  temp_dir=$(mktemp -d)
-  trap 'rm -rf "$temp_dir"' EXIT
-
-  local tarball="go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
-  local url="https://go.dev/dl/${tarball}"
-
-  if ! download_file "$url" "$temp_dir/go.tar.gz"; then
-    fail "failed to download Go ${GO_VERSION}"
-    return 1
-  fi
-
-  local go_install_dir=""
-  if [ -n "${GO_INSTALL_DIR:-}" ]; then
-    go_install_dir="$GO_INSTALL_DIR"
-  elif [ -w "/usr/local" ] && [ "$INSTALL_PREFIX" = "/usr/local/bin" ]; then
-    go_install_dir="/usr/local/go"
-  else
-    go_install_dir="$HOME/.local/go"
-  fi
-
-  rm -rf "$go_install_dir"
-  mkdir -p "$go_install_dir"
-
-  if tar -C "$go_install_dir" -xzf "$temp_dir/go.tar.gz" --strip-components=1; then
-    if [[ ":$PATH:" != *":$go_install_dir/bin:"* ]]; then
-      export PATH="$go_install_dir/bin:$PATH"
-      if [ -n "$ENV_FILE" ]; then
-        echo "export PATH=\"$go_install_dir/bin:\$PATH\"" >>"$ENV_FILE"
-      fi
-    fi
-    log "Go ${GO_VERSION} installed successfully"
-  else
-    fail "failed to extract Go"
-  fi
-}
-
-ensure_gopath() {
-  if [ -z "${GOPATH:-}" ]; then
-    export GOPATH="$HOME/go"
-  fi
-  mkdir -p "$GOPATH/bin"
-  if [[ ":$PATH:" != *":$GOPATH/bin:"* ]]; then
-    export PATH="$GOPATH/bin:$PATH"
-    if [ -n "$ENV_FILE" ]; then
-      echo "export PATH=\"$GOPATH/bin:\$PATH\"" >>"$ENV_FILE"
-    fi
-  fi
-}
-
-install_shfmt() {
-  if command_exists shfmt; then
-    log "shfmt already installed: $(shfmt --version)"
-    return 0
-  fi
-
-  if ! command_exists go; then
-    fail "Go is required to install shfmt"
-    return 1
-  fi
-
-  log "Installing shfmt v${SHFMT_VERSION}..."
-  if GOBIN="$INSTALL_PREFIX" go install "mvdan.cc/sh/v3/cmd/shfmt@v${SHFMT_VERSION}"; then
-    log "shfmt v${SHFMT_VERSION} installed successfully"
-  else
-    fail "failed to install shfmt"
-  fi
-}
-
-install_actionlint() {
-  if command_exists actionlint; then
-    log "actionlint already installed: $(actionlint --version | head -1)"
-    return 0
-  fi
-
-  if ! command_exists go; then
-    fail "Go is required to install actionlint"
-    return 1
-  fi
-
-  log "Installing actionlint v${ACTIONLINT_VERSION}..."
-  if GOBIN="$INSTALL_PREFIX" go install "github.com/rhysd/actionlint/cmd/actionlint@v${ACTIONLINT_VERSION}"; then
-    log "actionlint v${ACTIONLINT_VERSION} installed successfully"
-  else
-    fail "failed to install actionlint"
-  fi
-}
-
-install_node() {
-  if command_exists node && command_exists npm; then
-    log "Node.js already installed: $(node --version)"
-    log "npm already installed: $(npm --version)"
-    return 0
-  fi
-
-  log "Installing Node.js and npm..."
-  if install_packages nodejs npm; then
-    log "Node.js and npm installed successfully via apt-get"
-    return 0
-  fi
-
-  if command_exists nvm; then
-    if nvm install --lts; then
-      log "Node.js installed successfully via nvm"
-      return 0
-    fi
-  fi
-
-  fail "Failed to install Node.js and npm"
-}
-
-install_mise() {
-  if command_exists mise; then
-    log "mise already installed: $(mise --version)"
-    return 0
-  fi
-
-  log "Installing mise..."
-  local temp_dir
-  temp_dir=$(mktemp -d)
-  trap 'rm -rf "$temp_dir"' EXIT
-
-  if ! download_file "https://mise.run" "$temp_dir/mise-install.sh"; then
-    fail "failed to download mise installer"
-    return 1
-  fi
-
-  if sh "$temp_dir/mise-install.sh"; then
-    if [ -x "$HOME/.local/bin/mise" ]; then
-      export PATH="$HOME/.local/bin:$PATH"
-    elif [ -x "$HOME/.local/share/mise/bin/mise" ]; then
-      export PATH="$HOME/.local/share/mise/bin:$PATH"
-    fi
-    log "mise installed successfully: $(mise --version)"
-  else
-    fail "failed to install mise"
-  fi
-}
-
-install_prettier() {
-  if command_exists prettier; then
-    log "Prettier already installed: $(prettier --version)"
-    return 0
-  fi
-
-  if ! command_exists mise; then
-    fail "mise is required to install Prettier"
-    return 1
-  fi
-
-  log "Installing Prettier v${PRETTIER_VERSION} via mise..."
-  if MISE_OVERRIDE_CONFIG_FILENAMES=".mise.toml" mise install -C "$REPO_ROOT" "npm:prettier"; then
-    eval "$(MISE_OVERRIDE_CONFIG_FILENAMES=".mise.toml" mise activate -C "$REPO_ROOT" bash)"
-    log "Prettier v${PRETTIER_VERSION} installed successfully via mise"
-  else
-    fail "Failed to install Prettier via mise"
-  fi
-}
-
-install_bats() {
-  install_bats_from_release() {
-    local version="$1"
-    local temp_dir
-    temp_dir=$(mktemp -d)
-
-    local archive_url="https://github.com/bats-core/bats-core/archive/refs/tags/v${version}.tar.gz"
-    local archive_path="${temp_dir}/bats-core.tar.gz"
-    local extracted_dir="${temp_dir}/bats-core-${version}"
-
-    if ! download_file "$archive_url" "$archive_path"; then
-      rm -rf "$temp_dir"
-      return 1
-    fi
-
-    if ! tar -xzf "$archive_path" -C "$temp_dir"; then
-      rm -rf "$temp_dir"
-      return 1
-    fi
-
-    if [ ! -x "${extracted_dir}/install.sh" ]; then
-      rm -rf "$temp_dir"
-      return 1
-    fi
-
-    if ! "${extracted_dir}/install.sh" "$INSTALL_PREFIX"; then
-      rm -rf "$temp_dir"
-      return 1
-    fi
-
-    rm -rf "$temp_dir"
-    return 0
-  }
-
-  if command_exists bats; then
-    log "bats already installed: $(bats --version)"
-    return 0
-  fi
-
-  log "Installing bats..."
-  if command_exists apt-get; then
-    if install_packages bats; then
-      log "bats installed successfully via apt-get"
-    else
-      log "apt-get bats install failed; trying fallback installation from bats-core release"
-    fi
-  elif command_exists brew; then
-    if brew install bats-core; then
-      log "bats-core installed successfully via Homebrew"
-    else
-      log "Homebrew bats-core install failed; trying fallback installation from bats-core release"
-    fi
-  fi
-
-  if ! command_exists bats; then
-    log "Installing bats v${BATS_CORE_VERSION} from GitHub release..."
-    if install_bats_from_release "${BATS_CORE_VERSION}"; then
-      log "bats installed successfully from release archive"
-    else
-      fail "Failed to install bats from release archive"
-      return 1
-    fi
-  fi
-
-  if command_exists bats; then
-    log "bats command is available: $(bats --version)"
-    return 0
-  fi
-
-  fail "bats command is still unavailable after installation attempt"
-  return 1
-}
-
-install_helper_script() {
-  local script_name="$1"
-  local dest_name="$2"
-  local source_path="$REPO_ROOT/scripts/${script_name}.sh"
-  local dest_path="$INSTALL_PREFIX/$dest_name"
-
-  if [ -x "$dest_path" ]; then
-    log "$dest_name already installed"
-    return 0
-  fi
-
-  if [ -f "$source_path" ]; then
-    cp "$source_path" "$dest_path"
-    chmod +x "$dest_path"
-    log "$dest_name installed"
-  else
-    fail "$source_path not found"
-  fi
+	(
+		cd "$REPO_ROOT"
+		mise trust --yes "$REPO_ROOT/.mise.toml"
+	)
 }
 
 main() {
-  log "Starting tool installation"
-  ensure_path
+	export MISE_YES=1
+	export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:+${MISE_TRUSTED_CONFIG_PATHS}:}${REPO_ROOT}"
 
-  if ! detect_arch; then
-    return 0
-  fi
+	run_step "Installing mise..." bash "$ORCHESTRATOR_DIR/installers/mise.sh"
 
-  install_shellcheck
-  install_go
-  ensure_gopath
-  install_shfmt
-  install_actionlint
-  install_node
-  install_mise
-  install_prettier
-  install_bats
+	local mise_bin="$HOME/.local/bin"
+	append_path "$mise_bin"
 
-  install_helper_script "lint-shell" "lint-shell"
-  install_helper_script "lint-docs" "lint-docs"
+	run_step "Trusting mise config..." trust_mise_config
 
-  log "Tool installation completed"
+	run_step "Installing tools via mise..." install_mise_tools
+
+	local shims_dir="$HOME/.local/share/mise/shims"
+	append_path "$shims_dir"
+
+	run_step "Installing helper scripts..." bash "$ORCHESTRATOR_DIR/installers/helper-scripts.sh"
+
+	log "Tool installation completed"
 }
 
 main "$@"

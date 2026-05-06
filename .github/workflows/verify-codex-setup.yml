@@ -7,16 +7,11 @@ jobs:
   verify-codex-setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Run codex-setup.sh
         run: bash .codex/hooks/codex-setup.sh
 
       - name: Verify installed tools
         run: |
-          go version
-          shellcheck --version
-          shfmt --version
-          actionlint --version
-          node --version
-          prettier --version
+          qlty --version
