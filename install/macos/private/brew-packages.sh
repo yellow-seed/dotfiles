@@ -60,6 +60,8 @@ function install_packages() {
     "chatgpt"
     "codex"
     "codex-app"
+    "copilot-cli"
+    "cursor-cli"
     "discord"
     "firefox"
     "gcloud-cli"
