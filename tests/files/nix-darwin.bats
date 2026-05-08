@@ -23,32 +23,32 @@
 }
 
 @test "flake defines Apple Silicon darwin configuration" {
-  run grep -Eq '^[[:space:]]*"\$\{defaultHost\}" = mkDarwinSystem "aarch64-darwin";$' install/macos/nix/flake.nix
+  run grep -Eq '^[[:space:]]*\$\{defaultHost\} = mkDarwinSystem "aarch64-darwin";$' install/macos/nix/flake.nix
   [ "$status" -eq 0 ]
 }
 
 @test "flake defines Intel darwin configuration" {
-  run grep -Eq '^[[:space:]]*"\$\{intelHost\}" = mkDarwinSystem "x86_64-darwin";$' install/macos/nix/flake.nix
+  run grep -Eq '^[[:space:]]*\$\{intelHost\} = mkDarwinSystem "x86_64-darwin";$' install/macos/nix/flake.nix
   [ "$status" -eq 0 ]
 }
 
 @test "flake checks follow system-keyed output schema" {
-  run grep -Eq '^[[:space:]]*aarch64-darwin\.default = self\.darwinConfigurations\."\$\{defaultHost\}"\.system;$' install/macos/nix/flake.nix
+  run grep -Eq '^[[:space:]]*aarch64-darwin\.default = self\.darwinConfigurations\.\$\{defaultHost\}\.system;$' install/macos/nix/flake.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module configures required stateVersion" {
-  run grep -Eq '^[[:space:]]*system\.stateVersion = 5;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*stateVersion = 5;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module disables nix when using Determinate installer" {
-  run grep -Eq '^[[:space:]]*nix\.enable = false;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*enable = false;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module applies nix settings only when nix-darwin manages nix" {
-  run grep -Eq '^[[:space:]]*nix\.settings = lib\.mkIf config\.nix\.enable \{$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*settings = lib\.mkIf config\.nix\.enable \{$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
@@ -62,7 +62,7 @@
 }
 
 @test "macOS CI runs nix flake check" {
-  run grep -Eq 'DeterminateSystems/nix-installer-action@main' .github/workflows/ci-macos.yml
+  run grep -Eq 'DeterminateSystems/nix-installer-action@v22' .github/workflows/ci-macos.yml
   [ "$status" -eq 0 ]
   run grep -Eq '^[[:space:]]*run: nix --extra-experimental-features "nix-command flakes" flake check$' .github/workflows/ci-macos.yml
   [ "$status" -eq 0 ]
@@ -71,17 +71,17 @@
 }
 
 @test "darwin module disables startup chime" {
-  run grep -Eq '^[[:space:]]*system\.startup\.chime = false;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*startup\.chime = false;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module hides dock automatically" {
-  run grep -Eq '^[[:space:]]*system\.defaults\.dock\.autohide = true;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*autohide = true;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module keeps only selected persistent dock apps" {
-  run grep -Eq '^[[:space:]]*system\.defaults\.dock\.persistent-apps = \[$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*persistent-apps = \[$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
   run grep -Eq '^[[:space:]]*\{ app = "/System/Applications/Apps\.app"; \}$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
@@ -92,12 +92,27 @@
 }
 
 @test "darwin module keeps recent dock apps" {
-  run grep -Eq '^[[:space:]]*system\.defaults\.dock\.show-recents = true;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*show-recents = true;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module sets macOS standard prompt format" {
   run grep -Eq "^[[:space:]]*programs\\.zsh\\.promptInit = \"PROMPT='%n@%m %1~ %# '\";$" install/macos/nix/darwin/default.nix
+  [ "$status" -eq 0 ]
+}
+
+@test "nix lint CI checks nixfmt, statix, and deadnix" {
+  run grep -Eq 'nixfmt-rfc-style' .github/workflows/ci.yml
+  [ "$status" -eq 0 ]
+  run grep -Eq 'statix' .github/workflows/ci.yml
+  [ "$status" -eq 0 ]
+  run grep -Eq 'deadnix' .github/workflows/ci.yml
+  [ "$status" -eq 0 ]
+}
+
+@test "statix config disables unquoted_uri lint" {
+  [ -f "install/macos/nix/statix.toml" ]
+  run grep -Eq 'unquoted_uri' install/macos/nix/statix.toml
   [ "$status" -eq 0 ]
 }
 

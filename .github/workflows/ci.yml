@@ -51,4 +51,29 @@ jobs:
           bash scripts/install-tools.sh
 
       - name: Run bats tests
-        run: bats tests/*.bats
+        run: bats tests/*.bats tests/files/
+
+  NixLint:
+    name: Nix Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: |
+      github.event_name == 'pull_request' ||
+      contains(toJSON(github.event.commits), 'install/macos/nix')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v22
+
+      - name: Check Nix format (nixfmt)
+        run: nix run nixpkgs#nixfmt-rfc-style -- --check install/macos/nix/flake.nix install/macos/nix/darwin/default.nix
+
+      - name: Lint Nix (statix)
+        run: nix run nixpkgs#statix -- check --config install/macos/nix/statix.toml install/macos/nix
+
+      - name: Check dead Nix code (deadnix)
+        run: nix run nixpkgs#deadnix -- --fail install/macos/nix/flake.nix install/macos/nix/darwin/default.nix

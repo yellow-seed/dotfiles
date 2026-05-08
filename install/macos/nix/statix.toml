@@ -1,0 +1,5 @@
+# statix configuration
+# unquoted_uri conflicts with nixfmt-rfc-style, which prefers quoted strings
+disabled = [
+  "unquoted_uri",
+]

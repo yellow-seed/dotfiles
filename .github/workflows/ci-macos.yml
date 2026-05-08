@@ -1,0 +1,42 @@
+name: CI (macOS)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "install/macos/nix/**"
+  pull_request:
+    branches:
+      [
+        main,
+        feat/*,
+        fix/*,
+        docs/*,
+        style/*,
+        refactor/*,
+        perf/*,
+        test/*,
+        chore/*,
+        copilot/*,
+        claude/*,
+      ]
+    paths:
+      - "install/macos/nix/**"
+
+jobs:
+  FlakeCheck:
+    name: nix flake check
+    runs-on: macos-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v22
+
+      - name: Run nix flake check
+        run: nix --extra-experimental-features "nix-command flakes" flake check
+        working-directory: install/macos/nix
