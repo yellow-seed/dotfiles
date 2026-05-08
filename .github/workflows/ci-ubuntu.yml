@@ -46,6 +46,6 @@ jobs:
 
       - name: Run bats tests
         if: steps.check-tests.outputs.has_tests == 'true'
-        uses: bats-core/bats-action@v1.11.0
+        uses: bats-core/bats-action@4.0.0
         with:
           bats-args: install/ubuntu/*.bats
