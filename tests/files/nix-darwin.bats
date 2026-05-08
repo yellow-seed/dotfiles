@@ -62,7 +62,7 @@
 }
 
 @test "macOS CI runs nix flake check" {
-  run grep -Eq 'DeterminateSystems/nix-installer-action@main' .github/workflows/ci-macos.yml
+  run grep -Eq 'DeterminateSystems/nix-installer-action@v22' .github/workflows/ci-macos.yml
   [ "$status" -eq 0 ]
   run grep -Eq '^[[:space:]]*run: nix --extra-experimental-features "nix-command flakes" flake check$' .github/workflows/ci-macos.yml
   [ "$status" -eq 0 ]
