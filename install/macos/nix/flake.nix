@@ -20,13 +20,12 @@
       baseHost = "dotfiles";
       defaultHost = baseHost;
       intelHost = "${baseHost}-intel";
-      mkDarwinSystem = system:
+      mkDarwinSystem =
+        system:
         nix-darwin.lib.darwinSystem {
           modules = [
             ./darwin/default.nix
-            {
-              nixpkgs.hostPlatform = system;
-            }
+            { nixpkgs.hostPlatform = system; }
           ];
         };
     in
