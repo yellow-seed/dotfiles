@@ -13,7 +13,7 @@
 }
 
 @test "flake defines nix-darwin input" {
-  run grep -Eq '^[[:space:]]*url = "github:LnL7/nix-darwin";$' install/macos/nix/flake.nix
+  run grep -Eq '^[[:space:]]*url = github:LnL7/nix-darwin;$' install/macos/nix/flake.nix
   [ "$status" -eq 0 ]
 }
 
