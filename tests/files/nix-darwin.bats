@@ -13,7 +13,7 @@
 }
 
 @test "flake defines nix-darwin input" {
-  run grep -Eq '^[[:space:]]*url = github:LnL7/nix-darwin;$' install/macos/nix/flake.nix
+  run grep -Eq '^[[:space:]]*url = "github:LnL7/nix-darwin";$' install/macos/nix/flake.nix
   [ "$status" -eq 0 ]
 }
 
@@ -107,6 +107,12 @@
   run grep -Eq 'statix' .github/workflows/ci.yml
   [ "$status" -eq 0 ]
   run grep -Eq 'deadnix' .github/workflows/ci.yml
+  [ "$status" -eq 0 ]
+}
+
+@test "statix config disables unquoted_uri lint" {
+  [ -f "install/macos/nix/statix.toml" ]
+  run grep -Eq 'unquoted_uri' install/macos/nix/statix.toml
   [ "$status" -eq 0 ]
 }
 
