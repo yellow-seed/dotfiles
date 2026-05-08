@@ -1,0 +1,40 @@
+name: CI (Common)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "install/common/**"
+  pull_request:
+    branches:
+      [
+        main,
+        feat/*,
+        fix/*,
+        docs/*,
+        style/*,
+        refactor/*,
+        perf/*,
+        test/*,
+        chore/*,
+        copilot/*,
+        claude/*,
+      ]
+    paths:
+      - "install/common/**"
+
+jobs:
+  Test:
+    name: bats Test (Common)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Run bats tests
+        uses: bats-core/bats-action@v1.11.0
+        with:
+          bats-args: install/common/*.bats

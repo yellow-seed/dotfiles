@@ -46,18 +46,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Install tools
-        run: |
-          bash scripts/install-tools.sh
-
       - name: Run bats tests
-        run: bats tests/*.bats tests/files/
+        uses: bats-core/bats-action@v1.11.0
+        with:
+          bats-args: tests/*.bats tests/files/
 
   NixLint:
-    name: Nix Lint
+    name: NixLint (install/macos)
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # ubuntu-latest is more cost-effective than macos-latest for Nix operations
     if: |
       github.event_name == 'pull_request' ||
       contains(toJSON(github.event.commits), 'install/macos/nix')
