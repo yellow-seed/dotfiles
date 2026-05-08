@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'install/macos/nix/**'
+      - "install/macos/nix/**"
   pull_request:
     branches:
       [
@@ -21,7 +21,7 @@ on:
         claude/*,
       ]
     paths:
-      - 'install/macos/nix/**'
+      - "install/macos/nix/**"
 
 jobs:
   FlakeCheck:
