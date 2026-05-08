@@ -1,0 +1,79 @@
+name: CI (Windows)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "install/windows/**"
+  pull_request:
+    branches:
+      [
+        main,
+        feat/*,
+        fix/*,
+        docs/*,
+        style/*,
+        refactor/*,
+        perf/*,
+        test/*,
+        chore/*,
+        copilot/*,
+        claude/*,
+      ]
+    paths:
+      - "install/windows/**"
+
+jobs:
+  PesterTest:
+    name: Pester Test
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          Install-Module -Name Pester -MinimumVersion 5.0.0 -Force -Scope CurrentUser -SkipPublisherCheck
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          .\install\windows\run_unit_test.ps1
+
+  PSScriptAnalyzer:
+    name: PSScriptAnalyzer
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -SkipPublisherCheck
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $scripts = @(
+            "install/windows/01-winget.ps1",
+            "install/windows/02-dev-tools.ps1",
+            "install/windows/03-packages.ps1",
+            "install/windows/run_unit_test.ps1",
+            "install/windows/setup.ps1"
+          )
+          $results = $scripts | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Settings PSGallery }
+          if ($results) {
+            $results | Format-Table -AutoSize
+            Write-Error "PSScriptAnalyzer found issues"
+            exit 1
+          }

@@ -1,0 +1,51 @@
+name: CI (Ubuntu)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "install/ubuntu/**"
+  pull_request:
+    branches:
+      [
+        main,
+        feat/*,
+        fix/*,
+        docs/*,
+        style/*,
+        refactor/*,
+        perf/*,
+        test/*,
+        chore/*,
+        copilot/*,
+        claude/*,
+      ]
+    paths:
+      - "install/ubuntu/**"
+
+jobs:
+  Test:
+    name: bats Test (Ubuntu)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Check for bats tests
+        id: check-tests
+        run: |
+          shopt -s nullglob
+          files=(install/ubuntu/*.bats)
+          echo "has_tests=$([ ${#files[@]} -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          if [ ${#files[@]} -gt 0 ]; then
+            echo "Found ${#files[@]} test file(s): ${files[*]}"
+          fi
+
+      - name: Run bats tests
+        if: steps.check-tests.outputs.has_tests == 'true'
+        uses: bats-core/bats-action@4.0.0
+        with:
+          bats-args: install/ubuntu/*.bats
