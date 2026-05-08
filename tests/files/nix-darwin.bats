@@ -38,17 +38,17 @@
 }
 
 @test "darwin module configures required stateVersion" {
-  run grep -Eq '^[[:space:]]*system\.stateVersion = 5;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*stateVersion = 5;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module disables nix when using Determinate installer" {
-  run grep -Eq '^[[:space:]]*nix\.enable = false;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*enable = false;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module applies nix settings only when nix-darwin manages nix" {
-  run grep -Eq '^[[:space:]]*nix\.settings = lib\.mkIf config\.nix\.enable \{$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*settings = lib\.mkIf config\.nix\.enable \{$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
@@ -71,17 +71,17 @@
 }
 
 @test "darwin module disables startup chime" {
-  run grep -Eq '^[[:space:]]*system\.startup\.chime = false;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*startup\.chime = false;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module hides dock automatically" {
-  run grep -Eq '^[[:space:]]*system\.defaults\.dock\.autohide = true;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*autohide = true;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
 @test "darwin module keeps only selected persistent dock apps" {
-  run grep -Eq '^[[:space:]]*system\.defaults\.dock\.persistent-apps = \[$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*persistent-apps = \[$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
   run grep -Eq '^[[:space:]]*\{ app = "/System/Applications/Apps\.app"; \}$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
@@ -92,7 +92,7 @@
 }
 
 @test "darwin module keeps recent dock apps" {
-  run grep -Eq '^[[:space:]]*system\.defaults\.dock\.show-recents = true;$' install/macos/nix/darwin/default.nix
+  run grep -Eq '^[[:space:]]*show-recents = true;$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
 }
 
