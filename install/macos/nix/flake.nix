@@ -31,13 +31,13 @@
     in
     {
       darwinConfigurations = {
-        "${defaultHost}" = mkDarwinSystem "aarch64-darwin";
-        "${intelHost}" = mkDarwinSystem "x86_64-darwin";
+        ${defaultHost} = mkDarwinSystem "aarch64-darwin";
+        ${intelHost} = mkDarwinSystem "x86_64-darwin";
       };
 
       checks = {
-        aarch64-darwin.default = self.darwinConfigurations."${defaultHost}".system;
-        x86_64-darwin.default = self.darwinConfigurations."${intelHost}".system;
+        aarch64-darwin.default = self.darwinConfigurations.${defaultHost}.system;
+        x86_64-darwin.default = self.darwinConfigurations.${intelHost}.system;
       };
     };
 }
