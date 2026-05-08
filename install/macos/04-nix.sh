@@ -6,6 +6,7 @@ if [ "${DOTFILES_DEBUG:-}" ]; then
 fi
 
 DRY_RUN="${DRY_RUN:-false}"
+DOTFILES_PROFILE="${DOTFILES_PROFILE:-}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NIX_DIR="${SCRIPT_DIR}/nix"
@@ -42,7 +43,7 @@ function is_darwin_rebuild_installed() {
 }
 
 function get_flake_target() {
-  if [[ "$(uname -m)" == "arm64" ]]; then
+  if [[  "$(uname -m)" == "arm64" ]]; then
     echo ".#dotfiles"
   else
     echo ".#dotfiles-intel"
@@ -125,6 +126,11 @@ function apply_nix_darwin() {
 }
 
 function main() {
+  if [[ "${DOTFILES_PROFILE}" != "private" ]]; then
+    echo "Skipping nix-darwin setup (profile is '${DOTFILES_PROFILE:-not set}', not 'private')"
+    return 0
+  fi
+
   validate_nix_dir
   install_nix
   check_flake
