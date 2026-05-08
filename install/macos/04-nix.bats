@@ -59,7 +59,7 @@
 }
 
 @test "04-nix.sh skips when DOTFILES_PROFILE is not set" {
-  run bash install/macos/04-nix.sh
+  DOTFILES_PROFILE= run bash install/macos/04-nix.sh
   [ "$status" -eq 0 ]
   [[ "$output" == *"Skipping nix-darwin"* ]]
 }

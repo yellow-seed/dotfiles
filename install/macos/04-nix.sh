@@ -127,7 +127,7 @@ function apply_nix_darwin() {
 
 function main() {
   if [[ "${DOTFILES_PROFILE}" != "private" ]]; then
-    echo "Skipping nix-darwin setup (profile is '${DOTFILES_PROFILE:-not set}', not 'private')"
+    skip_log "Skipping nix-darwin setup (profile is '${DOTFILES_PROFILE:-not set}', not 'private')"
     return 0
   fi
 

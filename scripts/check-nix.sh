@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run the same Nix lint checks as CI (nixfmt, statix, deadnix).
 # Requires Nix with flakes enabled.
-set -euo pipefail
+set -Eeuo pipefail
 
 NIX_FILES="install/macos/nix/flake.nix install/macos/nix/darwin/default.nix"
 NIX_DIR="install/macos/nix"
