@@ -101,6 +101,15 @@
   [ "$status" -eq 0 ]
 }
 
+@test "nix lint CI checks nixfmt, statix, and deadnix" {
+  run grep -Eq 'nixfmt-rfc-style' .github/workflows/ci.yml
+  [ "$status" -eq 0 ]
+  run grep -Eq 'statix' .github/workflows/ci.yml
+  [ "$status" -eq 0 ]
+  run grep -Eq 'deadnix' .github/workflows/ci.yml
+  [ "$status" -eq 0 ]
+}
+
 @test "darwin module disables automatic Japanese conversion" {
   run grep -Eq '^[[:space:]]*"com\.apple\.inputmethod\.Kotoeri" = \{$' install/macos/nix/darwin/default.nix
   [ "$status" -eq 0 ]
