@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install qlty
-        uses: qltysh/qlty-action/install@v1
+        uses: qltysh/qlty-action/install@v2
 
       - name: Run checks
         run: scripts/run-checks.sh
